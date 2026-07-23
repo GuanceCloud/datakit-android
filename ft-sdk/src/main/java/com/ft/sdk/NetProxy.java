@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import android.net.Uri;
+
 import com.ft.sdk.garble.http.EngineFactory;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -8,6 +10,8 @@ import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.StringUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -114,7 +118,7 @@ public class NetProxy {
 
             appendHeaders(parts);
             appendBody(parts);
-            parts.add(quote(httpBuilder.getUrl()));
+            parts.add(quote(maskSensitiveUrl(httpBuilder.getUrl())));
 
             return join(parts);
         }
@@ -160,6 +164,19 @@ public class NetProxy {
         private boolean isMultipartRequest() {
             String contentType = httpBuilder.getHeadParams().get(CONTENT_TYPE);
             return contentType != null && contentType.toLowerCase(Locale.US).startsWith(MULTIPART_FORM_DATA);
+        }
+
+        private String maskSensitiveUrl(String url) {
+            if (Utils.isNullOrEmpty(httpBuilder.getHttpConfig().getDatawayUrl()) || Utils.isNullOrEmpty(url)) {
+                return url;
+            }
+            Uri uri = Uri.parse(url);
+            String token = uri.getQueryParameter("token");
+            if (Utils.isNullOrEmpty(token)) {
+                return url;
+            }
+
+            return url.replace("token=" + token, "token=" + StringUtils.maskHalfCharacter(token));
         }
 
         private String join(List<String> parts) {

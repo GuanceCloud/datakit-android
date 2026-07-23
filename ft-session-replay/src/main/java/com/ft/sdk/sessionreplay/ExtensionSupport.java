@@ -5,22 +5,30 @@ import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 
 import java.util.List;
 
+/**
+ * Provides custom components that extend how Session Replay maps and records views.
+ */
 public interface ExtensionSupport {
 
     /**
-     * Use this method if you want to apply a custom [WireframeMapper] for a specific [View].
+     * Use this method to apply custom mappers for specific Android {@code View} types.
      *
-     * @return the list of [MapperTypeWrapper]
+     * @return the list of mapper wrappers to register
      */
     List<MapperTypeWrapper<?>> getCustomViewMappers();
 
     /**
      * Implement this method if you need to return some specific implementations for the
-     * [OptionSelectorDetector].
+     * {@link OptionSelectorDetector}.
      *
-     * @return a list of custom [OptionSelectorDetector].
+     * @return a list of custom option selector detectors
      */
     List<OptionSelectorDetector> getOptionSelectorDetectors();
 
+    /**
+     * Returns custom drawable color mappers used while resolving view backgrounds.
+     *
+     * @return a list of drawable color mappers to register
+     */
     List<DrawableToColorMapper> getCustomDrawableMapper();
 }

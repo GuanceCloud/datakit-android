@@ -82,6 +82,7 @@ public class ShapeWireframe extends Wireframe {
         if (border != null) {
             json.add("border", border.toJson());
         }
+        appendPermanentId(json);
         json.addProperty("type", type);
         return json;
     }
@@ -108,7 +109,9 @@ public class ShapeWireframe extends Wireframe {
             WireframeClip clip = jsonObject.get("clip") != null ? WireframeClip.fromJsonObject(jsonObject.get("clip").getAsJsonObject()) : null;
             ShapeStyle shapeStyle = jsonObject.get("shapeStyle") != null ? ShapeStyle.fromJsonObject(jsonObject.get("shapeStyle").getAsJsonObject()) : null;
             ShapeBorder border = jsonObject.get("border") != null ? ShapeBorder.fromJsonObject(jsonObject.get("border").getAsJsonObject()) : null;
-            return new ShapeWireframe(id, x, y, width, height, clip, shapeStyle, border);
+            ShapeWireframe wireframe = new ShapeWireframe(id, x, y, width, height, clip, shapeStyle, border);
+            readPermanentId(jsonObject, wireframe);
+            return wireframe;
         } catch (IllegalStateException | NumberFormatException | NullPointerException e) {
             throw new JsonParseException(
                     "Unable to parse json into type ShapeWireframe",
@@ -118,7 +121,9 @@ public class ShapeWireframe extends Wireframe {
     }
 
     public Wireframe setClip(WireframeClip clip) {
-        return new ShapeWireframe(id, x, y, width, height, clip, shapeStyle, border);
+        ShapeWireframe wireframe = new ShapeWireframe(id, x, y, width, height, clip, shapeStyle, border);
+        copyPermanentIdTo(wireframe);
+        return wireframe;
     }
 
     @Override
@@ -131,11 +136,11 @@ public class ShapeWireframe extends Wireframe {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ShapeWireframe that = (ShapeWireframe) o;
-        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(type, that.type);
+        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(type, that.type) && Objects.equals(getPermanentId(), that.getPermanentId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, type);
+        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, type, getPermanentId());
     }
 }

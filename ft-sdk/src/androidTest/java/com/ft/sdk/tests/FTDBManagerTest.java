@@ -144,7 +144,22 @@ public class FTDBManagerTest extends FTBaseTest {
 
         assertEquals(FTDBCachePolicy.get().optRUMCachePolicy(10), 1);
 
-        assertEquals(FTDBCachePolicy.get().optLogCachePolicy(10), 10);
+        assertEquals(FTDBCachePolicy.get().optLogCachePolicy(10), -10);
+    }
+
+    @Test
+    public void rumCachePolicyDeletesLogsFirstWhenSharedLimitReached() throws Exception {
+        stopSyncTask();
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL)
+                .enableLimitWithDbSize(Constants.MINI_DB_SIZE_LIMIT)
+                .setDbCacheDiscard(DBCacheDiscard.DISCARD));
+
+        FTDBManager.get().insertFtOperation(createSyncData(DataType.LOG, "log-uuid", 1L), false);
+        FTDBCachePolicy.get().setCurrentDBSize(Constants.MINI_DB_SIZE_LIMIT);
+
+        assertEquals(1, FTDBManager.get().queryTotalCount(DataType.LOG));
+        assertEquals(1, FTDBCachePolicy.get().optRUMCachePolicy(1));
+        assertEquals(0, FTDBManager.get().queryTotalCount(DataType.LOG));
     }
 
     @Test
@@ -195,6 +210,14 @@ public class FTDBManagerTest extends FTBaseTest {
         values.put("value", "success");
         invokeSyncData(DataType.LOG, LOG_TEST_DATA_1_KB, tags, values);
 
+    }
+
+    private SyncData createSyncData(DataType dataType, String uuid, long time) {
+        SyncData data = new SyncData(dataType);
+        data.setUuid(uuid);
+        data.setTime(time);
+        data.setDataString("test-data");
+        return data;
     }
 
 }

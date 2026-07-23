@@ -1,3 +1,8 @@
+# plugin 1.3.7
+1. Added wildcard support for `ignorePackages`.
+2. Fix an issue where native `.so` symbol files cannot be detected when `autoUploadNativeDebugSymbol` is enabled and the default `nativeLibPath` auto-detection is used with AGP native library intermediate directories.
+
+---
 # plugin 1.3.7-alpha02
 1. Fix an issue where native .so files cannot be generated in the new Android environment.
 
@@ -217,4 +222,3 @@
 ---
 # plugin 1.0.1-alpha12
 1. Add trace feature
-

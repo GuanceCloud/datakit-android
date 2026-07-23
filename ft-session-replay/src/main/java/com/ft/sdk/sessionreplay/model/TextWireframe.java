@@ -101,6 +101,7 @@ public class TextWireframe extends Wireframe {
         if (border != null) {
             json.add("border", border.toJson());
         }
+        appendPermanentId(json);
         json.addProperty("type", type);
         json.addProperty("text", text);
         json.add("textStyle", textStyle.toJson());
@@ -135,7 +136,9 @@ public class TextWireframe extends Wireframe {
             String text = jsonObject.get("text").getAsString();
             TextStyle textStyle = TextStyle.fromJsonObject(jsonObject.get("textStyle").getAsJsonObject());
             TextPosition textPosition = jsonObject.get("textPosition") != null ? TextPosition.fromJsonObject(jsonObject.get("textPosition").getAsJsonObject()) : null;
-            return new TextWireframe(id, x, y, width, height, clip, shapeStyle, border, text, textStyle, textPosition);
+            TextWireframe wireframe = new TextWireframe(id, x, y, width, height, clip, shapeStyle, border, text, textStyle, textPosition);
+            readPermanentId(jsonObject, wireframe);
+            return wireframe;
         } catch (IllegalStateException | NumberFormatException | NullPointerException e) {
             throw new JsonParseException(
                     "Unable to parse json into type TextWireframe",
@@ -216,11 +219,11 @@ public class TextWireframe extends Wireframe {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TextWireframe that = (TextWireframe) o;
-        return id == that.id && x == that.x && y == that.y && width == that.width && height == that.height && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(text, that.text) && Objects.equals(textStyle, that.textStyle) && Objects.equals(textPosition, that.textPosition) && Objects.equals(type, that.type);
+        return id == that.id && x == that.x && y == that.y && width == that.width && height == that.height && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(text, that.text) && Objects.equals(textStyle, that.textStyle) && Objects.equals(textPosition, that.textPosition) && Objects.equals(type, that.type) && Objects.equals(getPermanentId(), that.getPermanentId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, text, textStyle, textPosition, type);
+        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, text, textStyle, textPosition, type, getPermanentId());
     }
 }

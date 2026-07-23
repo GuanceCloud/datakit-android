@@ -2,6 +2,10 @@ package com.ft.sdk.sessionreplay;
 
 import android.app.Activity;
 
+/**
+ * Callback for supplying Android lifecycle state that Session Replay cannot
+ * always discover automatically.
+ */
 public interface SessionReplayInternalCallback {
     /**
      * Retrieves the current activity, allowing clients to pass it when needed.

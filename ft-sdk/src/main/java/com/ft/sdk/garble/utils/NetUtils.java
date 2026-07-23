@@ -221,6 +221,37 @@ public class NetUtils {
         }
     }
 
+    public static Integer getNetworkSignalStrength(NetworkCapabilities capabilities) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && capabilities != null) {
+            int signalStrength = capabilities.getSignalStrength();
+            if (signalStrength != NetworkCapabilities.SIGNAL_STRENGTH_UNSPECIFIED) {
+                return signalStrength;
+            }
+        }
+        return null;
+    }
+
+    public static Boolean isNetworkValidated(NetworkCapabilities capabilities) {
+        if (capabilities != null) {
+            return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+        }
+        return null;
+    }
+
+    public static Integer getNetworkDownlinkKbps(NetworkCapabilities capabilities) {
+        if (capabilities != null && capabilities.getLinkDownstreamBandwidthKbps() > 0) {
+            return capabilities.getLinkDownstreamBandwidthKbps();
+        }
+        return null;
+    }
+
+    public static Integer getNetworkUplinkKbps(NetworkCapabilities capabilities) {
+        if (capabilities != null && capabilities.getLinkUpstreamBandwidthKbps() > 0) {
+            return capabilities.getLinkUpstreamBandwidthKbps();
+        }
+        return null;
+    }
+
     /**
      * Get WI-FI IP address
      *

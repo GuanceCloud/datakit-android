@@ -1,5 +1,8 @@
 package com.ft.sdk.sessionreplay.utils;
 
+/**
+ * Callback used by mappers to report asynchronous resource processing.
+ */
 public interface AsyncJobStatusCallback {
 
     /**

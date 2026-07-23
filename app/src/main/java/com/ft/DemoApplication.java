@@ -1,6 +1,10 @@
 package com.ft;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
+import android.util.Log;
 
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
@@ -27,6 +31,7 @@ import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.TouchPrivacy;
+import com.ft.sdk.sessionreplay.compose.ComposeExtensionSupport;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.WebViewXWireframeMapper;
 import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
@@ -36,6 +41,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -47,6 +55,9 @@ import okhttp3.Request;
  */
 public class DemoApplication extends BaseApplication {
 
+    private static final String TAG = "DemoApplication";
+    private static final ExecutorService FT_INIT_EXECUTOR = Executors.newSingleThreadExecutor();
+
     public DemoApplication() {
         super();
     }
@@ -56,8 +67,8 @@ public class DemoApplication extends BaseApplication {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
             LogUtils.registerInnerLogCacheToFile();
-            initFTSDK(this);
-
+            initFTSDK(DemoApplication.this);
+//            initFTSDKAsync(DemoApplication.this);
             //initOkGo();
 
         }
@@ -85,14 +96,49 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
+        long startTime = SystemClock.elapsedRealtime();
+        Log.i(TAG, "initFTSDK start");
+
+        FTSdk.install(buildFTSDKConfig(context));
+        initFTSDKFeatures();
+
+        Log.i(TAG, "initFTSDK end, cost=" + (SystemClock.elapsedRealtime() - startTime) + "ms");
+
+    }
+
+    static void initFTSDKAsync(Context context) {
+        long startTime = SystemClock.elapsedRealtime();
+        Log.i(TAG, "initFTSDKAsync start");
+
+        final FTSDKConfig ftSDKConfig = buildFTSDKConfig(context);
+        final Handler mainHandler = new Handler(Looper.getMainLooper());
+        FT_INIT_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                FTSdk.install(ftSDKConfig);
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        initFTSDKFeatures();
+                        Log.i(TAG, "initFTSDKAsync end, cost="
+                                + (SystemClock.elapsedRealtime() - startTime) + "ms");
+                    }
+                });
+            }
+        });
+    }
+
+    private static FTSDKConfig buildFTSDKConfig(Context context) {
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//Set whether it's debug
-                .setAutoSync(true)
+                .setAutoSync(false)
                 .setCustomSyncPageSize(10)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
                 .setSyncSleepTime(100)
+                .enableLimitWithCacheSize(31457280)
+                .setEnableDataFilter(true)
                 .setRemoteConfiguration(true)
                 .setRemoteConfigurationCallBack(new FTRemoteConfigManager.FetchResult() {
                     @Override
@@ -128,8 +174,9 @@ public class DemoApplication extends BaseApplication {
 //                        return value;
 //                    }
 //                })
-//                .enableLimitWithDbSize(1024 * 1024)
-//                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
+//                .enableLimitWithCacheSize(1024 * 1024)
+//                .setCacheDiscard(CacheDiscard.DISCARD_OLDEST)
+//                .enableFileDataStore()
 //                .setLineDataModifier(new LineDataModifier() {
 //                    @Override
 //                    public Map<String, Object> modify(String measurement, HashMap<String, Object> data) {
@@ -145,7 +192,7 @@ public class DemoApplication extends BaseApplication {
 //
 //                    }
 //                })
-                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
+                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase(Locale.ROOT)));
 //        try {
 //            URL url = new URL(BuildConfig.PROXY_ADDRESS);
 //            ftSDKConfig.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(url.getHost(), url.getPort())));
@@ -153,13 +200,15 @@ public class DemoApplication extends BaseApplication {
 //        } catch (MalformedURLException ignored) {
 //        }
 
-        FTSdk.install(ftSDKConfig);
+        return ftSDKConfig;
+    }
 
+    private static void initFTSDKFeatures() {
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
-                .setLogCacheLimitCount(1000)
+                .setLogCacheLimitCount(20000)
                 .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD)
                 .setPrintCustomLogToConsole(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR, Status.DEBUG})
@@ -241,13 +290,13 @@ public class DemoApplication extends BaseApplication {
                         .setTextAndInputPrivacy(TextAndInputPrivacy.MASK_SENSITIVE_INPUTS)
                         .enableLinkRUMKeys(new String[]{"wgt_id"})
                         .setImagePrivacy(ImagePrivacy.MASK_NONE)
+                        .addExtensionSupport(new ComposeExtensionSupport())
                         .addExtensionSupport(new MaterialExtensionSupport())
                         .addExtensionSupport(new CustomExtensionSupport()
                                 .addMapper(new MapperTypeWrapper<>(com.tencent.smtt.sdk.WebView.class,
                                         new WebViewXWireframeMapper())))
 
         );
-
     }
 
 }

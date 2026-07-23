@@ -10,6 +10,12 @@ import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.ViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 
+/**
+ * Base class for custom mappers that need common view id, bounds, color, and
+ * drawable helpers.
+ *
+ * @param <T> the view type supported by the mapper
+ */
 public abstract class BaseWireframeMapper<T extends View> implements WireframeMapper<T> {
 
     protected final ViewIdentifierResolver viewIdentifierResolver;
@@ -17,6 +23,14 @@ public abstract class BaseWireframeMapper<T extends View> implements WireframeMa
     protected final ViewBoundsResolver viewBoundsResolver;
     protected final DrawableToColorMapper drawableToColorMapper;
 
+    /**
+     * Creates a base mapper.
+     *
+     * @param viewIdentifierResolver resolver for stable Session Replay view ids
+     * @param colorStringFormatter formatter for wireframe color strings
+     * @param viewBoundsResolver resolver for global view bounds
+     * @param drawableToColorMapper mapper used to extract colors from drawables
+     */
     public BaseWireframeMapper(ViewIdentifierResolver viewIdentifierResolver,
                                ColorStringFormatter colorStringFormatter,
                                ViewBoundsResolver viewBoundsResolver,
@@ -28,14 +42,14 @@ public abstract class BaseWireframeMapper<T extends View> implements WireframeMa
     }
 
     /**
-     * Resolves the [View] unique id to be used in the mapped [MobileSegment.Wireframe].
+     * Resolves the {@link View} unique id to be used in mapped wireframes.
      */
     protected long resolveViewId(View view) {
         return viewIdentifierResolver.resolveViewId(view);
     }
 
     /**
-     * Resolves the [MobileSegment.ShapeStyle] based on the [View] drawables.
+     * Resolves the {@link ShapeStyle} based on the {@link View} drawables.
      */
     protected ShapeStyle resolveShapeStyle(
             Drawable drawable,

@@ -1,3 +1,115 @@
+# agent 1.7.4
+1. Added experimental Android RUM Heatmap support with `display`, `action_position`, and `action_target`; element association requires `ft-session-replay >= 0.1.7`.
+2. Fixed locale-sensitive parsing and improved custom log console fault tolerance.
+
+---
+# agent 1.7.4-beta01
+1. Same as 1.7.4-alpha02
+
+---
+# agent 1.7.4-alpha02
+1. Fixed WebView RUM container association so Session Replay prefers the View currently bound to the WebView slot instead of a stale Native View captured during initialization.
+2. Fixed RUM Heatmap action target generation for Toolbar menu items, Dialog buttons and list rows, RadioGroup selections, and TabHost clicks so actions bind to the actual replay View and include relative click positions when available.
+
+---
+# agent 1.7.4-alpha01
+1. Fixed locale-sensitive string handling under languages such as Turkish, preventing custom log console printing from crashing when log status values such as `info` are normalized.
+2. Improved custom log console printing fault tolerance so null or unexpected log status values and property string conversion failures no longer interrupt log collection.
+3. Replaced default-locale case conversion and formatting in SDK-related paths with locale-stable handling to keep environment names, trace IDs, trace types, filters, and enum parsing consistent across device languages.
+
+---
+# agent 1.7.3
+1. Added `FTSdk.setAutoSync(boolean)` to dynamically enable or disable automatic cached data synchronization after SDK initialization.
+2. Fixed `FTLoggerConfig.setLogLevelFilters` handling so `warn` and `warning` log level filters are treated equivalently.
+3. Fixed native crash and ANR logcat settings so `nativeCrashLogCatSetting` is applied to native crash reports and `anrCrashLogCatSetting` is applied to ANR reports.
+4. Optimized startup cache count initialization and file-backed cache size refresh to avoid blocking the main thread during SDK startup.
+5. Optimized file-backed cache size tracking with persisted incremental metadata, improving cache-limit accuracy and write performance for larger FileStore caches.
+6. Reduced RUM cache-policy lock contention when total cache-size limiting is enabled, improving high-concurrency FileStore write stability.
+7. Improved remote configuration log readability so array fields such as `rumAllowWebViewHost` and `logLevelFilters` print their actual values.
+
+---
+# agent 1.7.3-beta01
+1. same as 1.7.3-alpha01
+
+---
+# agent 1.7.3-alpha01
+1. Added `FTSdk.setAutoSync(boolean)` to dynamically enable or disable automatic cached data synchronization after SDK initialization.
+2. Fixed `FTLoggerConfig.setLogLevelFilters` handling so `warn` and `warning` log level filters are treated equivalently.
+3. Fixed native crash and ANR logcat settings so `nativeCrashLogCatSetting` is applied to native crash reports and `anrCrashLogCatSetting` is applied to ANR reports.
+4. Optimized startup cache count initialization and file-backed cache size refresh to avoid blocking the main thread during SDK startup.
+
+# agent 1.7.2
+1. Added DataKit-compatible data filtering for Logging and RUM data, enabled by default and configurable with `FTSDKConfig.setEnableDataFilter(false)`.
+2. Added `FTSDKConfig.setDataFilters` to configure local filter rules and the remote filter pull interval; filters run after `LineDataModifier` and before local cache writes.
+3. Added generic cache size limit APIs, including `FTSDKConfig.enableLimitWithCacheSize`, `FTSDKConfig.setCacheDiscard`, and `CacheDiscard`; the previous `enableLimitWithDbSize` and `setDbCacheDiscard` APIs remain compatible but are deprecated in favor of the new APIs.
+4. Added file-backed cache support for sync cache and RUM aggregate data, with a migration path for existing cache data.
+5. Removed the hard dependency from `ft-sdk` to `ft-session-replay`, so apps that do not enable Session Replay no longer need to add the `ft-session-replay` dependency.
+6. Added `app_launch_type` to cold-start Action data to distinguish foreground and background launches.
+7. Added real RUM fallback View data for `ApplicationLaunch`, `BackgroundView`, and `RootView`, so startup, background, and RUM events without a foreground View can be associated with a random `view_id`.
+8. Optimized data synchronization to prioritize RUM data and isolate retry/backoff state by data type, reducing cases where log synchronization affects RUM data reporting.
+9. Fixed custom Resource properties potentially overriding the SDK-calculated `duration`, and clamped fallback duration values to be non-negative.
+10. Fixed Session Replay upload retry handling and upload URL validation to avoid repeated uploads to invalid endpoints and apply backoff to retryable failures.
+
+# agent 1.7.2-beta01
+1. Fix data filter polling and file cache migration
+
+# agent 1.7.2-alpha03
+1. Added DataKit-compatible data filtering for Logging and RUM, enabled by default through `FTSDKConfig.setEnableDataFilter`, with local rules via `setDataFilters` and remote filter pulls scheduled by the server `pull_interval` with a 10-second SDK fallback.
+2. Applied data filters after `LineDataModifier` and before local cache writes, and aligned supported filter operators with `in`, `not in`, `match`, and `not match`.
+3. Optimized data synchronization to prioritize RUM data over logs and isolate retry/backoff state by data type, reducing cases where log uploads delay RUM synchronization.
+4. Added real RUM fallback View data for `ApplicationLaunch`, `BackgroundView`, and `RootView` contexts, so startup, background, and orphan RUM events use random View IDs backed by View summary records.
+5. Fixed RUM Resource duration handling so custom Resource properties no longer override SDK-calculated duration values, and invalid fallback durations are clamped to non-negative values.
+6. Fixed Session Replay upload retry handling and upload URL validation so retryable failures back off correctly and invalid upload endpoints do not trigger repeated upload attempts.
+7. Fixed DataKit filter bypass marking so cached rows are rechecked by the current SDK-supported remote filter config before Datakit uploads send `disable_filter=true`.
+
+---
+# agent 1.7.2-alpha02
+1. Replaced remaining JetBrains nullability annotations in core SDK code with AndroidX annotations to keep Android integration signatures consistent and avoid redundant annotation references.
+
+---
+# agent 1.7.2-alpha01
+1. Added opt-in file-backed storage for sync cache and RUM aggregate data, with file cache size enforcement and a shadow-write migration path.
+2. Added generic cache size configuration APIs, including `enableLimitWithCacheSize`, `setCacheDiscard`, and `CacheDiscard`, while keeping the previous DB cache APIs deprecated for compatibility.
+3. Made Session Replay optional for `ft-sdk`, allowing apps to use the core SDK without adding `ft-session-replay` to the classpath.
+4. Added `app_launch_type` to cold-start launch actions to distinguish foreground and background app starts.
+5. Added exponential backoff for ignored `403` and `429` data synchronization responses while preserving the existing cache cleanup behavior.
+
+---
+# agent 1.7.1
+1. Added `view_long_task_rate` to View RUM metrics. The value is calculated from total LongTask duration divided by View duration, and is capped at `1`.
+2. Added `foreground_crash_free_duration` and `background_crash_free_duration` to crash RUM Error metrics, and aligned pre-crash/native crash reporting with foreground/background duration snapshots.
+3. Added Resource network snapshot fields, including `network_available`, `network_validated`, `network_downlink_kbps`, `network_uplink_kbps`, and `network_signal_strength`.
+4. Enabled compression by default for SDK data synchronization. Use `FTSDKConfig.setCompressIntakeRequests(false)` to disable compression when needed.
+5. Corrected dependency version constraints between `ft-sdk` and Session Replay modules to improve integration compatibility checks.
+
+---
+# agent 1.7.1-beta01
+1. fix: correct dependency version constraint with ft-sdk and replay
+2. Enabled compression by default for SDK data synchronization 
+
+---
+# agent 1.7.1-alpha02
+1. fix: correct dependency version constraint with ft-sdk and replay
+
+---
+# agent 1.7.1-alpha01
+1. Added `view_long_task_rate` to View RUM metrics. The value is calculated from total LongTask duration divided by View duration, and is capped at `1`.
+2. Optimized View LongTask summary refresh timing to reduce the chance of stale View data overwriting newer `view_long_task_rate` values.
+3. Added Android test coverage for `view_long_task_rate` calculation and upper-bound behavior.
+4. Added `foreground_crash_free_duration` and `background_crash_free_duration` to crash RUM Error metrics, and aligned pre-crash/native crash reporting with foreground/background duration snapshots.
+5. Added Resource network snapshot fields, including `network_available`, `network_validated`, `network_downlink_kbps`, `network_uplink_kbps`, and `network_signal_strength`.
+
+---
+# agent 1.7.0
+1. Added Session Replay capabilities, including WebView Session Replay, DCloud WebView support, and full-snapshot keyframe support for WebView containers.
+2. Added Session Replay and RUM context association, allowing WebView containers to be linked with the context of loaded HTML content.
+3. Added Session Replay error sampling support and enabled dynamic Session Replay control through remote configuration.
+4. Added image resource upload support for Session Replay, along with parameter passing and synchronization updates for userAgent and appVersion.
+5. Optimized Session Replay initialization, frame completion during sharding, frame generation and consumption, delayed writes, and disk write limits to improve recording and synchronization stability.
+6. Fixed issues involving WebView data loss, handling of invisible WebView states, blank playback caused by writes occurring too early, synchronization failures on lower OkHttp versions, and recording failures caused by bitmap recycling.
+7. Fixed crashes caused by calling certain view methods before layout completion, improving overall stability and compatibility.
+
+---
 # agent 1.7.0-beta01
 1. Same as 1.7.0-alpha41
 

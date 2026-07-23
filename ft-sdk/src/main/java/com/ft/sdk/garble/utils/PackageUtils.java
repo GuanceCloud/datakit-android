@@ -39,10 +39,7 @@ public class PackageUtils {
      * session replay BuildConfig package path
      */
     public static final String PACKAGE_SESSION_REPLAY = "com.ft.sdk.sessionreplay.BuildConfig";
-    /**
-     * session replay material BuildConfig package path
-     */
-    public static final String PACKAGE_SESSION_REPLAY_MTR = "com.ft.sdk.sessionreplay.material.BuildConfig";
+
 
     /**
      * Get version field
@@ -73,11 +70,6 @@ public class PackageUtils {
         return isPackageExist(PACKAGE_SESSION_REPLAY);
     }
 
-    public static boolean isSessionReplayMtr() {
-        return isPackageExist(PACKAGE_SESSION_REPLAY_MTR);
-    }
-
-
     /**
      * Get native library version👌
      *
@@ -96,14 +88,6 @@ public class PackageUtils {
         return getPackVersion(PACKAGE_SESSION_REPLAY);
     }
 
-    /**
-     * Get session replay material library version
-     *
-     * @return
-     */
-    public static String getPackageSessionReplayMtr() {
-        return getPackVersion(PACKAGE_SESSION_REPLAY_MTR);
-    }
 
     /**
      * Whether to depend on okhttp3

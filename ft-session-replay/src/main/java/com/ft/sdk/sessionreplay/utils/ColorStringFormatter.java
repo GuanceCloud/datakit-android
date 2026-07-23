@@ -1,5 +1,8 @@
 package com.ft.sdk.sessionreplay.utils;
 
+/**
+ * Formats Android color integers into Session Replay color strings.
+ */
 public interface ColorStringFormatter {
 
     /**

@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import java.util.Locale;
+
 /**
  * description: Type of data uploaded
  */
@@ -38,7 +40,7 @@ public enum DataType {
     public final static String ERROR_SAMPLED_SUFFIX = "_error_sampled";
 
     public String getValue() {
-        return toString().toLowerCase();
+        return toString().toLowerCase(Locale.ROOT);
     }
 
 }

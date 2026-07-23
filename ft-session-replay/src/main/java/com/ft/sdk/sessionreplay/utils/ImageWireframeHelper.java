@@ -19,6 +19,9 @@ import com.ft.sdk.sessionreplay.resources.DrawableCopier;
 
 import java.util.List;
 
+/**
+ * Helper used by mappers to create image wireframes and uploadable image resources.
+ */
 public interface ImageWireframeHelper {
 
     /**

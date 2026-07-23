@@ -1,3 +1,85 @@
+# replay 0.1.7
+1. Added `Wireframe.getPermanentId()` and `Wireframe.setPermanentId(String)` for experimental Android Heatmap element association; requires `ft-sdk >= 1.7.4`.
+2. Fixed pointer IDs and coordinates for multi-touch and cancelled gestures.
+3. Fixed locale-sensitive `TouchPrivacy` parsing.
+
+---
+# replay 0.1.7-beta01
+1. Same as 0.1.7-alpha01
+
+---
+# replay 0.1.7-alpha01
+1. Added stable `permanentId` metadata to Session Replay Wireframes and exposed `Wireframe.getPermanentId()` and `Wireframe.setPermanentId(String)`, enabling replay elements to be associated with RUM Heatmap Action targets when used with `ft-sdk >= 1.7.4-alpha02`.
+2. Improved touch interaction recording for multi-pointer down/up and cancelled gestures, ensuring pointer IDs and coordinates are recorded for the correct touch.
+3. Fixed locale-sensitive `TouchPrivacy` parsing under languages such as Turkish by using locale-stable case conversion.
+
+---
+# replay 0.1.6
+1. Added Flutter Session Replay external recorder mode so Flutter-side recorders can reuse Session Replay sampling, context updates, and data writing while disabling the native recorder lifecycle.
+2. Fixed a crash when Session Replay handles a `DialogFragment` whose `getDialog()` or owner window is null during fragment resume or pause callbacks.
+
+---
+# replay 0.1.6-beta01
+1. same as 0.1.6-alpha02
+
+---
+# replay 0.1.6-alpha02
+1. Added Flutter Session Replay external recorder mode so Flutter-side recorders can reuse Session Replay sampling, context updates, and data writing while disabling the native recorder lifecycle.
+
+---
+# replay 0.1.6-alpha01
+1. Fixed a crash when Session Replay handles a `DialogFragment` whose `getDialog()` or owner window is null during fragment resume or pause callbacks.
+
+---
+# replay-compose 0.1.5
+1. Fixed Session Replay upload retry handling so retryable data and resource upload failures preserve retry state and use exponential backoff, while invalid upload URL configuration is skipped until a valid endpoint is available.
+2. Replaced remaining JetBrains nullability annotations with AndroidX annotations in Session Replay code to avoid redundant annotation references.
+
+# replay 0.1.5-beta01
+1. Same as 0.1.5-alpha01
+
+---
+# replay 0.1.5-alpha02
+1. Fixed Session Replay upload retry handling so retryable data and resource upload failures preserve retry state and use exponential backoff, while invalid upload URL configuration is skipped until a valid endpoint is available.
+
+---
+# replay 0.1.5-alpha01
+1. Added Flutter Session Replay upload compatibility by supporting Flutter RUM context keys when mapping replay batches to segments.
+2. Fixed Session Replay file reader/writer factory compatibility for plain and encrypted storage implementations.
+3. Replaced remaining JetBrains nullability annotations with AndroidX annotations in Session Replay code to avoid redundant annotation references.
+
+---
+# replay 0.1.4
+1. Removed redundant Kotlin dependencies to simplify the Session Replay dependency graph.
+2. Improved public API documentation for Session Replay configuration, privacy controls, custom mapper extensions, resource upload callbacks, and mapper helper types to make IDE integration and custom extension development clearer.
+
+---
+# replay 0.1.4-beta01
+1. Removed redundant Kotlin dependencies
+
+---
+# replay 0.1.4-alpha03
+1. Improved public API documentation for Session Replay configuration, privacy controls, custom mapper extensions, resource upload callbacks, and mapper helper types to make IDE integration and custom extension development clearer.
+2. Optimized the internal UTF-8 encoding implementation used when writing replay records, keeping the output format unchanged while avoiding a Kotlin charset dependency in Java code.
+
+---
+# replay 0.1.4-alpha02
+1. fix: correct dependency version constraint with ft-sdk and replay
+
+---
+# replay 0.1.4-alpha01
+1. No Changed
+
+---
+# replay 0.1.3
+1. Added WebView Session Replay support, including DCloud WebView support and full-snapshot keyframe support for WebView containers.
+2. Added RUM context association for Session Replay, allowing WebView containers to be linked with the context of loaded HTML content.
+3. Added error sampling support and remote configuration support for Session Replay.
+4. Added image resource upload support and improved metadata handling, including userAgent, appVersion, and forceFullSnapshot.
+5. Optimized frame generation and consumption, frame completion during data sharding, delayed writes for WebView replay data, invisible WebView handling, and disk write limits to improve replay stability and performance.
+6. Fixed issues involving WebView replay data loss, blank replay caused by writes occurring too early, synchronization failures on lower OkHttp versions, recording failures caused by bitmap recycling, null value handling for rumLinkKey, and replay timeout issues when many images are present.
+
+---
 # replay 0.1.3-beta02
 1. Same as 0.1.3-beta01
 

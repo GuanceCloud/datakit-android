@@ -156,8 +156,12 @@ public class SyncData implements Cloneable {
         } else {
             recordData.setUuid(uuid);
         }
-        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), bean.getTags(),
-                bean.getFields(), bean.getTimeNano(), dataType, uuid));
+        String bodyContent = helper.getBodyContent(bean.getMeasurement(), bean.getTags(),
+                bean.getFields(), bean.getTimeNano(), dataType, uuid);
+        if (Utils.isNullOrEmpty(bodyContent)) {
+            return null;
+        }
+        recordData.setDataString(bodyContent);
         return recordData;
     }
 
@@ -176,8 +180,12 @@ public class SyncData implements Cloneable {
         String uuid = Utils.getGUID_16();
         recordData.setTime(bean.getTimeNano());
         recordData.setUuid(uuid);
-        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(),
-                bean.getAllTags(), bean.getAllFields(), bean.getTimeNano(), DataType.LOG, uuid));
+        String bodyContent = helper.getBodyContent(bean.getMeasurement(),
+                bean.getAllTags(), bean.getAllFields(), bean.getTimeNano(), DataType.LOG, uuid);
+        if (Utils.isNullOrEmpty(bodyContent)) {
+            return null;
+        }
+        recordData.setDataString(bodyContent);
         return recordData;
     }
 

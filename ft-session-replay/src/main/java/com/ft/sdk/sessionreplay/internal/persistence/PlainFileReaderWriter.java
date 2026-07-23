@@ -15,7 +15,7 @@ import java.util.Locale;
 /**
  * A plain implementation of FileReaderWriter that handles reading and writing of ByteArray data.
  */
-public class PlainFileReaderWriter implements FileReaderWriter {
+public class PlainFileReaderWriter extends FileReaderWriter {
 
     private static final String TAG = "PlainFileReaderWriter";
     private final InternalLogger internalLogger;

@@ -1,0 +1,286 @@
+@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
+
+/*
+ * Unless explicitly stated otherwise all files in this repository are licensed under the Apache License Version 2.0.
+ * This product includes software developed at Datadog (https://www.datadoghq.com/).
+ * Copyright 2016-Present Datadog, Inc.
+ */
+
+package com.ft.sdk.sessionreplay.compose.internal.utils
+
+import android.graphics.Bitmap
+import android.text.StaticLayout
+import android.view.View
+import androidx.compose.animation.core.AnimationState
+import androidx.compose.runtime.Composition
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.text.MultiParagraph
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.AlignmentField
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.AsyncImagePainterClass
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.BitmapField
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.ChildFieldOfModifierNode
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.CompositionField
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.ContentPainterElementClass
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.ContentPainterModifierClass
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.ContentScaleField
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.GetInnerLayerCoordinatorMethod
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.GetInteropViewMethod
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.HeadFieldOfNodeChain
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.ImageField
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.LayoutField
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.LayoutNodeField
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.NodesFieldOfLayoutNode
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.PainterElementClass
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.PainterField
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.PainterFieldOfAsyncImagePainter
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.PainterFieldOfContentPainterElement
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.PainterFieldOfContentPainterModifier
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.PainterFieldOfPainterNode
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.PainterMethodOfAsync3ImagePainter
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.PainterNodeClass
+import com.ft.sdk.sessionreplay.compose.internal.reflection.ComposeReflection.StaticLayoutField
+import com.ft.sdk.sessionreplay.compose.internal.reflection.getSafe
+
+@Suppress("TooManyFunctions")
+internal class ReflectionUtils {
+
+    fun getComposition(view: View): Composition? {
+        return CompositionField?.getSafe(view) as? Composition
+    }
+
+    fun isBackgroundElement(modifier: Modifier): Boolean {
+        return ComposeReflection.BackgroundElementClass?.isInstance(modifier) == true
+    }
+
+    fun isPaddingElement(modifier: Modifier): Boolean {
+        return ComposeReflection.PaddingElementClass?.isInstance(modifier) == true ||
+            ComposeReflection.PaddingValuesModifierClass?.isInstance(modifier) == true
+    }
+
+    fun isTextStringSimpleElement(modifier: Modifier): Boolean {
+        return ComposeReflection.TextStringSimpleElement?.isInstance(modifier) == true
+    }
+
+    fun isWrappedCompositionClass(composition: Composition): Boolean {
+        return ComposeReflection.WrappedCompositionClass?.isInstance(composition) == true
+    }
+
+    fun isAndroidComposeView(any: Any): Boolean {
+        return ComposeReflection.AndroidComposeViewClass?.isInstance(any) == true
+    }
+
+    fun isAsyncImagePainter(painter: Painter): Boolean {
+        return ComposeReflection.AsyncImagePainterClass?.isInstance(painter) == true
+    }
+
+    fun isDrawBehindElementClass(modifier: Modifier): Boolean {
+        return ComposeReflection.DrawBehindElementClass?.isInstance(modifier) == true
+    }
+
+    fun getOwner(composition: Composition): Any? {
+        return ComposeReflection.OwnerField?.getSafe(composition)
+    }
+
+    fun getSemanticsOwner(any: Any): SemanticsOwner? {
+        return ComposeReflection.SemanticsOwner?.getSafe(any) as? SemanticsOwner
+    }
+
+    fun isGraphicsLayerElement(modifier: Modifier): Boolean {
+        return ComposeReflection.GraphicsLayerElementClass?.isInstance(modifier) == true
+    }
+
+    fun getColorProducerColor(modifier: Modifier): Color? {
+        val colorProducer = ComposeReflection.ColorProducerField?.getSafe(modifier)
+        return if (colorProducer is Function0<*>) {
+            colorProducer.invoke() as? Color
+        } else {
+            null
+        }
+    }
+
+    fun getTextStringSimpleElementOverflow(modifier: Modifier): Any? {
+        return ComposeReflection.TextStringSimpleElementOverflowField?.getSafe(modifier)
+    }
+
+    fun getPlaceable(semanticsNode: SemanticsNode): Placeable? {
+        val layoutNode = LayoutNodeField?.getSafe(semanticsNode)
+        val innerLayerCoordinator = layoutNode?.let { GetInnerLayerCoordinatorMethod?.invoke(it) }
+        return innerLayerCoordinator as? Placeable
+    }
+
+    fun getTopPadding(modifier: Modifier): Float {
+        return resolvePaddingField(modifier, ComposeReflection.TopField)
+    }
+
+    fun getStartPadding(modifier: Modifier): Float {
+        return resolvePaddingField(modifier, ComposeReflection.StartField)
+    }
+
+    fun getBottomPadding(modifier: Modifier): Float {
+        return resolvePaddingField(modifier, ComposeReflection.BottomField)
+    }
+
+    fun getEndPadding(modifier: Modifier): Float {
+        return resolvePaddingField(modifier, ComposeReflection.EndField)
+    }
+
+    fun getColor(modifier: Modifier): Long? {
+        // Session Replay currently resolves Compose backgrounds as a single solid color.
+        // Brush-based backgrounds (for example linear gradients) are not supported here.
+        val colorValue = ComposeReflection.ColorField?.getSafe(modifier)
+        return when (colorValue) {
+            is Long -> colorValue
+            else -> ComposeReflection.ComposeColorValueField?.getSafe(colorValue) as? Long
+        }
+    }
+
+    fun getShape(modifier: Modifier): Shape? {
+        return ComposeReflection.ShapeField?.getSafe(modifier) as? Shape
+    }
+
+    fun getClipShape(modifier: Modifier): Shape? {
+        return ComposeReflection.ClipShapeField?.getSafe(modifier) as? Shape
+    }
+
+    private fun resolvePaddingField(modifier: Modifier, field: java.lang.reflect.Field?): Float {
+        val directValue = field?.getSafe(modifier) as? Float
+        if (directValue != null) {
+            return directValue
+        }
+        val paddingValues = ComposeReflection.PaddingValuesField?.getSafe(modifier)
+        return field?.getSafe(paddingValues) as? Float ?: 0.0f
+    }
+
+    fun getBitmapInVectorPainter(vectorPainter: VectorPainter): Bitmap? {
+        val vector = ComposeReflection.VectorField?.getSafe(vectorPainter)
+        val cacheDrawScope = ComposeReflection.CacheDrawScopeField?.getSafe(vector)
+        val mCachedImage = ComposeReflection.CachedImageField?.getSafe(cacheDrawScope)
+        return mCachedImage?.let {
+            BitmapField?.getSafe(it) as? Bitmap
+        }
+    }
+
+    fun getBitmapInBitmapPainter(bitmapPainter: BitmapPainter): Bitmap? {
+        return ImageField?.getSafe(bitmapPainter)?.let { image ->
+            BitmapField?.getSafe(image) as? Bitmap
+        }
+    }
+
+    fun getCoil3AsyncImagePainter(semanticsNode: SemanticsNode): Painter? {
+        // Check if Coil3 ContentPainterNode is present first to optimize the performance
+        // by skipping the node chain iteration
+        if (PainterNodeClass == null) return null
+
+        val layoutNode = LayoutNodeField?.getSafe(semanticsNode)
+        val nodeChain = NodesFieldOfLayoutNode?.getSafe(layoutNode)
+        val headNode = HeadFieldOfNodeChain?.getSafe(nodeChain) as? Modifier.Node
+        var currentNode = headNode
+        var painterNode: Modifier.Node? = null
+        // Iterate NodeChain to find Coil3 `ContentPainterNode`
+        while (currentNode != null) {
+            if (currentNode::class.java == PainterNodeClass) {
+                painterNode = currentNode
+                break
+            }
+            currentNode = ChildFieldOfModifierNode?.getSafe(currentNode) as? Modifier.Node
+        }
+        val asyncImagePainter = PainterFieldOfPainterNode?.getSafe(painterNode)
+        val painter = asyncImagePainter?.let { PainterMethodOfAsync3ImagePainter?.invoke(it) }
+        return painter as? Painter
+    }
+
+    fun getLocalImagePainter(semanticsNode: SemanticsNode): Painter? {
+        val modifier = semanticsNode.layoutInfo.getModifierInfo().firstOrNull {
+            PainterElementClass?.isInstance(it.modifier) == true
+        }?.modifier
+        return modifier?.let { PainterField?.getSafe(it) as? Painter }
+    }
+
+    fun getContentScale(semanticsNode: SemanticsNode): ContentScale? {
+        val modifier = semanticsNode.layoutInfo.getModifierInfo().firstOrNull {
+            PainterElementClass?.isInstance(it.modifier) == true
+        }?.modifier
+        return modifier?.let { ContentScaleField?.getSafe(it) as? ContentScale }
+    }
+
+    fun getAlignment(semanticsNode: SemanticsNode): Alignment? {
+        val modifier = semanticsNode.layoutInfo.getModifierInfo().firstOrNull {
+            PainterElementClass?.isInstance(it.modifier) == true
+        }?.modifier
+        return modifier?.let { AlignmentField?.getSafe(it) as? Alignment }
+    }
+
+    fun getAsyncImagePainter(semanticsNode: SemanticsNode): Painter? {
+        // Check if Coil AsyncImagePainter is present first to optimize the performance
+        // by skipping the modifier iteration
+        if (AsyncImagePainterClass == null) return null
+
+        val asyncPainter = semanticsNode.layoutInfo.getModifierInfo().firstNotNullOfOrNull {
+            if (ContentPainterModifierClass?.isInstance(it.modifier) == true) {
+                PainterFieldOfContentPainterModifier?.getSafe(it.modifier)
+            } else if (ContentPainterElementClass?.isInstance(it.modifier) == true) {
+                PainterFieldOfContentPainterElement?.getSafe(it.modifier)
+            } else {
+                null
+            }
+        }
+        return PainterFieldOfAsyncImagePainter?.getSafe(asyncPainter) as? Painter
+    }
+
+    fun getNestedPainter(painter: Painter): Painter? {
+        return PainterFieldOfAsyncImagePainter?.getSafe(painter) as? Painter
+    }
+
+    fun getMultiParagraphCapturedText(multiParagraph: MultiParagraph): String? {
+        val infoList = ComposeReflection.ParagraphInfoListField?.getSafe(multiParagraph) as? List<*>
+        val paragraphInfo = infoList?.firstOrNull()
+        val paragraph = ComposeReflection.ParagraphField?.getSafe(paragraphInfo)
+        val layout = LayoutField?.getSafe(paragraph)
+        val staticLayout = StaticLayoutField?.getSafe(layout) as? StaticLayout
+        return staticLayout?.text?.toString()
+    }
+
+    fun getInteropView(semanticsNode: SemanticsNode): View? {
+        return GetInteropViewMethod?.invoke(semanticsNode.layoutInfo) as? View
+    }
+
+    fun getOnDraw(modifier: Modifier): Any? {
+        return ComposeReflection.OnDrawField?.getSafe(modifier)
+    }
+
+    fun getBoxColor(onDrawInstance: Any): AnimationState<*, *>? {
+        return ComposeReflection.BoxColorField?.getSafe(onDrawInstance) as? AnimationState<*, *>
+    }
+
+    fun getRadioColor(onDrawInstance: Any): AnimationState<*, *>? {
+        return ComposeReflection.RadioColorField?.getSafe(onDrawInstance) as? AnimationState<*, *>
+    }
+
+    fun getCheckColor(onDrawInstance: Any): AnimationState<*, *>? {
+        return ComposeReflection.CheckColorField?.getSafe(onDrawInstance) as? AnimationState<*, *>
+    }
+
+    fun getBorderColor(onDrawInstance: Any): AnimationState<*, *>? {
+        return ComposeReflection.BorderColorField?.getSafe(onDrawInstance) as? AnimationState<*, *>
+    }
+
+    fun getCheckCache(onDrawInstance: Any): Any? {
+        return ComposeReflection.CheckCacheField?.getSafe(onDrawInstance)
+    }
+
+    fun getCheckPath(checkCache: Any): Path? {
+        return ComposeReflection.CheckPathField?.getSafe(checkCache) as? Path
+    }
+}

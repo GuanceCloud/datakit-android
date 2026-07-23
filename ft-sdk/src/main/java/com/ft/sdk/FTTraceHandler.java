@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * author: huangDianHua
@@ -90,7 +91,7 @@ public class FTTraceHandler extends FTTraceInterceptor.TraceRUMLinkable {
         if (config.getTraceType() == TraceType.ZIPKIN_MULTI_HEADER
                 || config.getTraceType() == TraceType.ZIPKIN_SINGLE_HEADER
                 || config.getTraceType() == TraceType.JAEGER || config.getTraceType() == TraceType.TRACEPARENT) {
-            traceID = Utils.randomUUID().toLowerCase();
+            traceID = Utils.randomUUID().toLowerCase(Locale.ROOT);
             spanID = Utils.getGUID_16();
         } else if (config.getTraceType() == TraceType.DDTRACE) {
             traceID = String.valueOf(Utils.getDDtraceNewId());

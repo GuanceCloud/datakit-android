@@ -34,8 +34,6 @@ import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.Utils;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -212,17 +210,17 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
 
     @Override
     public Wireframe createImageWireframeByDrawable(
-            @NotNull View view,
-            @NotNull ImagePrivacy imagePrivacy,
+            @NonNull View view,
+            @NonNull ImagePrivacy imagePrivacy,
             int currentWireframeIndex,
             long x,
             long y,
             int width,
             int height,
             boolean usePIIPlaceholder,
-            @NotNull Drawable drawable,
+            @NonNull Drawable drawable,
             DrawableCopier drawableCopier,
-            @NotNull AsyncJobStatusCallback asyncJobStatusCallback,
+            @NonNull AsyncJobStatusCallback asyncJobStatusCallback,
             WireframeClip clipping,
             ShapeStyle shapeStyle,
             ShapeBorder border,

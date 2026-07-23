@@ -15,7 +15,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.DBCacheDiscard;
+import com.ft.sdk.CacheDiscard;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.DataType;
@@ -36,7 +36,7 @@ import java.util.List;
  * Description: Database management class
  */
 @SuppressLint("Range")
-public class FTDBManager extends DBManager {
+public class FTDBManager extends DBManager implements FTDataStore {
     private static FTDBManager ftdbManager;
     public final static String TAG = Constants.LOG_TAG_PREFIX + "FTDBManager";
 
@@ -66,26 +66,53 @@ public class FTDBManager extends DBManager {
     }
 
     @Override
-    protected boolean enableDBSizeLimit() {
-        return FTDBCachePolicy.get().isEnableLimitWithDbSize();
+    protected boolean enableCacheSizeLimit() {
+        return FTDBCachePolicy.get().isLimitWithCacheSize();
     }
 
     @Override
-    protected void onDBSizeCacheChange(SQLiteDatabase db, long fileSize) {
-//        LogUtils.d(TAG, "onDBSizeCacheChange:" + (fileSize / 1024) + "KB");
-        //only do it in main process, db
-        FTDBCachePolicy.get().setCurrentDBSize(fileSize);
-        if (FTDBCachePolicy.get().isReachDbLimit()) {
-            if (FTDBCachePolicy.get().getDbCacheDiscard() == DBCacheDiscard.DISCARD_OLDEST) {
+    protected void onCacheSizeChange(SQLiteDatabase db, long fileSize) {
+//        LogUtils.d(TAG, "onCacheSizeChange:" + (fileSize / 1024) + "KB");
+        // In total cache-size mode the DB backend reports the SQLite file size to the
+        // shared cache policy. If DISCARD_OLDEST is configured, run a best-effort
+        // cleanup immediately, preferring old Log data before other sync records.
+        FTDBCachePolicy.get().setCurrentCacheSize(fileSize);
+        if (FTDBCachePolicy.get().isReachCacheLimit()) {
+            if (FTDBCachePolicy.get().getCacheDiscard() == CacheDiscard.DISCARD_OLDEST) {
                 LogUtils.w(TAG, "Database size exceeds limit! Performing cleanup...");
-                db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
-                        + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " ORDER by tm ASC LIMIT " + Constants.DB_OLD_CACHE_REMOVE_COUNT + ")");
+                int deleted = deleteOldestSyncData(db, DataType.LOG.getValue(),
+                        Constants.CACHE_OLD_DATA_REMOVE_COUNT);
+                if (deleted <= 0) {
+                    deleteOldestSyncData(db, null, Constants.CACHE_OLD_DATA_REMOVE_COUNT);
+                }
                 LogUtils.d(TAG, "Cleanup completed. Size reduced.");
                 db.close();
                 LogUtils.w(TAG, "DB Close to reduce size");
             }
         }
 
+    }
+
+    private int deleteOldestSyncData(SQLiteDatabase db, String dataType, int limit) {
+        StringBuilder where = new StringBuilder();
+        where.append(FTSQL.RECORD_COLUMN_ID)
+                .append(" in (SELECT ")
+                .append(FTSQL.RECORD_COLUMN_ID)
+                .append(" from ")
+                .append(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME);
+        if (dataType != null) {
+            where.append(" where ")
+                    .append(FTSQL.RECORD_COLUMN_DATA_TYPE)
+                    .append("='")
+                    .append(dataType)
+                    .append("'");
+        }
+        where.append(" ORDER by ")
+                .append(FTSQL.RECORD_COLUMN_TM)
+                .append(" ASC LIMIT ")
+                .append(limit)
+                .append(")");
+        return db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, where.toString(), null);
     }
 
     /**
@@ -934,15 +961,16 @@ public class FTDBManager extends DBManager {
         int count = 0;
 
         try {
-            // Use ContentProvider's call method to execute rawQuery
             String where = getDataTypeWhereString(list);
-            // Since rawQuery returns a Bundle, we need to get data through other methods
-            // Here we directly use ContentProvider's query method
             Uri uri = FTContentProvider.getUriSyncDataFlat();
             LogUtils.d(TAG, "queryTotalCount:" + uri + "," + where);
-            Cursor cursor = contentProvider.query(uri, null, where, null, null);
+            Cursor cursor = contentProvider.query(uri,
+                    new String[]{"COUNT(*)"},
+                    where,
+                    null,
+                    null);
             if (cursor != null && cursor.moveToFirst()) {
-                count = cursor.getCount();
+                count = cursor.getInt(0);
             }
             if (cursor != null) {
                 cursor.close();
@@ -954,6 +982,9 @@ public class FTDBManager extends DBManager {
     }
 
     private String getDataTypeWhereString(DataType[] list) {
+        if (list == null || list.length == 0) {
+            return null;
+        }
         StringBuilder where = new StringBuilder();
         for (int i = 0; i < list.length; i++) {
             where.append(FTSQL.RECORD_COLUMN_DATA_TYPE + "='").append(list[i].getValue()).append("'");
@@ -988,8 +1019,8 @@ public class FTDBManager extends DBManager {
             Bundle result = contentProvider.call(FTContentProvider.getUriSyncDataFlat(), FTContentProvider.METHOD_EXEC_SQL, null, extras);
             if (result.getBoolean("success")) {
 
-                if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
-                        && FTDBCachePolicy.get().isReachDbLimit()) {
+                if (FTDBCachePolicy.get().isLimitWithCacheSize()
+                        && FTDBCachePolicy.get().isReachCacheLimit()) {
                     LogUtils.w(TAG, "BD close to reduce size");
                 }
             } else {
@@ -1160,8 +1191,8 @@ public class FTDBManager extends DBManager {
             LogUtils.e(TAG, "DB table delete via ContentProvider - sync: " + deletedSync +
                     ", action: " + deletedAction + ", view: " + deletedView);
 
-            if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
-                    && FTDBCachePolicy.get().isReachDbLimit()) {
+            if (FTDBCachePolicy.get().isLimitWithCacheSize()
+                    && FTDBCachePolicy.get().isReachCacheLimit()) {
                 // Close database connection
                 LogUtils.d(TAG, "close BD to reduce size");
             }

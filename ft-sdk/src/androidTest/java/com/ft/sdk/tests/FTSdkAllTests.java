@@ -23,7 +23,8 @@ import org.junit.runners.Suite;
         SDKGlobalContextTest.class,
         SDKRunStateTest.class,
         TraceHeaderTest.class,
-        SDKDataClearTest.class
+        SDKDataClearTest.class,
+        FTFileStoreFoundationTest.class
 }
 )
 public class FTSdkAllTests {

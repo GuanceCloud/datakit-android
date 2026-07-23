@@ -1,5 +1,8 @@
 package com.ft.sdk.sessionreplay.utils;
 
+/**
+ * Immutable view bounds in raw pixels.
+ */
 public class GlobalBoundsInPx {
 
     private final int x;
@@ -7,6 +10,14 @@ public class GlobalBoundsInPx {
     private final int width;
     private final int height;
 
+    /**
+     * Creates pixel bounds.
+     *
+     * @param x horizontal position in pixels
+     * @param y vertical position in pixels
+     * @param width width in pixels
+     * @param height height in pixels
+     */
     public GlobalBoundsInPx(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
@@ -14,18 +25,30 @@ public class GlobalBoundsInPx {
         this.height = height;
     }
 
+    /**
+     * Returns the horizontal position in pixels.
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Returns the vertical position in pixels.
+     */
     public int getY() {
         return y;
     }
 
+    /**
+     * Returns the width in pixels.
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Returns the height in pixels.
+     */
     public int getHeight() {
         return height;
     }
@@ -43,4 +66,3 @@ public class GlobalBoundsInPx {
         return height == that.height;
     }
 }
-

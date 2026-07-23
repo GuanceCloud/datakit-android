@@ -1,4 +1,34 @@
-# replay 0.1.3-beta02
+# replay-material 0.1.7
+1. No Changed
+
+---
+# replay-material 0.1.5
+1. No Changed
+
+# replay-material 0.1.4
+1. Aligned the release version with `ft-session-replay` 0.1.4. No API or behavior changes.
+
+---
+# replay-material 0.1.4-beta01
+1. No Changed
+
+---
+# replay-material 0.1.4-alpha02
+1. No Changed
+
+---
+# replay-material 0.1.4-alpha01
+1. No Changed
+
+---
+# replay-material 0.1.3
+1. Added support for Material components in Session Replay, including CardView and Chip.
+2. Improved compatibility and debugging support for lower Android versions.
+3. Optimized Material component rendering behavior in replay data, including updates to MaterialDrawableToColorMapper rules.
+4. Aligned versioning with `ft-session-replay` for more consistent release management and integration.
+
+---
+# replay-material 0.1.3-beta02
 1. Updated MaterialDrawableToColorMapper rules
 
 ---

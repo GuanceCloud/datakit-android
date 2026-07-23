@@ -1,3 +1,8 @@
+# native 1.1.3
+1. Added null address detection for native crashes, and made libft_native_exp_lib.so use stricter null and wild pointer checks when performing backtraces with libunwind.so.
+2. Prevented secondary crashes in libunwind.so during native crash handling.
+
+----------------------
 # native 1.1.3-alpha02
 1. Prevented secondary crashes in libunwind.so.
 

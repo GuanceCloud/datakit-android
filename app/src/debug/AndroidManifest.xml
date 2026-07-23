@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application>
         <activity
@@ -17,6 +19,18 @@
         <activity
             android:name=".MainActivity"
             tools:node="remove" />
+
+        <service
+            android:name=".BackgroundLaunchService"
+            android:exported="true"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- remove provider setting -->
+<!--        <provider-->
+<!--            android:name="com.ft.sdk.garble.db.FTContentProvider"-->
+<!--            android:authorities="${applicationId}.ft_sdk_provider_removed"-->
+<!--            tools:node="remove" />-->
+
 
     </application>
 

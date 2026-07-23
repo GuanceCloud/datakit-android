@@ -22,11 +22,24 @@ import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 
 import java.util.List;
 
+/**
+ * Base mapper that records a view background as either a shape or an image wireframe.
+ *
+ * @param <T> the view type supported by the mapper
+ */
 public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends BaseWireframeMapper<T> {
 
     public static final String PREFIX_BACKGROUND_DRAWABLE = "backgroundDrawable";
     private final DefaultViewIdentifierResolver uniqueIdentifierGenerator = new DefaultViewIdentifierResolver();
 
+    /**
+     * Creates a background-aware base mapper.
+     *
+     * @param viewIdentifierResolver resolver for stable Session Replay view ids
+     * @param colorStringFormatter formatter for wireframe color strings
+     * @param viewBoundsResolver resolver for global view bounds
+     * @param drawableToColorMapper mapper used to extract colors from drawables
+     */
     public BaseAsyncBackgroundWireframeMapper(
             ViewIdentifierResolver viewIdentifierResolver,
             ColorStringFormatter colorStringFormatter,
@@ -36,6 +49,9 @@ public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends
         super(viewIdentifierResolver, colorStringFormatter, viewBoundsResolver, drawableToColorMapper);
     }
 
+    /**
+     * Maps the view background into a wireframe when possible.
+     */
     @UiThread
     public List<Wireframe> map(
             T view,
@@ -97,6 +113,9 @@ public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends
         );
     }
 
+    /**
+     * Creates an image wireframe for the view background.
+     */
     @UiThread
     protected Wireframe resolveBackgroundAsImageWireframe(
             View view,

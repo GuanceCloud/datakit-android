@@ -141,6 +141,10 @@ public class RemoteConfigTest extends FTBaseTest {
         Assert.assertArrayEquals(config.getRumAllowWebViewHost(), VALUE_RUM_ALLOW_WEB_VIEW_HOST);
         Assert.assertEquals(config.getLogSampleRate(), VALUE_LOG_SAMPLE_RATE, 0.0);
         Assert.assertArrayEquals(config.getLogLevelFilters(), VALUE_LOG_LEVEL_FILTERS);
+        Assert.assertTrue(config.toString().contains("rumAllowWebViewHost='"
+                + Arrays.toString(VALUE_RUM_ALLOW_WEB_VIEW_HOST) + "'"));
+        Assert.assertTrue(config.toString().contains("logLevelFilters='"
+                + Arrays.toString(VALUE_LOG_LEVEL_FILTERS) + "'"));
         Assert.assertEquals(config.getLogEnableCustomLog(), VALUE_LOG_ENABLE_CUSTOM_LOG);
         Assert.assertEquals(config.getLogEnableConsoleLog(), VALUE_LOG_ENABLE_CONSOLE_LOG);
         Assert.assertEquals(config.getTraceSampleRate(), VALUE_TRACE_SAMPLE_RATE, 0.0);

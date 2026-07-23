@@ -185,9 +185,12 @@ public class RecorderWindowCallback implements Window.Callback {
             case MotionEvent.ACTION_DOWN:
                 // Reset the flush time to avoid flush in the next event
                 lastPerformedFlushTimeInNs = System.nanoTime();
-                updatePositions(event, PointerEventType.DOWN);
+                updatePosition(event, PointerEventType.DOWN, event.getActionIndex());
                 // Reset the on move update time to take into account the first move event
                 lastOnMoveUpdateTimeInNs = 0;
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                updatePosition(event, PointerEventType.DOWN, event.getActionIndex());
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (System.nanoTime() - lastOnMoveUpdateTimeInNs >= motionUpdateThresholdInNs) {
@@ -199,30 +202,44 @@ public class RecorderWindowCallback implements Window.Callback {
                     flushPositions();
                 }
                 break;
+            case MotionEvent.ACTION_POINTER_UP:
+                updatePosition(event, PointerEventType.UP, event.getActionIndex());
+                break;
             case MotionEvent.ACTION_UP:
+                updatePosition(event, PointerEventType.UP, event.getActionIndex());
+                flushPositions();
+                lastOnMoveUpdateTimeInNs = 0;
+                shouldRecordMotion = false;
+                break;
+            case MotionEvent.ACTION_CANCEL:
                 updatePositions(event, PointerEventType.UP);
                 flushPositions();
                 lastOnMoveUpdateTimeInNs = 0;
+                shouldRecordMotion = false;
                 break;
         }
     }
 
     private void updatePositions(MotionEvent event, PointerEventType eventType) {
         for (int pointerIndex = 0; pointerIndex < event.getPointerCount(); pointerIndex++) {
-            long pointerId = event.getPointerId(pointerIndex);
-            float pointerAbsoluteX = MotionEventUtils.getPointerAbsoluteX(event, pointerIndex);
-            float pointerAbsoluteY = MotionEventUtils.getPointerAbsoluteY(event, pointerIndex);
-            pointerInteractions.add(new MobileRecord.MobileIncrementalSnapshotRecord(
-                    timeProvider.getDeviceTimestamp(),
-                    new PointerInteractionData(
-                            eventType,
-                            PointerType.TOUCH,
-                            pointerId,
-                            Utils.densityNormalized(pointerAbsoluteX, pixelsDensity),
-                            Utils.densityNormalized(pointerAbsoluteY, pixelsDensity)
-                    )
-            ));
+            updatePosition(event, eventType, pointerIndex);
         }
+    }
+
+    private void updatePosition(MotionEvent event, PointerEventType eventType, int pointerIndex) {
+        long pointerId = event.getPointerId(pointerIndex);
+        float pointerAbsoluteX = MotionEventUtils.getPointerAbsoluteX(event, pointerIndex);
+        float pointerAbsoluteY = MotionEventUtils.getPointerAbsoluteY(event, pointerIndex);
+        pointerInteractions.add(new MobileRecord.MobileIncrementalSnapshotRecord(
+                timeProvider.getDeviceTimestamp(),
+                new PointerInteractionData(
+                        eventType,
+                        PointerType.TOUCH,
+                        pointerId,
+                        Utils.densityNormalized(pointerAbsoluteX, pixelsDensity),
+                        Utils.densityNormalized(pointerAbsoluteY, pixelsDensity)
+                )
+        ));
     }
 
     @MainThread

@@ -41,7 +41,9 @@ public class FTTraceConfig {
      */
     private FTTraceInterceptor.HeaderHandler headerHandler;
 
-
+    /**
+     * Returns the custom OkHttp trace header handler, or null when the default handler is used.
+     */
     public FTTraceInterceptor.HeaderHandler getOkHttpTraceHeaderHandler() {
         return headerHandler;
     }
@@ -73,15 +75,27 @@ public class FTTraceConfig {
             "multipart/form-data"
     );
 
+    /**
+     * Returns the trace sampling rate.
+     */
     public float getSamplingRate() {
         return samplingRate;
     }
 
+    /**
+     * Sets the trace sampling rate.
+     *
+     * @param samplingRate sampling rate in the range [0, 1]
+     * @return this config for chaining
+     */
     public FTTraceConfig setSamplingRate(float samplingRate) {
         this.samplingRate = samplingRate;
         return this;
     }
 
+    /**
+     * Returns the configured trace header propagation type.
+     */
     public TraceType getTraceType() {
         return traceType;
     }
@@ -89,8 +103,8 @@ public class FTTraceConfig {
     /**
      * <a href="https://docs.guance.com/real-user-monitoring/explorer/resource/">Explorer Resource</a> function, used to trace the Trace chain of problematic Resource data
      *
-     * @param traceType
-     * @return
+     * @param traceType trace header propagation type
+     * @return this config for chaining
      */
 
     public FTTraceConfig setTraceType(TraceType traceType) {
@@ -98,10 +112,19 @@ public class FTTraceConfig {
         return this;
     }
 
+    /**
+     * Returns whether trace ids are linked to RUM resource data.
+     */
     public boolean isEnableLinkRUMData() {
         return enableLinkRUMData;
     }
 
+    /**
+     * Sets whether trace ids should be linked to RUM resource data.
+     *
+     * @param enableLinkRUMData true to attach trace metadata to RUM resources
+     * @return this config for chaining
+     */
     public FTTraceConfig setEnableLinkRUMData(boolean enableLinkRUMData) {
         this.enableLinkRUMData = enableLinkRUMData;
         return this;
@@ -114,8 +137,8 @@ public class FTTraceConfig {
     //    /**
 //     * Set supported collection types
 //     *
-//     * @param traceContentType
-//     * @return
+//     * @param traceContentType supported response content types
+//     * @return this config for chaining
 //     */
 //    public FTTraceConfig setTraceContentType(List<String> traceContentType) {
 //        if (traceContentType != null) {
@@ -128,7 +151,7 @@ public class FTTraceConfig {
     /**
      * Get link support
      *
-     * @return
+     * @return content types supported for trace response body handling
      */
     public List<String> getTraceContentType() {
         return traceContentType;
@@ -141,12 +164,23 @@ public class FTTraceConfig {
         return enableAutoTrace;
     }
 
+    /**
+     * Returns whether legacy WebView trace injection is enabled.
+     *
+     * @deprecated Use automatic trace configuration instead.
+     */
     @Deprecated
     public boolean isEnableWebTrace() {
         return enableWebTrace;
     }
 
-
+    /**
+     * Sets whether legacy WebView trace injection is enabled.
+     *
+     * @param enableWebTrace true to enable legacy WebView trace injection
+     * @return this config for chaining
+     * @deprecated Use automatic trace configuration instead.
+     */
     @Deprecated
     public FTTraceConfig setEnableWebTrace(boolean enableWebTrace) {
         this.enableWebTrace = enableWebTrace;
@@ -157,15 +191,17 @@ public class FTTraceConfig {
     /**
      * {@link #enableAutoTrace}
      *
-     * @param enableAutoTrace
-     * @return
+     * @param enableAutoTrace true to automatically inject trace headers for supported requests
+     * @return this config for chaining
      */
     public FTTraceConfig setEnableAutoTrace(boolean enableAutoTrace) {
         this.enableAutoTrace = enableAutoTrace;
         return this;
     }
 
-
+    /**
+     * Returns global trace attributes configured on this object.
+     */
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;
     }

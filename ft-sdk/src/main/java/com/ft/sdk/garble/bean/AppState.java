@@ -2,6 +2,8 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.NonNull;
 
+import java.util.Locale;
+
 /**
  * Application running state, used to distinguish the running state of the App by checking the application state flag
  */
@@ -33,7 +35,7 @@ public enum AppState {
         AppState[] states = AppState.values();
         for (int i = 0; i < AppState.values().length; i++) {
             AppState state = states[i];
-            if (state.toString().toLowerCase().equals(value)) {
+            if (state.toString().toLowerCase(Locale.ROOT).equals(value)) {
                 return state;
             }
         }
@@ -48,6 +50,6 @@ public enum AppState {
     @NonNull
     @Override
     public String toString() {
-        return super.toString().toLowerCase();
+        return super.toString().toLowerCase(Locale.ROOT);
     }
 }

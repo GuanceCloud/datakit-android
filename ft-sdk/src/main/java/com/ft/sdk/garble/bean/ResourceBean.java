@@ -177,6 +177,18 @@ public class ResourceBean {
      */
     public String resourceHostIP = "";
 
+    /**
+     * Active network snapshot when the resource starts.
+     */
+    public boolean networkAvailable = false;
+
+    public Boolean networkValidated = null;
+
+    public Integer networkDownlinkKbps = null;
+
+    public Integer networkUplinkKbps = null;
+
+    public Integer networkSignalStrength = null;
 
     /**
      * Resource request start time

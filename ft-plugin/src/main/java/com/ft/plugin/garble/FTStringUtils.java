@@ -1,5 +1,7 @@
 package com.ft.plugin.garble;
 
+import java.util.Locale;
+
 public class FTStringUtils {
 
     /**
@@ -10,7 +12,7 @@ public class FTStringUtils {
      */
     public static String captitalizedString(String inputString) {
         if (inputString != null && !inputString.isEmpty()) {
-            return inputString.substring(0, 1).toUpperCase() + inputString.substring(1);
+            return inputString.substring(0, 1).toUpperCase(Locale.ROOT) + inputString.substring(1);
 
         } else {
             return inputString;

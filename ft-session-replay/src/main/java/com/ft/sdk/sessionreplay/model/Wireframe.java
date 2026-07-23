@@ -8,12 +8,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Wireframe {
+    private String permanentId;
+
     public abstract JsonElement toJson();
 
     public static Wireframe fromJson(String jsonString) throws JsonParseException {
@@ -95,8 +95,32 @@ public abstract class Wireframe {
 
     public abstract Long getId();
 
+    public String getPermanentId() {
+        return permanentId;
+    }
+
+    public Wireframe setPermanentId(String permanentId) {
+        this.permanentId = permanentId;
+        return this;
+    }
+
+    protected void appendPermanentId(JsonObject json) {
+        if (permanentId != null && permanentId.length() > 0) {
+            json.addProperty("permanentId", permanentId);
+        }
+    }
+
+    protected void copyPermanentIdTo(Wireframe wireframe) {
+        wireframe.setPermanentId(permanentId);
+    }
+
+    protected static void readPermanentId(JsonObject jsonObject, Wireframe wireframe) {
+        if (jsonObject.has("permanentId")) {
+            wireframe.setPermanentId(jsonObject.get("permanentId").getAsString());
+        }
+    }
+
     @NonNull
-    @NotNull
     @Override
     public String toString() {
         return "id:" + getId();

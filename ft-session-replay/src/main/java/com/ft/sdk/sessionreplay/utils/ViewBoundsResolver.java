@@ -2,6 +2,9 @@ package com.ft.sdk.sessionreplay.utils;
 
 import android.view.View;
 
+/**
+ * Resolves Android view bounds for Session Replay wireframes.
+ */
 public interface ViewBoundsResolver {
 
     /**

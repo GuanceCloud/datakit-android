@@ -193,6 +193,29 @@ public class ConfigTest extends FTBaseTest {
 
         FTSdk.install(config.setAutoSync(false));
         Assert.assertTrue(checkInnerFieldValue(SyncTaskManager.get(), "autoSync", false));
+
+        FTSdk.setAutoSync(true);
+        Assert.assertTrue(FTSdk.get().getBaseConfig().isAutoSync());
+        Assert.assertTrue(checkInnerFieldValue(SyncTaskManager.get(), "autoSync", true));
+
+        FTSdk.setAutoSync(false);
+        Assert.assertFalse(FTSdk.get().getBaseConfig().isAutoSync());
+        Assert.assertTrue(checkInnerFieldValue(SyncTaskManager.get(), "autoSync", false));
+    }
+
+    /**
+     * Validate {@link FTSDKConfig#compressIntakeRequests} configuration
+     */
+    @Test
+    public void compressIntakeRequests() {
+        FTSDKConfig config = getDatakitConfig();
+        FTSdk.install(config);
+        Assert.assertTrue(config.isCompressIntakeRequests());
+        Assert.assertTrue(FTHttpConfigManager.get().isCompressIntakeRequests());
+
+        FTSdk.install(config.setCompressIntakeRequests(false));
+        Assert.assertFalse(config.isCompressIntakeRequests());
+        Assert.assertFalse(FTHttpConfigManager.get().isCompressIntakeRequests());
     }
 
     /**

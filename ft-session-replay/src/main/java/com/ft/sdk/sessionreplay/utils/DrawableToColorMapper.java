@@ -2,6 +2,9 @@ package com.ft.sdk.sessionreplay.utils;
 
 import android.graphics.drawable.Drawable;
 
+/**
+ * Extracts a representative color from an Android drawable for shape wireframes.
+ */
 public interface DrawableToColorMapper {
 
     /**

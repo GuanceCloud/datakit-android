@@ -296,7 +296,7 @@ public class FTBaseTest {
      * @return
      */
     public long getCurrentDBSize() {
-        return ((AtomicLong) Whitebox.getInternalState(FTDBCachePolicy.get(), "currentDbSize")).get();
+        return ((AtomicLong) Whitebox.getInternalState(FTDBCachePolicy.get(), "currentCacheSize")).get();
     }
 
     /**
@@ -305,7 +305,7 @@ public class FTBaseTest {
      * @param
      */
     public void setDBLimit(long dbLimit) throws IllegalAccessException {
-        Whitebox.setInternalState(FTDBCachePolicy.get(), "dbLimitSize", dbLimit);
+        Whitebox.setInternalState(FTDBCachePolicy.get(), "cacheLimit", dbLimit);
     }
 
 

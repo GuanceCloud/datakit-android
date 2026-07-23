@@ -41,7 +41,7 @@ public class FTResourceInterceptor implements Interceptor {
         /**
          * OKHttp Request
          *
-         * @param request
+         * @param request   OkHttp request before it is executed
          * @param extraData Additional data
          */
         public abstract void onRequest(Request request, HashMap<String, Object> extraData);
@@ -49,7 +49,7 @@ public class FTResourceInterceptor implements Interceptor {
         /**
          * OKHttp Response
          *
-         * @param response
+         * @param response  OkHttp response after it is received
          * @param extraData Additional data
          */
         public abstract void onResponse(Response response, HashMap<String, Object> extraData) throws IOException;
@@ -85,10 +85,19 @@ public class FTResourceInterceptor implements Interceptor {
 
     }
 
+    /**
+     * Creates an interceptor that records OkHttp requests as RUM resources.
+     */
     public FTResourceInterceptor() {
 
     }
 
+    /**
+     * Creates an interceptor that records OkHttp requests as RUM resources and lets callers
+     * append request, response, or exception attributes.
+     *
+     * @param handlerHelper callback used to append custom resource attributes
+     */
     public FTResourceInterceptor(ContentHandlerHelper handlerHelper) {
         this.handlerHelper = handlerHelper;
     }
@@ -100,9 +109,11 @@ public class FTResourceInterceptor implements Interceptor {
     private static final int BYTE_LIMIT_COUNT = 33554432;
 
     /**
-     * @param chain
-     * @return
-     * @throws IOException
+     * Intercepts an OkHttp request, records it as a RUM resource, and returns the response.
+     *
+     * @param chain OkHttp interceptor chain
+     * @return OkHttp response
+     * @throws IOException when the underlying request fails
      */
     @NonNull
     @Override

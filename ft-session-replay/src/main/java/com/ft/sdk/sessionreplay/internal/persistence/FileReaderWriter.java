@@ -5,9 +5,9 @@ import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 
 /**
- * Interface for file reading and writing operations with byte array data.
+ * Base type for file reading and writing operations with byte array data.
  */
-public interface FileReaderWriter extends FileWriter<byte[]>, FileReader<byte[]> {
+public abstract class FileReaderWriter implements FileWriter<byte[]>, FileReader<byte[]> {
 
     /**
      * Creates either a plain {@link PlainFileReaderWriter} or a {@link PlainFileReaderWriter}
@@ -17,7 +17,7 @@ public interface FileReaderWriter extends FileWriter<byte[]>, FileReader<byte[]>
      * @param encryption Optional encryption instance to wrap the reader writer.
      * @return An instance of {@link FileReaderWriter}.
      */
-    static FileReaderWriter create(InternalLogger internalLogger, Encryption encryption) {
+    public static FileReaderWriter create(InternalLogger internalLogger, Encryption encryption) {
         PlainFileReaderWriter readerWriter = new PlainFileReaderWriter(internalLogger);
         if (encryption == null) {
             return readerWriter;

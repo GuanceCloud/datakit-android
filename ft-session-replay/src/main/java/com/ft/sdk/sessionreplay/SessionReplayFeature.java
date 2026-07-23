@@ -84,6 +84,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     private Sampler sessionRelayErrorSampler;
     private final RecorderProvider recorderProvider;
     private final String[] linkRumKeys;
+    private final boolean enableNativeRecorder;
 
     private final AtomicReference<String> currentRumSessionId = new AtomicReference<>();
 
@@ -111,7 +112,9 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 config.getSessionReplayOnErrorSampleRate(),
                 config.isDelayInit(),
                 config.isDynamicOptimizationEnabled(),
-                config.getInternalCallback(), config.getRumLinkKeys(), new SlotIdWebviewBinder(sdkCore.getInternalLogger()));
+                config.getInternalCallback(), config.getRumLinkKeys(),
+                new SlotIdWebviewBinder(sdkCore.getInternalLogger()),
+                !config.isExternalRecorderMode());
 
     }
 
@@ -123,6 +126,20 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 Sampler sessionReplayErrorSampler,
                                 RecorderProvider recorderProvider, String[] linkRumKeys,
                                 SlotIdWebviewBinder slotIdWebviewBinder) {
+        this(sdkCore, customEndpointUrl, textAndInputPrivacy, touchPrivacy, imagePrivacy,
+                sessionReplaySampler, sessionReplayErrorSampler, recorderProvider, linkRumKeys,
+                slotIdWebviewBinder, true);
+    }
+
+    private SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
+                                 TextAndInputPrivacy textAndInputPrivacy,
+                                 TouchPrivacy touchPrivacy,
+                                 ImagePrivacy imagePrivacy,
+                                 Sampler sessionReplaySampler,
+                                 Sampler sessionReplayErrorSampler,
+                                 RecorderProvider recorderProvider, String[] linkRumKeys,
+                                 SlotIdWebviewBinder slotIdWebviewBinder,
+                                 boolean enableNativeRecorder) {
         this.sdkCore = sdkCore;
         this.customEndpointUrl = customEndpointUrl;
         this.textAndInputPrivacy = textAndInputPrivacy;
@@ -133,6 +150,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         this.recorderProvider = recorderProvider;
         this.linkRumKeys = linkRumKeys == null ? new String[]{} : linkRumKeys;
         this.slotIdWebviewBinder = slotIdWebviewBinder;
+        this.enableNativeRecorder = enableNativeRecorder;
     }
 
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
@@ -148,6 +166,27 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 boolean isDelayInit,
                                 boolean dynamicOptimizationEnabled,
                                 SessionReplayInternalCallback internalCallback, String[] linkRumKeys, SlotIdWebviewBinder slotIdWebviewBinder) {
+        this(sdkCore, customEndpointUrl, textAndInputPrivacy, touchPrivacy, touchPrivacyManager,
+                imagePrivacy, customMappers, customOptionSelectorDetectors, customDrawableMappers,
+                sampleRate, sessionReplayOnErrorSampleRate, isDelayInit, dynamicOptimizationEnabled,
+                internalCallback, linkRumKeys, slotIdWebviewBinder, true);
+    }
+
+    private SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
+                                 TextAndInputPrivacy textAndInputPrivacy,
+                                 TouchPrivacy touchPrivacy,
+                                 TouchPrivacyManager touchPrivacyManager,
+                                 ImagePrivacy imagePrivacy,
+                                 List<MapperTypeWrapper<?>> customMappers,
+                                 List<OptionSelectorDetector> customOptionSelectorDetectors,
+                                 List<DrawableToColorMapper> customDrawableMappers,
+                                 float sampleRate,
+                                 float sessionReplayOnErrorSampleRate,
+                                 boolean isDelayInit,
+                                 boolean dynamicOptimizationEnabled,
+                                 SessionReplayInternalCallback internalCallback, String[] linkRumKeys,
+                                 SlotIdWebviewBinder slotIdWebviewBinder,
+                                 boolean enableNativeRecorder) {
         this(sdkCore, customEndpointUrl,
                 textAndInputPrivacy,
                 touchPrivacy,
@@ -164,7 +203,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                         internalCallback,
                         isDelayInit, linkRumKeys != null && linkRumKeys.length > 0,
                         slotIdWebviewBinder
-                ), linkRumKeys, slotIdWebviewBinder);
+                ), linkRumKeys, slotIdWebviewBinder, enableNativeRecorder);
     }
 
     public RecordWriter getDataWriter() {
@@ -211,10 +250,14 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         );
 
         dataWriter = createDataWriter();
-        sessionReplayRecorder = recorderProvider.provideSessionReplayRecorder(
-                resourceDataStoreManager, resourcesFeature.getDataWriter(), dataWriter, (Application) appContext
-        );
-        sessionReplayRecorder.registerCallbacks();
+        if (enableNativeRecorder) {
+            sessionReplayRecorder = recorderProvider.provideSessionReplayRecorder(
+                    resourceDataStoreManager, resourcesFeature.getDataWriter(), dataWriter, (Application) appContext
+            );
+            sessionReplayRecorder.registerCallbacks();
+        } else {
+            sessionReplayRecorder = new NoOpRecorder();
+        }
         initialized.set(true);
         sdkCore.updateFeatureContext(getName(), new SessionReplayRecordCallback.UpdateCallBack() {
             @Override
@@ -323,7 +366,11 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             startRecording(true);
         } else {
             sdkCore.getInternalLogger().w(TAG, SESSION_SAMPLED_OUT_MESSAGE);
-            stopRecording();
+            if (isRecording.get()) {
+                stopRecording();
+            } else {
+                notifyRecordingDisabled();
+            }
         }
         currentRumSessionId.set(sessionId);
     }
@@ -342,7 +389,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     void startRecording(boolean isErrorSampled) {
         // Check initialization again so we don't forget to do it when this method is made public
         if (checkIfInitialized() && !isRecording.getAndSet(true)) {
-            sdkCore.getInternalLogger().d(TAG, "start record");
+            sdkCore.getInternalLogger().d(TAG, enableNativeRecorder ? "start record" : "start external record");
             sdkCore.updateFeatureContext(getName(), new SessionReplayRecordCallback.UpdateCallBack() {
 
                 @Override
@@ -351,8 +398,21 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                     context.put(SESSION_REPLAY_ENABLED_ON_ERROR_KEY, isErrorSampled);
                 }
             });
-            sessionReplayRecorder.resumeRecorders();
+            if (enableNativeRecorder) {
+                sessionReplayRecorder.resumeRecorders();
+            }
         }
+    }
+
+    private void notifyRecordingDisabled() {
+        sdkCore.updateFeatureContext(getName(),
+                new SessionReplayRecordCallback.UpdateCallBack() {
+                    @Override
+                    public void onUpdate(Map<String, Object> context) {
+                        context.put(SESSION_REPLAY_ENABLED_KEY, false);
+                    }
+                }
+        );
     }
 
     private RecordWriter createDataWriter() {
@@ -366,15 +426,10 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     void stopRecording() {
         if (isRecording.getAndSet(false)) {
             sdkCore.getInternalLogger().d(TAG, "stopRecording");
-            sdkCore.updateFeatureContext(getName(),
-                    new SessionReplayRecordCallback.UpdateCallBack() {
-                        @Override
-                        public void onUpdate(Map<String, Object> context) {
-                            context.put(SESSION_REPLAY_ENABLED_KEY, false);
-                        }
-                    }
-            );
-            sessionReplayRecorder.stopRecorders();
+            notifyRecordingDisabled();
+            if (enableNativeRecorder) {
+                sessionReplayRecorder.stopRecorders();
+            }
         }
     }
 

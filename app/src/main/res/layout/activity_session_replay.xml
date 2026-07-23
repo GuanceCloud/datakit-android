@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/session_replay_privacy_ll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fillViewport="true">
 
-    <Button
-        android:id="@+id/session_replay_dialog"
+    <LinearLayout
+        android:id="@+id/session_replay_privacy_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dialog" />
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/session_replay_dialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dialog" />
 
     <Button
         android:id="@+id/session_replay_origin_toast"
@@ -35,6 +40,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="MaterialButton Isolated Test Page" />
+
+    <TextView
+        android:id="@+id/session_replay_upload_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="SR upload scenario: use the buttons below to break, retry, restore, and generate frames."
+        android:textSize="13sp" />
+
+    <Button
+        android:id="@+id/session_replay_upload_invalid_url_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SR Upload: Invalid URL" />
+
+    <Button
+        android:id="@+id/session_replay_upload_retryable_url_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SR Upload: Retryable Failure URL" />
+
+    <Button
+        android:id="@+id/session_replay_upload_restore_url_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SR Upload: Restore Valid URL" />
+
+    <Button
+        android:id="@+id/session_replay_upload_generate_frames_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SR Upload: Generate Replay Frames" />
 
     <!--    <androidx.cardview.widget.CardView-->
 <!--        android:layout_width="wrap_content"-->
@@ -152,9 +189,10 @@
         </LinearLayout>
 
 
-        <ListView
-            android:id="@+id/session_replay_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <ListView
+                android:id="@+id/session_replay_list"
+                android:layout_width="match_parent"
+                android:layout_height="360dp" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

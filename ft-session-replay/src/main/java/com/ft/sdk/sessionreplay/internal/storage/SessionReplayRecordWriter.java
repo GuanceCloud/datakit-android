@@ -9,7 +9,7 @@ import com.ft.sdk.sessionreplay.internal.RecordCallback;
 import com.ft.sdk.sessionreplay.internal.processor.EnrichedRecord;
 import com.ft.sdk.storage.EventBatchWriter;
 
-import kotlin.text.Charsets;
+import java.nio.charset.StandardCharsets;
 
 public class SessionReplayRecordWriter implements RecordWriter {
 
@@ -37,7 +37,7 @@ public class SessionReplayRecordWriter implements RecordWriter {
             sdkCore.getFeature(Feature.SESSION_REPLAY_FEATURE_NAME).withWriteContext(forceNew, new DataConsumerCallback(record.isWebRecord()) {
                 @Override
                 public void onConsume(SessionReplayContext context, EventBatchWriter writer) {
-                    byte[] serializedRecord = record.toJson().getBytes(Charsets.UTF_8);
+                    byte[] serializedRecord = record.toJson().getBytes(StandardCharsets.UTF_8);
                     RawBatchEvent rawBatchEvent = new RawBatchEvent(serializedRecord, null);
                     synchronized (this) {
                         if (writer.write(rawBatchEvent, null, EventType.DEFAULT)) {
@@ -56,7 +56,7 @@ public class SessionReplayRecordWriter implements RecordWriter {
             sdkCore.getFeature(Feature.SESSION_REPLAY_FEATURE_NAME).withWriteContext(forceNew, new DataConsumerCallback(record.isWebRecord()) {
                 @Override
                 public void onConsume(SessionReplayContext context, EventBatchWriter writer) {
-                    byte[] serializedRecord = record.toJson().getBytes(Charsets.UTF_8);
+                    byte[] serializedRecord = record.toJson().getBytes(StandardCharsets.UTF_8);
                     RawBatchEvent rawBatchEvent = new RawBatchEvent(serializedRecord, null);
                     synchronized (this) {
                         if (writer.write(rawBatchEvent, null, EventType.DEFAULT)) {

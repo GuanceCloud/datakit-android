@@ -9,8 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Monitor {@link androidx.fragment.app.Fragment} view activities
  */
@@ -26,7 +24,7 @@ final class AndroidXFragmentLifecycleCallbacks extends FragmentManager.FragmentL
     }
 
     @Override
-    public void onFragmentPreAttached(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @NonNull @NotNull Context context) {
+    public void onFragmentPreAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
         super.onFragmentPreAttached(fm, f, context);
         if (fm.getClass().getName().equals(INVALID_FRAGMENT__REPORT_FRAGMENT)) return;
         if (callBack != null) {
@@ -36,7 +34,7 @@ final class AndroidXFragmentLifecycleCallbacks extends FragmentManager.FragmentL
     }
 
     @Override
-    public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @Nullable Bundle savedInstanceState) {
+    public void onFragmentCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @Nullable Bundle savedInstanceState) {
         super.onFragmentCreated(fm, f, savedInstanceState);
         if (fm.getClass().getName().equals(INVALID_FRAGMENT__REPORT_FRAGMENT)) return;
         if (callBack != null) {

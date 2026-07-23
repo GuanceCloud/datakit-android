@@ -116,6 +116,26 @@ public class Constants {
      * Store error occurrence time
      */
     public static final String FT_RUM_ERROR_TIMELINE = "ft.error.timeline";
+    /**
+     * Store crash-free duration statistics baseline time
+     */
+    public static final String FT_CRASH_FREE_START_TIME = "ft.crash_free.start_time";
+    /**
+     * Store accumulated foreground crash-free duration
+     */
+    public static final String FT_CRASH_FREE_FOREGROUND_DURATION = "ft.crash_free.foreground_duration";
+    /**
+     * Store accumulated background crash-free duration
+     */
+    public static final String FT_CRASH_FREE_BACKGROUND_DURATION = "ft.crash_free.background_duration";
+    /**
+     * Store current crash-free app state
+     */
+    public static final String FT_CRASH_FREE_APP_STATE = "ft.crash_free.app_state";
+    /**
+     * Store current crash-free state start time
+     */
+    public static final String FT_CRASH_FREE_STATE_START_TIME = "ft.crash_free.state_start_time";
 
     /**
      * Store {@link  android.content.SharedPreferences} data storage key value
@@ -162,6 +182,16 @@ public class Constants {
     public static final String URL_ENV_VARIABLE = "v1/env_variable";
 
     /**
+     * DataKit center configuration pull address, used for filters.
+     */
+    public static final String URL_DATAKIT_PULL = "v1/datakit/pull";
+
+    /**
+     * URL query parameter used to tell server-side intake that SDK-side filters have been applied.
+     */
+    public static final String URL_PARAM_DISABLE_FILTER = "disable_filter";
+
+    /**
      * Default service name, field service
      */
     public static final String DEFAULT_SERVICE_NAME = "df_rum_android";
@@ -188,9 +218,25 @@ public class Constants {
     /**
      * Set total cache size limit
      */
-    public static final int DEFAULT_DB_SIZE_LIMIT = 104857600;//100MB
-    public static final int MINI_DB_SIZE_LIMIT = 31457280;//30MB
-    public static final int DB_OLD_CACHE_REMOVE_COUNT = 100;
+    public static final int DEFAULT_CACHE_SIZE_LIMIT = 104857600;//100MB
+    public static final int MINI_CACHE_SIZE_LIMIT = 31457280;//30MB
+    public static final int CACHE_OLD_DATA_REMOVE_COUNT = 100;
+
+    /**
+     * @deprecated Use {@link #DEFAULT_CACHE_SIZE_LIMIT}.
+     */
+    @Deprecated
+    public static final int DEFAULT_DB_SIZE_LIMIT = DEFAULT_CACHE_SIZE_LIMIT;
+    /**
+     * @deprecated Use {@link #MINI_CACHE_SIZE_LIMIT}.
+     */
+    @Deprecated
+    public static final int MINI_DB_SIZE_LIMIT = MINI_CACHE_SIZE_LIMIT;
+    /**
+     * @deprecated Use {@link #CACHE_OLD_DATA_REMOVE_COUNT}.
+     */
+    @Deprecated
+    public static final int DB_OLD_CACHE_REMOVE_COUNT = CACHE_OLD_DATA_REMOVE_COUNT;
 
 
 //    public static final String KEY_EVENT_ID = "event_id";
@@ -469,11 +515,6 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_REPLAY = "replay";
 
     /**
-     * ft-session-replay-material module
-     */
-    public static final String KEY_RUM_SDK_PACKAGE_REPLAY_MATERIAL = "replay_mtr";
-
-    /**
      * Web view uses web sdk release version
      */
     public static final String KEY_RUM_SDK_PACKAGE_WEB = "web";
@@ -584,6 +625,14 @@ public class Constants {
      */
     public static final String KEY_RUM_ERROR_SITUATION = "error_situation";
     /**
+     * Foreground crash-free duration, nanoseconds.
+     */
+    public static final String KEY_RUM_FOREGROUND_CRASH_FREE_DURATION = "foreground_crash_free_duration";
+    /**
+     * Background crash-free duration, nanoseconds.
+     */
+    public static final String KEY_RUM_BACKGROUND_CRASH_FREE_DURATION = "background_crash_free_duration";
+    /**
      * Long task duration, nanoseconds, {@link #FT_MEASUREMENT_RUM_LONG_TASK}
      */
     public static final String KEY_RUM_LONG_TASK_DURATION = "duration";
@@ -595,6 +644,15 @@ public class Constants {
      * Network type, WIFI, 3G, 4G, etc.
      */
     public static final String KEY_RUM_NETWORK_TYPE = "network_type";
+
+    /**
+     * Active network snapshot.
+     */
+    public static final String KEY_RUM_NETWORK_AVAILABLE = "network_available";
+    public static final String KEY_RUM_NETWORK_VALIDATED = "network_validated";
+    public static final String KEY_RUM_NETWORK_DOWNLINK_KBPS = "network_downlink_kbps";
+    public static final String KEY_RUM_NETWORK_UPLINK_KBPS = "network_uplink_kbps";
+    public static final String KEY_RUM_NETWORK_SIGNAL_STRENGTH = "network_signal_strength";
 
     /**
      * Session ID
@@ -646,6 +704,18 @@ public class Constants {
      * View root path default value
      */
     public static final String VIEW_NAME_ROOT = "root";
+    /**
+     * Fallback view name used when RUM data has no valid foreground View context.
+     */
+    public static final String VIEW_NAME_ROOT_FALLBACK = "RootView";
+    /**
+     * Virtual view name used for RUM data generated during application launch.
+     */
+    public static final String VIEW_NAME_APPLICATION_LAUNCH = "ApplicationLaunch";
+    /**
+     * Virtual view name used for RUM data generated after the app enters background.
+     */
+    public static final String VIEW_NAME_BACKGROUND = "BackgroundView";
 
     /**
      * Page load time
@@ -655,6 +725,10 @@ public class Constants {
      * Number of long tasks in page cycle, {@link #FT_MEASUREMENT_RUM_LONG_TASK}
      */
     public static final String KEY_RUM_VIEW_LONG_TASK_COUNT = "view_long_task_count";
+    /**
+     * Long task duration ratio in page cycle.
+     */
+    public static final String KEY_RUM_VIEW_LONG_TASK_RATE = "view_long_task_rate";
     /**
      * Number of resource requests in page cycle, {@link #FT_MEASUREMENT_RUM_RESOURCE}
      */
@@ -697,6 +771,21 @@ public class Constants {
     public static final String KEY_RUM_ACTION_TYPE = "action_type";
 
     /**
+     * Action position relative to the action target, JSON format: {"x":0,"y":0}
+     */
+    public static final String KEY_RUM_ACTION_POSITION = "action_position";
+
+    /**
+     * Action target metadata, JSON format: {"permanent_id":"","width":0,"height":0}
+     */
+    public static final String KEY_RUM_ACTION_TARGET = "action_target";
+
+    /**
+     * Display metadata, JSON format: {"viewport":{"width":0,"height":0}}
+     */
+    public static final String KEY_RUM_DISPLAY = "display";
+
+    /**
      * Pre-application initialization time, JSON format: {"start": 0, "duration": applicationPreOnCreateDuration}
      * Represents the time from app start to Application.onCreate()
      */
@@ -713,6 +802,15 @@ public class Constants {
      * Represents the time from first Activity preOnCreate() to first frame drawn
      */
     public static final String KEY_RUM_APP_FIRST_FRAME_INIT_TIME ="app_first_frame_init_time";
+
+    /**
+     * App launch type for cold start actions.
+     */
+    public static final String KEY_RUM_APP_LAUNCH_TYPE = "app_launch_type";
+
+    public static final String APP_LAUNCH_TYPE_FOREGROUND = "foreground";
+
+    public static final String APP_LAUNCH_TYPE_BACKGROUND = "background";
 
     /**
      * Action cycle content long duration count statistics, {@link Constants#FT_MEASUREMENT_RUM_LONG_TASK}
@@ -752,6 +850,11 @@ public class Constants {
      *
      */
     public static final String KEY_RUM_SDK_INNER_KEY_START_TIME_NANO = "start_time_nano";
+
+    /**
+     * Long task total duration in current View lifecycle, unit: nanoseconds
+     */
+    public static final String KEY_RUM_SDK_INNER_KEY_VIEW_LONG_TASK_DURATION = "view_long_task_duration";
 
 
     /**

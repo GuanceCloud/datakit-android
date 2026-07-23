@@ -2,13 +2,16 @@
 
 buildscript {
     ext {
-        mavenPublishUrl = 'https://mvnrepo.jiagouyun.com/repository'
+        mavenPublishUrl = 'https://mvnrepo.guance.com/repository'
         getDefaultProperties = this.&getDefaultProperties
         sdkVersions = [
-                ftSdk          : "1.7.0-beta01",
-                ftSessionReplay: "0.1.3-beta02",
-                ftPlugin       : "1.3.6-alpha07",
-                ftNative       : "1.1.3-alpha02"
+                ftSdk                     : "1.7.4",
+                ftSdkMiniReplaySupport    : "0.1.3",
+                ftSessionReplay           : "0.1.7",
+                replayMiniAgentSupport    : "1.7.0",
+                ftPlugin                  : "1.3.7",
+                pluginMinAgentSupport     : "1.6.10-alpha03",
+                ftNative                  : "1.1.3"
         ]
     }
 
@@ -55,13 +58,13 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.3.6-alpha07'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.3.7'
 //        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin-legacy:1.1.8'
 //        classpath 'com.guardsquare:proguard-gradle:7.1.0'
 //       classpath files('ft-plugin/build/libs/ft-plugin-1.3.7-alpha01.jar')
 
         classpath "com.github.gmazzo:gradle-buildconfig-plugin:3.1.0"
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

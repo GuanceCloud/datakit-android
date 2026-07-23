@@ -1,6 +1,8 @@
 package com.ft.sdk.sessionreplay.internal.recorder.mapper;
 
 import android.view.View;
+import android.view.ViewParent;
+import android.widget.AdapterView;
 
 import androidx.annotation.UiThread;
 
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewWireframeMapper extends BaseWireframeMapper<View> {
+    private static final String TRANSPARENT_HEATMAP_COLOR = "#00000000";
 
     public ViewWireframeMapper(
             ViewIdentifierResolver viewIdentifierResolver,
@@ -47,6 +50,10 @@ public class ViewWireframeMapper extends BaseWireframeMapper<View> {
                 ? resolveShapeStyle(view.getBackground(), view.getAlpha(), internalLogger)
                 : null;
 
+        if (shapeStyle == null && isHeatmapBindingTarget(view)) {
+            shapeStyle = new ShapeStyle(TRANSPARENT_HEATMAP_COLOR, 0f, null);
+        }
+
         if (shapeStyle != null) {
             ArrayList<Wireframe> list = new ArrayList<>();
             list.add(new ShapeWireframe(
@@ -63,5 +70,13 @@ public class ViewWireframeMapper extends BaseWireframeMapper<View> {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    private boolean isHeatmapBindingTarget(View view) {
+        if (view.isClickable()) {
+            return true;
+        }
+        ViewParent parent = view.getParent();
+        return parent instanceof AdapterView;
     }
 }

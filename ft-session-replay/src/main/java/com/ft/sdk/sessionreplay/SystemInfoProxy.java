@@ -7,5 +7,8 @@ public abstract class SystemInfoProxy {
 
     public abstract boolean isBatteryHealthToSync();
 
+    public boolean isUploadUrlAvailable() {
+        return true;
+    }
 
 }

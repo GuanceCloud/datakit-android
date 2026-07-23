@@ -41,6 +41,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.util.Locale;
 
 /**
  * High load Java Crash, Native Crash
@@ -76,7 +77,7 @@ public class StableTest extends BaseTest {
                 .setDebug(true)//whether is debug mode
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
-                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
+                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase(Locale.ROOT)));
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
