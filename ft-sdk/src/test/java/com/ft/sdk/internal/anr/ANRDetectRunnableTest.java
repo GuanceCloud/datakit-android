@@ -54,7 +54,7 @@ public class ANRDetectRunnableTest {
     }
 
     @Test
-    public void reportsOncePerEpisodeAndRearmsAfterMainThreadRecovery() throws Exception {
+    public void reportsOnceAndStopsForDetectorLifetime() throws Exception {
         BlockingQueue<Runnable> mainCallbacks = new LinkedBlockingQueue<>();
         BlockingQueue<Integer> reports = new LinkedBlockingQueue<>();
         Thread mainThread = new Thread("fake-main");
@@ -70,20 +70,22 @@ public class ANRDetectRunnableTest {
                 25L);
         Thread detector = new Thread(runnable, "anr-detector-test");
         detector.start();
+        try {
+            Runnable callback = mainCallbacks.poll(1, TimeUnit.SECONDS);
+            Assert.assertNotNull(callback);
+            Assert.assertEquals(Integer.valueOf(1), reports.poll(1, TimeUnit.SECONDS));
 
-        Runnable firstEpisodeCallback = mainCallbacks.poll(1, TimeUnit.SECONDS);
-        Assert.assertNotNull(firstEpisodeCallback);
-        Assert.assertEquals(Integer.valueOf(1), reports.poll(1, TimeUnit.SECONDS));
-        Assert.assertNull(reports.poll(100, TimeUnit.MILLISECONDS));
+            callback.run();
+            detector.join(500L);
 
-        firstEpisodeCallback.run();
-        Runnable secondEpisodeCallback = mainCallbacks.poll(1, TimeUnit.SECONDS);
-        Assert.assertNotNull(secondEpisodeCallback);
-        Assert.assertEquals(Integer.valueOf(2), reports.poll(1, TimeUnit.SECONDS));
-
-        runnable.shutdown();
-        detector.join(1000L);
-        Assert.assertFalse(detector.isAlive());
+            Assert.assertFalse(detector.isAlive());
+            Assert.assertNull(mainCallbacks.poll(100, TimeUnit.MILLISECONDS));
+            Assert.assertNull(reports.poll(100, TimeUnit.MILLISECONDS));
+            Assert.assertEquals(1, reportCount.get());
+        } finally {
+            runnable.shutdown();
+            detector.join(1_000L);
+        }
     }
 
     @Test

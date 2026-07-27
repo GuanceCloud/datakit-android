@@ -66,7 +66,7 @@ public final class ANRDetectRunnable implements Runnable {
                     }
                     long deadline = System.nanoTime() + detectDurationMs * 1_000_000L;
                     long remainingMs = detectDurationMs;
-                    // A healthy callback may notify early; keep the configured detection cadence.
+                    // Keep the configured detection cadence across early or spurious wakeups.
                     while (!isClose && remainingMs > 0) {
                         runnable.wait(remainingMs);
                         long remainingNanos = deadline - System.nanoTime();
@@ -104,12 +104,7 @@ public final class ANRDetectRunnable implements Runnable {
                 } catch (Throwable throwable) {
                     LogUtils.e(TAG, "ANR report failed: " + throwable.getClass().getSimpleName());
                 }
-
-                synchronized (runnable) {
-                    while (!isClose && !runnable.isCalled()) {
-                        runnable.wait();
-                    }
-                }
+                break;
             } catch (InterruptedException e) {
                 LogUtils.e(TAG, "ANR Thread interrupt");
                 Thread.currentThread().interrupt();
@@ -173,7 +168,6 @@ public final class ANRDetectRunnable implements Runnable {
         @Override
         public synchronized void run() {
             called = true;
-            notifyAll();
         }
 
         /**
