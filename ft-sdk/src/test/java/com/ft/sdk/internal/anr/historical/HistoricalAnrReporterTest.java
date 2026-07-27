@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class HistoricalAnrReporterTest {
 
@@ -73,6 +74,40 @@ public class HistoricalAnrReporterTest {
                 reporter.report(exit, errorSampled, "blocked", "dedupe-two"));
         assertEquals(1, sink.calls);
         assertEquals(CollectType.COLLECT_BY_ERROR_SAMPLE, sink.collectType);
+    }
+
+    @Test
+    public void reportAppliesIssueProviderFieldsBeforePersisting() {
+        RecordingSink sink = new RecordingSink();
+        final boolean[] called = {false};
+        DefaultHistoricalAnrReporter reporter = new DefaultHistoricalAnrReporter(
+                sink,
+                new DefaultHistoricalAnrReporter.IssueFieldsEnricher() {
+                    @Override
+                    public void enrich(String stack,
+                                       long occurredAtNs,
+                                       com.ft.sdk.garble.bean.AppState state,
+                                       HashMap<String, Object> tags,
+                                       HashMap<String, Object> fields) {
+                        called[0] = true;
+                        assertEquals("blocked", stack);
+                        assertEquals(20_000_000_000L, occurredAtNs);
+                        assertEquals("run", state.toString());
+                        fields.put("provider_field", "historical-anr");
+                    }
+                });
+        ProcessExitRecord exit = new ProcessExitRecord(
+                "com.example.app", 123, 20_000,
+                ProcessExitRecord.REASON_ANR, 100, null);
+        HistoricalRumContext context = new HistoricalRumContext(
+                "com.example.app", "run", 1_000, "session", "view", "Home",
+                10_000_000_000L, 0, false);
+
+        assertEquals(HistoricalAnrReporter.ReportResult.INSERTED,
+                reporter.report(exit, context, "blocked", "dedupe"));
+
+        assertTrue(called[0]);
+        assertEquals("historical-anr", sink.fields.get("provider_field"));
     }
 
     private static final class RecordingSink implements HistoricalAnrSink {

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * author: huangDianHua
@@ -161,6 +162,10 @@ public class FTTrackInner {
 
     HashMap<String, Object> getSessionReplayRUMLinksKeys(String[] links) {
         return dataHelper.checkSessionReplayRUMLinksKeys(links);
+    }
+
+    Set<String> getRUMReservedKeys() {
+        return dataHelper.getRUMReservedKeys();
     }
 
     /**
