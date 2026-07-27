@@ -8,7 +8,6 @@ import com.ft.sdk.FTIssueInfo;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -92,18 +91,26 @@ public final class FTIssueFieldEnricher {
                 }
                 String key = (String) rawKey;
                 Object value = normalizeValue(entry.getValue());
-                if (!isValidKey(key) || value == INVALID_VALUE) {
+                if (!isValidKeySyntax(key) || value == INVALID_VALUE) {
                     continue;
                 }
 
-                int keyBytes = utf8Length(key);
-                int valueBytes = value instanceof String
-                        ? utf8Length((String) value)
-                        : utf8Length(String.valueOf(value));
-                if (value instanceof String && valueBytes > MAX_STRING_BYTES) {
+                int keyBytes = utf8LengthUpTo(key, MAX_KEY_BYTES);
+                if (keyBytes > MAX_KEY_BYTES) {
                     continue;
                 }
-                if (totalBytes + keyBytes + valueBytes > MAX_TOTAL_BYTES) {
+                int remainingBytes = MAX_TOTAL_BYTES - totalBytes - keyBytes;
+                if (remainingBytes < 0) {
+                    continue;
+                }
+                int valueByteLimit = value instanceof String
+                        ? Math.min(MAX_STRING_BYTES, remainingBytes)
+                        : remainingBytes;
+                String serializedValue = value instanceof String
+                        ? (String) value
+                        : String.valueOf(value);
+                int valueBytes = utf8LengthUpTo(serializedValue, valueByteLimit);
+                if (valueBytes > valueByteLimit) {
                     continue;
                 }
 
@@ -133,10 +140,9 @@ public final class FTIssueFieldEnricher {
         }
     }
 
-    private static boolean isValidKey(@Nullable String key) {
+    private static boolean isValidKeySyntax(@Nullable String key) {
         return key != null
                 && !key.isEmpty()
-                && utf8Length(key) <= MAX_KEY_BYTES
                 && !key.startsWith("error.")
                 && !key.startsWith("error_");
     }
@@ -173,7 +179,35 @@ public final class FTIssueFieldEnricher {
                 : INVALID_VALUE;
     }
 
-    private static int utf8Length(@NonNull String value) {
-        return value.getBytes(StandardCharsets.UTF_8).length;
+    private static int utf8LengthUpTo(@NonNull String value, int maxBytes) {
+        int bytes = 0;
+        for (int i = 0; i < value.length(); i++) {
+            char current = value.charAt(i);
+            int currentBytes;
+            if (current <= 0x7F) {
+                currentBytes = 1;
+            } else if (current <= 0x7FF) {
+                currentBytes = 2;
+            } else if (Character.isHighSurrogate(current)) {
+                if (i + 1 < value.length()
+                        && Character.isLowSurrogate(value.charAt(i + 1))) {
+                    currentBytes = 4;
+                    i++;
+                } else {
+                    // Java's UTF-8 encoder replaces an unpaired surrogate with one-byte '?'.
+                    currentBytes = 1;
+                }
+            } else if (Character.isLowSurrogate(current)) {
+                // Java's UTF-8 encoder replaces an unpaired surrogate with one-byte '?'.
+                currentBytes = 1;
+            } else {
+                currentBytes = 3;
+            }
+            if (bytes > maxBytes - currentBytes) {
+                return maxBytes + 1;
+            }
+            bytes += currentBytes;
+        }
+        return bytes;
     }
 }

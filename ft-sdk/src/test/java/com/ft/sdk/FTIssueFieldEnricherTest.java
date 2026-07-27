@@ -3,11 +3,13 @@ package com.ft.sdk;
 import com.ft.sdk.internal.issue.FTIssueFieldEnricher;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
@@ -174,6 +176,51 @@ public class FTIssueFieldEnricherTest {
     }
 
     @Test
+    public void oversizedStringValidationDoesNotAllocateAFullUtf8Copy() throws Exception {
+        ThreadAllocationProbe allocationProbe = threadAllocationProbeOrSkip();
+
+        String oversized = repeat("a", 2 * 1024 * 1024);
+        FTIssueFieldEnricher enricher = new FTIssueFieldEnricher(
+                issue -> java.util.Collections.<String, Object>singletonMap(
+                        "oversized", oversized));
+        enricher.provideAdditionalFields(newIssue());
+
+        long before = allocationProbe.currentThreadAllocatedBytes();
+        HashMap<String, Object> additional = enricher.provideAdditionalFields(newIssue());
+        long allocatedBytes = allocationProbe.currentThreadAllocatedBytes() - before;
+
+        Assert.assertTrue(additional.isEmpty());
+        // A full UTF-8 copy is about 2 MiB; 512 KiB tolerates test overhead while catching it.
+        Assert.assertTrue("validation allocated " + allocatedBytes + " bytes",
+                allocatedBytes < 512 * 1024);
+    }
+
+    @Test
+    public void stringByteLimitMatchesUtf8EncodingAtBoundary() {
+        Map<String, Object> supplied = new LinkedHashMap<>();
+        supplied.put("ascii_at_limit", repeat("a", 4096));
+        supplied.put("ascii_over_limit", repeat("a", 4097));
+        supplied.put("cjk_at_limit", repeat("中", 1364) + "abcd");
+        supplied.put("cjk_over_limit", repeat("中", 1365) + "ab");
+        supplied.put("emoji_at_limit", repeat("😀", 1024));
+        supplied.put("emoji_over_limit", repeat("😀", 1024) + "a");
+        supplied.put("unpaired_surrogate_at_limit", repeat("a", 4095) + "\uD800");
+        supplied.put("unpaired_surrogate_over_limit", repeat("a", 4096) + "\uD800");
+
+        HashMap<String, Object> additional =
+                new FTIssueFieldEnricher(issue -> supplied).provideAdditionalFields(newIssue());
+
+        Assert.assertTrue(additional.containsKey("ascii_at_limit"));
+        Assert.assertFalse(additional.containsKey("ascii_over_limit"));
+        Assert.assertTrue(additional.containsKey("cjk_at_limit"));
+        Assert.assertFalse(additional.containsKey("cjk_over_limit"));
+        Assert.assertTrue(additional.containsKey("emoji_at_limit"));
+        Assert.assertFalse(additional.containsKey("emoji_over_limit"));
+        Assert.assertTrue(additional.containsKey("unpaired_surrogate_at_limit"));
+        Assert.assertFalse(additional.containsKey("unpaired_surrogate_over_limit"));
+    }
+
+    @Test
     public void additionalFieldsFailOpenForThrowableAndOversizedPayload() {
         FTIssueFieldEnricher throwing = new FTIssueFieldEnricher(issue -> {
             throw new AssertionError("provider failure");
@@ -295,6 +342,31 @@ public class FTIssueFieldEnricherTest {
                 123L, "run", "thread", false);
     }
 
+    private static ThreadAllocationProbe threadAllocationProbeOrSkip() {
+        try {
+            Class<?> managementFactory = Class.forName("java.lang.management.ManagementFactory");
+            Object allocationBean = managementFactory.getMethod("getThreadMXBean").invoke(null);
+            Class<?> allocationBeanClass = Class.forName("com.sun.management.ThreadMXBean");
+            Assume.assumeTrue(allocationBeanClass.isInstance(allocationBean));
+            Method isSupported =
+                    allocationBeanClass.getMethod("isThreadAllocatedMemorySupported");
+            Assume.assumeTrue((Boolean) isSupported.invoke(allocationBean));
+            Method isEnabled =
+                    allocationBeanClass.getMethod("isThreadAllocatedMemoryEnabled");
+            if (!(Boolean) isEnabled.invoke(allocationBean)) {
+                allocationBeanClass.getMethod(
+                                "setThreadAllocatedMemoryEnabled", boolean.class)
+                        .invoke(allocationBean, true);
+            }
+            Method getAllocatedBytes =
+                    allocationBeanClass.getMethod("getThreadAllocatedBytes", long.class);
+            return new ThreadAllocationProbe(allocationBean, getAllocatedBytes);
+        } catch (ReflectiveOperationException | SecurityException unavailable) {
+            Assume.assumeNoException(unavailable);
+            throw new AssertionError(unavailable);
+        }
+    }
+
     private static Map<String, Object> mapBackedBy(
             Iterator<Map.Entry<String, Object>> iterator, int size) {
         return new AbstractMap<String, Object>() {
@@ -330,5 +402,20 @@ public class FTIssueFieldEnricherTest {
             builder.append(value);
         }
         return builder.toString();
+    }
+
+    private static final class ThreadAllocationProbe {
+        private final Object allocationBean;
+        private final Method getAllocatedBytes;
+
+        private ThreadAllocationProbe(Object allocationBean, Method getAllocatedBytes) {
+            this.allocationBean = allocationBean;
+            this.getAllocatedBytes = getAllocatedBytes;
+        }
+
+        private long currentThreadAllocatedBytes() throws Exception {
+            return (Long) getAllocatedBytes.invoke(
+                    allocationBean, Thread.currentThread().getId());
+        }
     }
 }
