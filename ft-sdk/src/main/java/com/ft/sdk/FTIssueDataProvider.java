@@ -12,11 +12,13 @@ import java.util.Map;
  * Implementations should be thread-safe, avoid I/O and return within 10 ms. A fatal crash restored on
  * the next application start is reported with {@link FTIssueInfo#isHistorical()} set to {@code true}.</p>
  *
- * <p>Returned values may contain strings, booleans and finite numbers. At most 50 fields are accepted. Keys may
- * contain at most 100 UTF-8 bytes, string values at most 4096 UTF-8 bytes, and all accepted custom fields together
- * at most 25 KiB. Invalid, oversized or SDK-reserved entries are ignored. Ordinary {@link Throwable} failures are
- * isolated, but implementations must not throw or terminate the process; the SDK cannot protect against
- * out-of-memory failures, {@code System.exit}, native aborts or similar process-ending behavior.</p>
+ * <p>Returned values may contain strings, booleans and finite numbers. Providers should return no more than
+ * 50 entries. To bound processing cost, the SDK inspects at most the first 50 entries encountered in map iteration
+ * order; invalid entries still consume this scan budget, and no entry-selection guarantee is made for larger maps.
+ * Keys may contain at most 100 UTF-8 bytes, string values at most 4096 UTF-8 bytes, and all accepted custom fields
+ * together at most 25 KiB. Invalid, oversized or SDK-reserved entries are ignored. Ordinary {@link Throwable}
+ * failures are isolated, but implementations must not throw or terminate the process; the SDK cannot protect
+ * against out-of-memory failures, {@code System.exit}, native aborts or similar process-ending behavior.</p>
  *
  * <p>Java example:</p>
  * <pre>{@code

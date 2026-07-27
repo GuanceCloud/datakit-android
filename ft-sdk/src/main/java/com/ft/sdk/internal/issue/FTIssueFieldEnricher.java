@@ -9,8 +9,8 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +35,7 @@ public final class FTIssueFieldEnricher {
     }
 
     /**
-     * Invokes the snapshotted provider once and returns an isolated, validated map.
+     * Invokes the configured provider once and returns an isolated, validated map.
      */
     @NonNull
     public HashMap<String, Object> provideAdditionalFields(@NonNull FTIssueInfo issue) {
@@ -61,23 +61,29 @@ public final class FTIssueFieldEnricher {
             return new HashMap<>();
         }
 
-        final Map<String, Object> snapshot;
+        final Iterator<? extends Map.Entry<?, ?>> iterator;
         try {
-            snapshot = Collections.unmodifiableMap(new HashMap<>(supplied));
+            iterator = supplied.entrySet().iterator();
         } catch (Throwable throwable) {
-            LogUtils.e(TAG, "Issue data provider result could not be copied");
-            return new HashMap<>();
-        }
-        if (snapshot.isEmpty()) {
+            LogUtils.e(TAG, "Issue data provider result could not be traversed");
             return new HashMap<>();
         }
 
         HashMap<String, Object> accepted = new HashMap<>();
+        int scanned = 0;
         int totalBytes = 0;
-        for (Map.Entry<String, Object> entry : snapshot.entrySet()) {
-            if (accepted.size() >= MAX_FIELD_COUNT) {
-                break;
+        while (scanned < MAX_FIELD_COUNT) {
+            final Map.Entry<?, ?> entry;
+            try {
+                if (!iterator.hasNext()) {
+                    break;
+                }
+                entry = iterator.next();
+            } catch (Throwable throwable) {
+                LogUtils.e(TAG, "Issue data provider result could not be traversed");
+                return new HashMap<>();
             }
+            scanned++;
 
             try {
                 Object rawKey = entry.getKey();

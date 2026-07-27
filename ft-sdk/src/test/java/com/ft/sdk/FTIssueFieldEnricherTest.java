@@ -10,19 +10,105 @@ import org.robolectric.annotation.Config;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE, sdk = 21)
 public class FTIssueFieldEnricherTest {
+
+    @Test
+    public void providerMapTraversalIsBoundedByFieldLimit() {
+        AtomicInteger visitedEntries = new AtomicInteger();
+        Map<String, Object> supplied = mapBackedBy(new Iterator<Map.Entry<String, Object>>() {
+            private int index;
+
+            @Override
+            public boolean hasNext() {
+                return index < 10_000;
+            }
+
+            @Override
+            public Map.Entry<String, Object> next() {
+                int current = index++;
+                visitedEntries.incrementAndGet();
+                return new AbstractMap.SimpleImmutableEntry<>("field_" + current, current);
+            }
+        }, 10_000);
+
+        HashMap<String, Object> additional =
+                new FTIssueFieldEnricher(issue -> supplied).provideAdditionalFields(newIssue());
+
+        Assert.assertEquals(FTIssueFieldEnricher.MAX_FIELD_COUNT, additional.size());
+        Assert.assertEquals(FTIssueFieldEnricher.MAX_FIELD_COUNT, visitedEntries.get());
+    }
+
+    @Test
+    public void invalidEntriesConsumeProviderMapScanBudget() {
+        AtomicInteger visitedEntries = new AtomicInteger();
+        Map<String, Object> supplied = mapBackedBy(new Iterator<Map.Entry<String, Object>>() {
+            private int index;
+
+            @Override
+            public boolean hasNext() {
+                return index < 60;
+            }
+
+            @Override
+            public Map.Entry<String, Object> next() {
+                int current = index++;
+                visitedEntries.incrementAndGet();
+                return current < FTIssueFieldEnricher.MAX_FIELD_COUNT
+                        ? new AbstractMap.SimpleImmutableEntry<>("", current)
+                        : new AbstractMap.SimpleImmutableEntry<>("valid_" + current, current);
+            }
+        }, 60);
+
+        HashMap<String, Object> additional =
+                new FTIssueFieldEnricher(issue -> supplied).provideAdditionalFields(newIssue());
+
+        Assert.assertTrue(additional.isEmpty());
+        Assert.assertEquals(FTIssueFieldEnricher.MAX_FIELD_COUNT, visitedEntries.get());
+    }
+
+    @Test
+    public void iteratorFailureDiscardsAllProviderFieldsForCurrentIssue() {
+        Map<String, Object> supplied = mapBackedBy(new Iterator<Map.Entry<String, Object>>() {
+            private boolean first = true;
+
+            @Override
+            public boolean hasNext() {
+                if (!first) {
+                    throw new AssertionError("iterator failure");
+                }
+                return true;
+            }
+
+            @Override
+            public Map.Entry<String, Object> next() {
+                first = false;
+                return new AbstractMap.SimpleImmutableEntry<>("accepted_before_failure", true);
+            }
+        }, 2);
+
+        HashMap<String, Object> additional =
+                new FTIssueFieldEnricher(issue -> supplied).provideAdditionalFields(newIssue());
+
+        Assert.assertTrue(additional.isEmpty());
+    }
 
     @Test
     public void additionalFieldsAcceptOnlySupportedValuesAndRespectSdkFields() {
@@ -67,11 +153,9 @@ public class FTIssueFieldEnricherTest {
     }
 
     @Test
-    public void additionalFieldsEnforceLimitsAndDefensivelyCopyTheProviderMap() {
-        Map<String, Object> supplied = new HashMap<>();
-        for (int i = 0; i < 60; i++) {
-            supplied.put("field_" + i, i);
-        }
+    public void additionalFieldsEnforceByteLimitsAndDefensivelyCopyTheProviderMap() {
+        Map<String, Object> supplied = new LinkedHashMap<>();
+        supplied.put("valid", true);
         supplied.put(repeat("k", 101), "too-long-key");
         supplied.put(repeat("中", 34), "too-long-utf8-key");
         supplied.put("too_long_string", repeat("v", 4097));
@@ -81,7 +165,8 @@ public class FTIssueFieldEnricherTest {
         HashMap<String, Object> additional = enricher.provideAdditionalFields(newIssue());
         supplied.clear();
 
-        Assert.assertEquals(50, additional.size());
+        Assert.assertEquals(1, additional.size());
+        Assert.assertEquals(true, additional.get("valid"));
         Assert.assertFalse(additional.containsKey("too_long_string"));
         Assert.assertFalse(additional.containsKey("too_long_utf8_string"));
         Assert.assertFalse(additional.containsKey(repeat("k", 101)));
@@ -185,8 +270,13 @@ public class FTIssueFieldEnricherTest {
     }
 
     @Test
-    public void providerMapIsCopiedWithoutTrustingItsIsEmptyImplementation() {
+    public void providerMapIsTraversedWithoutTrustingSizeOrIsEmpty() {
         HashMap<String, Object> supplied = new HashMap<String, Object>() {
+            @Override
+            public int size() {
+                throw new AssertionError("untrusted map implementation");
+            }
+
             @Override
             public boolean isEmpty() {
                 throw new AssertionError("untrusted map implementation");
@@ -203,6 +293,26 @@ public class FTIssueFieldEnricherTest {
     private static FTIssueInfo newIssue() {
         return new FTIssueInfo(FTIssueCategory.CRASH, "java_crash", "message", "stack",
                 123L, "run", "thread", false);
+    }
+
+    private static Map<String, Object> mapBackedBy(
+            Iterator<Map.Entry<String, Object>> iterator, int size) {
+        return new AbstractMap<String, Object>() {
+            @Override
+            public Set<Entry<String, Object>> entrySet() {
+                return new AbstractSet<Entry<String, Object>>() {
+                    @Override
+                    public Iterator<Entry<String, Object>> iterator() {
+                        return iterator;
+                    }
+
+                    @Override
+                    public int size() {
+                        return size;
+                    }
+                };
+            }
+        };
     }
 
     private static int estimatedBytes(Map<String, Object> fields) {
