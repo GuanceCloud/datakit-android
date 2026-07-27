@@ -43,7 +43,15 @@ import java.util.Map;
 @FunctionalInterface
 public interface FTIssueDataProvider {
     /**
-     * Returns custom RUM Error fields for {@code issue}, or {@code null} for no additional fields.
+     * Supplies custom fields while the SDK synchronously constructs an automatically collected
+     * Crash or ANR Error.
+     *
+     * <p>This method may run concurrently on SDK collection threads. Follow the threading,
+     * performance, type, entry-count, and size limits documented on this interface.</p>
+     *
+     * @param issue immutable facts about the issue being collected; never {@code null}
+     * @return custom fields to merge into the RUM Error, or {@code null} or an empty map when no
+     * additional fields should be added; the SDK validates and copies accepted entries
      */
     @Nullable
     Map<String, Object> provideAdditionalFields(@NonNull FTIssueInfo issue);
