@@ -1,8 +1,12 @@
 package com.ft.sdk.internal.anr;
 
+import com.ft.sdk.ExtraLogCatSetting;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -10,6 +14,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ANRDetectRunnableTest {
+
+    @Test
+    public void legacyPublicConstructorRemainsAvailable() throws Exception {
+        Constructor<ANRDetectRunnable> constructor =
+                ANRDetectRunnable.class.getConstructor(ExtraLogCatSetting.class);
+
+        Assert.assertTrue(Modifier.isPublic(constructor.getModifiers()));
+    }
 
     @Test
     public void healthyMainThreadMaintainsDetectInterval() throws Exception {

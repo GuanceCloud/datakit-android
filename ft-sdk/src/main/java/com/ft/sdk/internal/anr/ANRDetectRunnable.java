@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.ft.sdk.ExtraLogCatSetting;
+import com.ft.sdk.FTRUMGlobalManager;
+import com.ft.sdk.garble.bean.AppState;
+import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
@@ -17,6 +20,14 @@ import com.ft.sdk.garble.utils.Utils;
 public final class ANRDetectRunnable implements Runnable {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "ANRDetectRunnable";
+
+    private static final IssueReporter LEGACY_ISSUE_REPORTER = new IssueReporter() {
+        @Override
+        public void report(String stack, long occurredAtNanoseconds, String threadName) {
+            FTRUMGlobalManager.get().addError(
+                    stack, "android_anr", ErrorType.ANR_ERROR, AppState.RUN);
+        }
+    };
 
     /**
      * Monitoring cycle
@@ -32,8 +43,15 @@ public final class ANRDetectRunnable implements Runnable {
     private final long detectDurationMs;
 
     /**
-     * Main thread message Handler
+     * Creates a detector using the legacy global RUM Error reporting path.
+     *
+     * @deprecated Configure ANR collection through the SDK instead of constructing the detector.
      */
+    @Deprecated
+    public ANRDetectRunnable(ExtraLogCatSetting extraLogCatSetting) {
+        this(extraLogCatSetting, LEGACY_ISSUE_REPORTER);
+    }
+
     public ANRDetectRunnable(ExtraLogCatSetting extraLogCatSetting, IssueReporter issueReporter) {
         this(extraLogCatSetting, new AndroidMainThreadPoster(), issueReporter, ANR_DETECT_DURATION_MS);
     }
