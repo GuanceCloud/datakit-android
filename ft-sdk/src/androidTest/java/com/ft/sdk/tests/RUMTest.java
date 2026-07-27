@@ -705,6 +705,7 @@ public class RUMTest extends FTBaseTest {
                 ERROR, ERROR_MESSAGE, 456L, FTIssueCategory.ANR,
                 ErrorType.ANR_ERROR.toString(), AppState.RUN, false, "main", null, null);
         waitEventConsumeInThreadPool();
+        Thread.sleep(2000);
 
         Assert.assertEquals(2, issues.size());
         Assert.assertEquals(0, replacementCalls.get());
