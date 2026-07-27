@@ -1,3 +1,8 @@
+# Unreleased
+1. Fixed cold-start `app_launch_type` classification when a background component starts the process long before the first Activity.
+2. Aligned cold-start duration calculation with the uptime clock so device deep sleep is not counted as launch work.
+
+---
 # agent 1.7.4
 1. Added experimental Android RUM Heatmap support with `display`, `action_position`, and `action_target`; element association requires `ft-session-replay >= 0.1.7`.
 2. Fixed locale-sensitive parsing and improved custom log console fault tolerance.
