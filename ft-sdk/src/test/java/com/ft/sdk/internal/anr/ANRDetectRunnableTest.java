@@ -4,11 +4,54 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ANRDetectRunnableTest {
+
+    @Test
+    public void healthyMainThreadMaintainsDetectInterval() throws Exception {
+        CountDownLatch firstPost = new CountDownLatch(1);
+        CountDownLatch secondPost = new CountDownLatch(1);
+        AtomicInteger postCount = new AtomicInteger();
+        Thread mainThread = new Thread("fake-main");
+        ANRDetectRunnable runnable = new ANRDetectRunnable(
+                null,
+                new ANRDetectRunnable.MainThreadPoster() {
+                    @Override
+                    public boolean post(Runnable callback) {
+                        if (postCount.incrementAndGet() == 1) {
+                            firstPost.countDown();
+                        } else {
+                            secondPost.countDown();
+                        }
+                        callback.run();
+                        return true;
+                    }
+
+                    @Override
+                    public Thread getThread() {
+                        return mainThread;
+                    }
+                },
+                (stack, occurredAtNanoseconds, threadName) ->
+                        Assert.fail("healthy main reported ANR"),
+                1_000L);
+        Thread detector = new Thread(runnable, "anr-detector-test");
+        detector.start();
+        try {
+            Assert.assertTrue(firstPost.await(1, TimeUnit.SECONDS));
+            Assert.assertFalse("healthy callback shortened the detect interval",
+                    secondPost.await(100, TimeUnit.MILLISECONDS));
+        } finally {
+            runnable.shutdown();
+            detector.join(1_000L);
+        }
+
+        Assert.assertFalse(detector.isAlive());
+    }
 
     @Test
     public void reportsOncePerEpisodeAndRearmsAfterMainThreadRecovery() throws Exception {

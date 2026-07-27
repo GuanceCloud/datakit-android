@@ -66,7 +66,8 @@ public final class ANRDetectRunnable implements Runnable {
                     }
                     long deadline = System.nanoTime() + detectDurationMs * 1_000_000L;
                     long remainingMs = detectDurationMs;
-                    while (!isClose && !runnable.isCalled() && remainingMs > 0) {
+                    // A healthy callback may notify early; keep the configured detection cadence.
+                    while (!isClose && remainingMs > 0) {
                         runnable.wait(remainingMs);
                         long remainingNanos = deadline - System.nanoTime();
                         remainingMs = remainingNanos <= 0
