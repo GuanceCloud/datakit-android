@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="historical_anr_acceptance_entry">Historical ANR Acceptance</string>
+    <string name="historical_anr_acceptance_title">Historical ANR Acceptance</string>
+    <string name="historical_anr_acceptance_instructions">Manual API 30+ acceptance:\n1. Start the worker scenario.\n2. Tap Trigger Fatal ANR and wait until Android shows the ANR dialog; choose Close app.\n3. Return here and start two fresh recovery processes concurrently.\n4. Expect one provider call, one emitted payload, a matching system/provider timestamp, and payload sessionId/viewId matching the expected old context.\n5. Wait 12 seconds and repeat step 3, or relaunch the App; both counts must remain one.</string>
+    <string name="historical_anr_start">1. Start worker scenario</string>
+    <string name="historical_anr_consume">3. Start two concurrent recovery processes</string>
+    <string name="historical_anr_refresh">Refresh result</string>
+    <string name="historical_anr_reset">Reset acceptance state</string>
+    <string name="historical_anr_requires_api_30">ApplicationExitInfo acceptance requires Android API 30 or above.</string>
+    <string name="historical_anr_worker_title">Historical ANR Worker</string>
+    <string name="historical_anr_worker_preparing">Preparing and persisting the worker RUM View…</string>
+    <string name="historical_anr_worker_view_failed">Worker View was not persisted. Return and retry before triggering ANR.</string>
+    <string name="historical_anr_worker_ready">Tap the button and wait until Android shows the ANR dialog. Choose Close app, then start the two concurrent recovery processes from the controller page.</string>
+    <string name="historical_anr_trigger">2. Trigger worker fatal ANR</string>
+</resources>

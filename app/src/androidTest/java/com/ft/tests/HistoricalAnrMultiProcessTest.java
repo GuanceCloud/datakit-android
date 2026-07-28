@@ -12,13 +12,11 @@ import android.os.Build;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SdkSuppress;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ServiceTestRule;
 
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.service.HistoricalAnrWorkerService;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -29,9 +27,6 @@ import java.util.concurrent.TimeUnit;
 @RunWith(AndroidJUnit4.class)
 @SdkSuppress(minSdkVersion = 30)
 public class HistoricalAnrMultiProcessTest {
-    @Rule
-    public final ServiceTestRule serviceRule = new ServiceTestRule();
-
     @Test
     public void workerInitializesSdkAndPersistsItsOwnViewIdentity() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
@@ -47,7 +42,7 @@ public class HistoricalAnrMultiProcessTest {
         };
         registerReceiver(context, receiver);
         try {
-            serviceRule.startService(HistoricalAnrWorkerService.prepareIntent(context));
+            context.startService(HistoricalAnrWorkerService.prepareIntent(context));
             assertTrue("worker did not become ready", ready.await(10, TimeUnit.SECONDS));
             assertTrue("SDK was not initialized in :anr_worker", installed[0]);
 
