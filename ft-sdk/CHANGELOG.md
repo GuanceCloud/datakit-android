@@ -1,6 +1,12 @@
+# Unreleased
+1. Added `FTRUMConfig.setIssueDataProvider` to attach validated custom fields to automatically collected Java/native Crash and watchdog/native ANR RUM Errors, including historical native dump context.
+2. Fixed Java watchdog ANR detection so it rearms after the main thread recovers and exits promptly during SDK shutdown.
+
+---
 # agent 1.7.4
 1. Added experimental Android RUM Heatmap support with `display`, `action_position`, and `action_target`; element association requires `ft-session-replay >= 0.1.7`.
 2. Fixed locale-sensitive parsing and improved custom log console fault tolerance.
+3. Added API 30+ fatal ANR recovery through `ApplicationExitInfo`, with persisted historical RUM View association and multi-process effectively-once deduplication across DB, File, and Shadow storage modes.
 
 ---
 # agent 1.7.4-beta01

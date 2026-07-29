@@ -1,38 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Network Test"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:paddingBottom="16dp" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/btn_normal_request"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Normal Network Request Test"
-        android:layout_marginBottom="8dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="16dp"
+            android:text="@string/network_test_title"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/btn_stream_upload"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Streaming Upload Test"
-        android:layout_marginBottom="8dp" />
+        <Button
+            android:id="@+id/btn_normal_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/network_normal_request" />
 
-    <Button
-        android:id="@+id/btn_stream_download"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Streaming Download Test" />
+        <Button
+            android:id="@+id/btn_stream_upload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/network_stream_upload" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btn_stream_download"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/network_stream_download" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/resource_queue_repro_title"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/resource_queue_repro_description" />
+
+        <EditText
+            android:id="@+id/et_resource_queue_hold_seconds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/resource_queue_hold_hint"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLines="1"
+            android:text="@string/resource_queue_default_hold_seconds" />
+
+        <Button
+            android:id="@+id/btn_resource_queue_repro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/resource_queue_repro_action" />
+
+        <TextView
+            android:id="@+id/tv_resource_queue_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="monospace"
+            android:paddingBottom="24dp"
+            android:text="@string/resource_queue_repro_initial_result"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+</ScrollView>

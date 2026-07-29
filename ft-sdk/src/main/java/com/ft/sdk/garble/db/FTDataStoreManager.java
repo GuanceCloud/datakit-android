@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.pm.ProviderInfo;
 import android.os.Looper;
 
+import androidx.annotation.RestrictTo;
+
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.db.file.FTFileDataStore;
@@ -103,6 +105,11 @@ public class FTDataStoreManager {
         synchronized (FTDataStoreManager.class) {
             dataStore = null;
         }
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static boolean isFileDataStorePrimary() {
+        return get() instanceof FTFileDataStore;
     }
 
     private static boolean isDbProviderAvailable() {

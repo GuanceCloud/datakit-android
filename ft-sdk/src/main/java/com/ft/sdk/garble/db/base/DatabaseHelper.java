@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.db.base;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -36,19 +37,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Upgrade database
-        if (oldVersion == 1 && newVersion == 2) {
+        if (oldVersion < 2) {
             update1to2(db);
-        } else if (oldVersion < 3 && newVersion == 3) {
+        }
+        if (oldVersion < 3) {
             update2to3(db);
-            if (oldVersion == 1) {
-                update1to2(db);
-            }
+        }
+        if (oldVersion < 4) {
+            update3to4(db);
         }
     }
 
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion >= 4 && newVersion < 4) {
+            return;
+        }
         if (oldVersion == 3 && newVersion < 3) {
             createTable(db);
         } else {
@@ -66,6 +70,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(FTSQL.FT_TABLE_SYNC_CREATE);
         db.execSQL(FTSQL.FT_TABLE_VIEW_CREATE);
         db.execSQL(FTSQL.FT_TABLE_ACTION_CREATE);
+        db.execSQL(FTSQL.FT_SYNC_DEDUPE_INDEX_CREATE);
+        db.execSQL(FTSQL.FT_HISTORICAL_EXIT_CLAIM_CREATE);
 //        db.execSQL(FTSQL.FT_TABLE_USER_DATA_CREATE);
     }
 
@@ -83,5 +89,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void update2to3(SQLiteDatabase db) {
         db.execSQL(FTSQL.FT_TABLE_SYNC_CREATE);
+    }
+
+    private void update3to4(SQLiteDatabase db) {
+        addColumnIfMissing(db, FTSQL.FT_TABLE_VIEW, FTSQL.RUM_COLUMN_PROCESS_NAME,
+                "TEXT");
+        addColumnIfMissing(db, FTSQL.FT_TABLE_VIEW, FTSQL.RUM_COLUMN_PROCESS_RUN_ID,
+                "TEXT");
+        addColumnIfMissing(db, FTSQL.FT_TABLE_VIEW, FTSQL.RUM_COLUMN_PROCESS_START_MS,
+                "BIGINT DEFAULT 0");
+        addColumnIfMissing(db, FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME,
+                FTSQL.RECORD_COLUMN_DEDUPE_KEY, "TEXT");
+        db.execSQL(FTSQL.FT_SYNC_DEDUPE_INDEX_CREATE);
+        db.execSQL(FTSQL.FT_HISTORICAL_EXIT_CLAIM_CREATE);
+    }
+
+    private void addColumnIfMissing(SQLiteDatabase db, String table, String column,
+                                    String definition) {
+        if (!hasColumn(db, table, column)) {
+            db.execSQL("ALTER TABLE " + table + " ADD COLUMN " + column + " " + definition);
+        }
+    }
+
+    private boolean hasColumn(SQLiteDatabase db, String table, String column) {
+        Cursor cursor = db.rawQuery("PRAGMA table_info(" + table + ")", null);
+        try {
+            int nameIndex = cursor.getColumnIndex("name");
+            while (cursor.moveToNext()) {
+                if (column.equals(cursor.getString(nameIndex))) {
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            cursor.close();
+        }
     }
 }

@@ -14,5 +14,5 @@ public class FTDBConfig {
     /**
      * DB version number
      */
-    public static int DATABASE_VERSION = 3;
+    public static int DATABASE_VERSION = 4;
 }

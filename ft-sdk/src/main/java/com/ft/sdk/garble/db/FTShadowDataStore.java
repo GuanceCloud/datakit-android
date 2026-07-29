@@ -290,6 +290,36 @@ class FTShadowDataStore implements FTDataStore {
     }
 
     @Override
+    public InsertResult insertSyncDataIfAbsent(@NonNull String dedupeKey,
+                                               @NonNull SyncData data) {
+        InsertResult result = primary.insertSyncDataIfAbsent(dedupeKey, data);
+        if (result == InsertResult.INSERTED) {
+            mirror(new Runnable() {
+                @Override
+                public void run() {
+                    shadow.insertSyncDataIfAbsent(dedupeKey, data);
+                }
+            });
+        }
+        return result;
+    }
+
+    @Override
+    public InsertResult increaseViewErrorOnce(@NonNull String viewId,
+                                              @NonNull String dedupeKey) {
+        InsertResult result = primary.increaseViewErrorOnce(viewId, dedupeKey);
+        if (result == InsertResult.INSERTED) {
+            mirror(new Runnable() {
+                @Override
+                public void run() {
+                    shadow.increaseViewErrorOnce(viewId, dedupeKey);
+                }
+            });
+        }
+        return result;
+    }
+
+    @Override
     public boolean insertFtOptList(@NonNull List<SyncData> dataList, boolean reInsert) {
         boolean result = primary.insertFtOptList(dataList, reInsert);
         resyncShadowSyncQueue();

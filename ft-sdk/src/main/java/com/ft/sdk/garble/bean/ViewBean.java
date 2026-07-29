@@ -128,6 +128,12 @@ public class ViewBean {
      */
     String sessionId;
 
+    String processName;
+
+    String processRunId;
+
+    long processStartMs;
+
 
     /**
      * Page update count, {@link  Constants#KEY_RUM_SDK_VIEW_UPDATE_TIME}
@@ -238,6 +244,30 @@ public class ViewBean {
 
     public String getSessionId() {
         return sessionId;
+    }
+
+    public String getProcessName() {
+        return processName;
+    }
+
+    public void setProcessName(String processName) {
+        this.processName = processName;
+    }
+
+    public String getProcessRunId() {
+        return processRunId;
+    }
+
+    public void setProcessRunId(String processRunId) {
+        this.processRunId = processRunId;
+    }
+
+    public long getProcessStartMs() {
+        return processStartMs;
+    }
+
+    public void setProcessStartMs(long processStartMs) {
+        this.processStartMs = processStartMs;
     }
 
     public void setId(String id) {
@@ -492,6 +522,9 @@ public class ViewBean {
                 ", batteryCurrentAvg=" + batteryCurrentAvg +
                 ", batteryCurrentMax=" + batteryCurrentMax +
                 ", sessionId='" + sessionId + '\'' +
+                ", processName='" + processName + '\'' +
+                ", processRunId='" + processRunId + '\'' +
+                ", processStartMs=" + processStartMs +
                 '}';
     }
 }

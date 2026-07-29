@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
@@ -83,8 +85,27 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * @param callBack
      */
     public void uploadCrashLog(String crash, String message, AppState state, RunnerCompleteCallBack callBack) {
-        long dateline = Utils.getCurrentNanoTime();
-        FTRUMInnerManager.get().addError(crash, message, dateline, ErrorType.JAVA.toString(), state, callBack);
+        uploadCrashLog(crash, message, Utils.getCurrentNanoTime(), state,
+                Thread.currentThread().getName(), callBack);
+    }
+
+    private void uploadCrashLog(String crash,
+                                String message,
+                                long dateline,
+                                AppState state,
+                                String threadName,
+                                RunnerCompleteCallBack callBack) {
+        FTRUMInnerManager.get().addAutomaticIssue(
+                crash,
+                message,
+                dateline,
+                FTIssueCategory.CRASH,
+                ErrorType.JAVA.toString(),
+                state,
+                false,
+                threadName,
+                null,
+                callBack);
     }
 
     private FTExceptionHandler() {
@@ -133,6 +154,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
+        long occurredAtNanoseconds = Utils.getCurrentNanoTime();
         StringWriter writer = new StringWriter();
         PrintWriter printWriter = new PrintWriter(writer);
         e.printStackTrace(printWriter);
@@ -151,7 +173,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                             logCatWithError.getLogcatEventsLines()));
         }
         CountDownLatch latch = new CountDownLatch(1);
-        uploadCrashLog(writer.toString(), e.getMessage(), FTActivityManager.get().getAppState(), new RunnerCompleteCallBack() {
+        uploadCrashLog(writer.toString(), e.getMessage(), occurredAtNanoseconds,
+                FTActivityManager.get().getAppState(), t.getName(), new RunnerCompleteCallBack() {
             @Override
             public void onComplete() {
                 latch.countDown();
@@ -247,14 +270,33 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         long crashTime = item.lastModified() * 1000000L;
         HashMap<String, Object> property = new HashMap<>();
         property.put(IS_PRE_CRASH, isPreCrash);
-        if (config.isEnableTrackAppANR()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+                && config.isEnableTrackAppANR()
                 && item.getName().contains(ANR_FILE_NAME)) {
-            FTRUMInnerManager.get().addError(crashString, "Native Crash",
-                    crashTime, ErrorType.ANR_CRASH.toString(), state, property, callBack);
+            FTRUMInnerManager.get().addAutomaticIssue(
+                    crashString,
+                    "Native Crash",
+                    crashTime,
+                    FTIssueCategory.ANR,
+                    ErrorType.ANR_CRASH.toString(),
+                    state,
+                    isPreCrash,
+                    null,
+                    property,
+                    callBack);
         } else if (config.isEnableTrackAppCrash()
                 && item.getName().contains(NATIVE_FILE_NAME)) {
-            FTRUMInnerManager.get().addError(crashString, "Native Crash",
-                    crashTime, ErrorType.NATIVE.toString(), state, property, callBack);
+            FTRUMInnerManager.get().addAutomaticIssue(
+                    crashString,
+                    "Native Crash",
+                    crashTime,
+                    FTIssueCategory.CRASH,
+                    ErrorType.NATIVE.toString(),
+                    state,
+                    isPreCrash,
+                    null,
+                    property,
+                    callBack);
         }
 
     }

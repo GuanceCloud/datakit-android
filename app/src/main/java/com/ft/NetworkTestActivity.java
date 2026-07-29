@@ -2,6 +2,9 @@ package com.ft;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ft.BuildConfig;
 import com.ft.sdk.FTResourceEventListener;
@@ -29,6 +32,8 @@ import okhttp3.ResponseBody;
 public class NetworkTestActivity extends NameTitleActivity {
 
     private static final String TAG = "NetworkTestActivity";
+    private static final int DEFAULT_QUEUE_HOLD_SECONDS = 5;
+    private static final int MAX_QUEUE_HOLD_SECONDS = 15 * 60;
 
     private final OkHttpClient client = new OkHttpClient.Builder()
             .addInterceptor(new FTTraceInterceptor())
@@ -36,6 +41,11 @@ public class NetworkTestActivity extends NameTitleActivity {
             .eventListenerFactory(new FTResourceEventListener.FTFactory())
             .connectTimeout(10, TimeUnit.SECONDS)
             .build();
+
+    private Button resourceQueueReproButton;
+    private EditText resourceQueueHoldSeconds;
+    private TextView resourceQueueResult;
+    private ResourceQueueTimingRepro resourceQueueTimingRepro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +63,53 @@ public class NetworkTestActivity extends NameTitleActivity {
         // Streaming download test
         Button streamDownloadBtn = findViewById(R.id.btn_stream_download);
         streamDownloadBtn.setOnClickListener(v -> testStreamDownload());
+
+        resourceQueueReproButton = findViewById(R.id.btn_resource_queue_repro);
+        resourceQueueHoldSeconds = findViewById(R.id.et_resource_queue_hold_seconds);
+        resourceQueueResult = findViewById(R.id.tv_resource_queue_result);
+        resourceQueueReproButton.setOnClickListener(v -> testResourceQueueTiming());
+    }
+
+    private void testResourceQueueTiming() {
+        int queueHoldSeconds;
+        try {
+            queueHoldSeconds = Integer.parseInt(
+                    resourceQueueHoldSeconds.getText().toString().trim()
+            );
+        } catch (NumberFormatException ignored) {
+            queueHoldSeconds = DEFAULT_QUEUE_HOLD_SECONDS;
+        }
+        if (queueHoldSeconds < 1 || queueHoldSeconds > MAX_QUEUE_HOLD_SECONDS) {
+            Toast.makeText(
+                    this,
+                    "Hold time must be between 1 and 900 seconds",
+                    Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
+
+        resourceQueueReproButton.setEnabled(false);
+        resourceQueueResult.setText("正在启动真实并发排队场景…");
+        resourceQueueTimingRepro = new ResourceQueueTimingRepro();
+        resourceQueueTimingRepro.start(
+                queueHoldSeconds,
+                new ResourceQueueTimingRepro.Listener() {
+                    @Override
+                    public void onProgress(String message) {
+                        runOnUiThread(() -> resourceQueueResult.append("\n" + message));
+                    }
+
+                    @Override
+                    public void onComplete(String result) {
+                        LogUtils.d(TAG, "Resource queue timing reproduction:\n" + result);
+                        runOnUiThread(() -> {
+                            resourceQueueResult.setText(result);
+                            resourceQueueReproButton.setEnabled(true);
+                            resourceQueueTimingRepro = null;
+                        });
+                    }
+                }
+        );
     }
 
     /**
@@ -180,5 +237,13 @@ public class NetworkTestActivity extends NameTitleActivity {
             }
         }).start();
     }
-}
 
+    @Override
+    protected void onDestroy() {
+        ResourceQueueTimingRepro repro = resourceQueueTimingRepro;
+        if (repro != null) {
+            repro.close();
+        }
+        super.onDestroy();
+    }
+}

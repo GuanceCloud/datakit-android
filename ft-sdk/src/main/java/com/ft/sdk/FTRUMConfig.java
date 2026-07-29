@@ -3,6 +3,7 @@ package com.ft.sdk;
 import android.app.Activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
@@ -41,6 +42,12 @@ public class FTRUMConfig {
      * Set whether to detect ANR
      */
     private boolean enableTrackAppANR;
+
+    /**
+     * Custom field provider for automatically collected Crash and ANR Errors.
+     */
+    @Nullable
+    private FTIssueDataProvider issueDataProvider;
     /**
      * Whether to enable user action tracking
      */
@@ -391,6 +398,25 @@ public class FTRUMConfig {
         this.extraLogCatWithANR = extraLogCatWithANR;
         return this;
     }
+
+    /**
+     * Sets a synchronous provider for custom fields on automatically collected Crash and ANR Errors.
+     * The SDK snapshots this provider during RUM initialization. Changing this config afterwards does
+     * not affect the active SDK instance.
+     *
+     * @param provider provider to invoke, or {@code null} to disable custom issue fields
+     * @return this config for chaining
+     */
+    public FTRUMConfig setIssueDataProvider(@Nullable FTIssueDataProvider provider) {
+        this.issueDataProvider = provider;
+        return this;
+    }
+
+    @Nullable
+    FTIssueDataProvider getIssueDataProvider() {
+        return issueDataProvider;
+    }
+
     /**
      * Returns whether automatic user action tracking is enabled.
      */

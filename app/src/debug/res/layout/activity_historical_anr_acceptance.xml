@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/historical_anr_acceptance_instructions"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/historical_anr_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/historical_anr_start" />
+
+        <Button
+            android:id="@+id/historical_anr_consume"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/historical_anr_consume" />
+
+        <Button
+            android:id="@+id/historical_anr_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/historical_anr_refresh" />
+
+        <Button
+            android:id="@+id/historical_anr_reset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/historical_anr_reset" />
+
+        <TextView
+            android:id="@+id/historical_anr_acceptance_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:paddingTop="16dp"
+            android:textIsSelectable="true"
+            android:textSize="14sp" />
+    </LinearLayout>
+</ScrollView>
