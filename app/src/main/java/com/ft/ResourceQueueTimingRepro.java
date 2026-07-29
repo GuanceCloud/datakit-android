@@ -46,6 +46,7 @@ import okhttp3.ResponseBody;
  */
 final class ResourceQueueTimingRepro implements Closeable {
 
+    private static final String REPRO_API_PATH = "/api/v1/test/resource-queue";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static final long RESOURCE_REMOVAL_TIMEOUT_MS = 10_000L;
     private static final long OBSERVED_TIMESTAMP_NEAR_END_NS = TimeUnit.SECONDS.toNanos(1);
@@ -120,7 +121,7 @@ final class ResourceQueueTimingRepro implements Closeable {
                 .readTimeout(0, TimeUnit.MILLISECONDS)
                 .build();
 
-        String url = "http://localhost:" + server.getPort() + "/v3/user/check-user-token";
+        String url = "http://localhost:" + server.getPort() + REPRO_API_PATH;
         Request firstRequest = createRequest(url);
         Request secondRequest = createRequest(url);
         String resourceId = Utils.identifyRequest(firstRequest);
