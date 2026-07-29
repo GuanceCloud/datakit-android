@@ -15,6 +15,7 @@ import com.ft.sdk.ErrorMonitorType;
 import com.ft.sdk.FTIssueDataProvider;
 import com.ft.sdk.FTIssueInfo;
 import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.LineDataModifier;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.FTSDKConfig;
@@ -40,6 +41,7 @@ import com.ft.sdk.sessionreplay.compose.ComposeExtensionSupport;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.WebViewXWireframeMapper;
 import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
+import com.ft.utils.HistoricalAnrAcceptanceStore;
 import com.lzy.okgo.OkGo;
 
 import org.json.JSONException;
@@ -109,7 +111,7 @@ public class DemoApplication extends BaseApplication {
         Log.i(TAG, "initFTSDK start");
 
         FTSdk.install(buildFTSDKConfig(context));
-        initFTSDKFeatures();
+        initFTSDKFeatures(context);
 
         Log.i(TAG, "initFTSDK end, cost=" + (SystemClock.elapsedRealtime() - startTime) + "ms");
 
@@ -128,7 +130,7 @@ public class DemoApplication extends BaseApplication {
                 mainHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        initFTSDKFeatures();
+                        initFTSDKFeatures(context);
                         Log.i(TAG, "initFTSDKAsync end, cost="
                                 + (SystemClock.elapsedRealtime() - startTime) + "ms");
                     }
@@ -202,6 +204,17 @@ public class DemoApplication extends BaseApplication {
 //                    }
 //                })
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase(Locale.ROOT)));
+        if (BuildConfig.DEBUG) {
+            ftSDKConfig.setLineDataModifier(new LineDataModifier() {
+                @Override
+                public Map<String, Object> modify(String measurement,
+                                                  HashMap<String, Object> data) {
+                    HistoricalAnrAcceptanceStore.recordHistoricalPayload(
+                            context, measurement, data);
+                    return null;
+                }
+            });
+        }
 //        try {
 //            URL url = new URL(BuildConfig.PROXY_ADDRESS);
 //            ftSDKConfig.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(url.getHost(), url.getPort())));
@@ -212,7 +225,7 @@ public class DemoApplication extends BaseApplication {
         return ftSDKConfig;
     }
 
-    private static void initFTSDKFeatures() {
+    private static void initFTSDKFeatures(Context context) {
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
@@ -246,6 +259,10 @@ public class DemoApplication extends BaseApplication {
                             @Nullable
                             @Override
                             public Map<String, Object> provideAdditionalFields(@NonNull FTIssueInfo issue) {
+                                if (BuildConfig.DEBUG) {
+                                    HistoricalAnrAcceptanceStore.recordHistoricalIssue(
+                                            context, issue);
+                                }
                                 int callCount = ISSUE_PROVIDER_CALL_COUNT.incrementAndGet();
                                 HashMap<String, Object> fields = new HashMap<>();
                                 fields.put("demo_issue_marker", ISSUE_PROVIDER_MARKER);

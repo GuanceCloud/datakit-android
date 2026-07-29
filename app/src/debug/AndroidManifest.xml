@@ -17,6 +17,15 @@
         </activity>
 
         <activity
+            android:name=".HistoricalAnrAcceptanceActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".HistoricalAnrWorkerActivity"
+            android:exported="false"
+            android:process=":anr_worker" />
+
+        <activity
             android:name=".MainActivity"
             tools:node="remove" />
 
@@ -42,6 +51,32 @@
             android:name=".BackgroundLaunchProvider"
             android:authorities="com.ft.background-launch"
             android:exported="true" />
+
+        <service
+            android:name=".service.HistoricalAnrWorkerService"
+            android:exported="false"
+            android:process=":anr_worker" />
+
+        <service
+            android:name=".service.HistoricalAnrConsumerService"
+            android:exported="false"
+            android:process=":anr_consumer_a" />
+
+        <service
+            android:name=".service.HistoricalAnrConsumerServiceB"
+            android:exported="false"
+            android:process=":anr_consumer_b" />
+
+        <receiver
+            android:name=".HistoricalAnrAcceptanceReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.ft.historical_anr.acceptance.WORKER_VIEW_READY" />
+                <action android:name="com.ft.historical_anr.acceptance.ANR_TRIGGERED" />
+                <action android:name="com.ft.historical_anr.acceptance.ISSUE_OBSERVED" />
+                <action android:name="com.ft.historical_anr.acceptance.PAYLOAD_OBSERVED" />
+            </intent-filter>
+        </receiver>
 
         <!-- remove provider setting -->
 <!--        <provider-->

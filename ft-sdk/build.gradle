@@ -38,6 +38,9 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
     namespace 'com.ft.sdk'
 }
 
@@ -66,5 +69,4 @@ dependencies {
 }
 
 apply from: '../maven_aar_publish.gradle'
-
 

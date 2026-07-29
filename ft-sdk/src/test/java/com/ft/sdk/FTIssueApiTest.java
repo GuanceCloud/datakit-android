@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.bean.AppState;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,5 +36,22 @@ public class FTIssueApiTest {
         Assert.assertEquals("crash-thread", info.getThreadName());
         Assert.assertFalse(info.isHistorical());
         Assert.assertFalse(config.toString().contains("issueDataProvider"));
+    }
+
+    @Test
+    public void applicationExitInfoAnrUsesHistoricalIssueFacts() {
+        FTIssueInfo info = FTRUMInnerManager.createHistoricalAnrIssueInfo(
+                "blocked main thread",
+                456L,
+                AppState.BACKGROUND);
+
+        Assert.assertEquals(FTIssueCategory.ANR, info.getCategory());
+        Assert.assertEquals("anr_crash", info.getErrorType());
+        Assert.assertEquals("android_anr", info.getMessage());
+        Assert.assertEquals("blocked main thread", info.getStack());
+        Assert.assertEquals(456L, info.getOccurredAtNanoseconds());
+        Assert.assertEquals("background", info.getAppState());
+        Assert.assertNull(info.getThreadName());
+        Assert.assertTrue(info.isHistorical());
     }
 }

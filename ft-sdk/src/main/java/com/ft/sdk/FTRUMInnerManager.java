@@ -3,6 +3,8 @@ package com.ft.sdk;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.RestrictTo;
+
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ActiveActionBean;
 import com.ft.sdk.garble.bean.ActiveViewBean;
@@ -25,6 +27,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.anr.historical.ProcessRunIdentity;
 import com.ft.sdk.internal.issue.FTIssueFieldEnricher;
 
 import org.json.JSONException;
@@ -803,6 +806,12 @@ public class FTRUMInnerManager {
     }
 
     private void createNewView(ActiveViewBean newView, HashMap<String, Object> property, boolean enableMonitor) {
+        ProcessRunIdentity processIdentity = ProcessRunIdentity.get();
+        if (processIdentity != null) {
+            newView.setProcessName(processIdentity.getProcessName());
+            newView.setProcessRunId(processIdentity.getProcessRunId());
+            newView.setProcessStartMs(processIdentity.getProcessStartMs());
+        }
         if (property != null) {
             newView.getProperty().putAll(property);
         }
@@ -955,6 +964,36 @@ public class FTRUMInnerManager {
                 issueFieldEnricher.provideAdditionalFields(issue);
         addErrorInternal(log, message, dateline, errorType, state, property, callBack,
                 additionalFields);
+    }
+
+    /**
+     * Enriches an ApplicationExitInfo ANR without attaching current-process RUM context.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public void enrichHistoricalAnrFields(String stack,
+                                          long dateline,
+                                          AppState state,
+                                          HashMap<String, Object> tags,
+                                          HashMap<String, Object> fields) {
+        FTIssueInfo issue = createHistoricalAnrIssueInfo(stack, dateline, state);
+        HashMap<String, Object> additionalFields =
+                issueFieldEnricher.provideAdditionalFields(issue);
+        issueFieldEnricher.mergeAdditionalFields(additionalFields, tags, fields,
+                FTTrackInner.getInstance().getRUMReservedKeys());
+    }
+
+    static FTIssueInfo createHistoricalAnrIssueInfo(String stack,
+                                                    long dateline,
+                                                    AppState state) {
+        return new FTIssueInfo(
+                FTIssueCategory.ANR,
+                ErrorType.ANR_CRASH.toString(),
+                "android_anr",
+                stack == null ? "" : stack,
+                dateline,
+                state.toString(),
+                null,
+                true);
     }
 
     private void addErrorInternal(String log,
@@ -1849,13 +1888,15 @@ public class FTRUMInnerManager {
         sessionId = Utils.randomUUID();
         syntheticViewMap.clear();
         checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
+    }
+
+    void closePreviousProcessRumData() {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 FTDataStoreManager.get().closeAllActionAndView();
             }
         });
-
     }
 
     void updateWebviewContainerProperty(String viewId, Map<String, Object> map) {

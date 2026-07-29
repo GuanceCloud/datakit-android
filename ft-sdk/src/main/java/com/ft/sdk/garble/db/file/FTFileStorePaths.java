@@ -15,11 +15,13 @@ public class FTFileStorePaths {
     static final String SYNC_DIR_NAME = "sync";
     static final String RUM_VIEW_DIR_NAME = "rum_view";
     static final String RUM_ACTION_DIR_NAME = "rum_action";
+    static final String HISTORICAL_EXIT_DIR_NAME = "historical_exit";
 
     private final File rootDir;
     private final File syncDir;
     private final File rumViewDir;
     private final File rumActionDir;
+    private final File historicalExitDir;
     private final File lockFile;
     private final File sizeFile;
 
@@ -32,6 +34,7 @@ public class FTFileStorePaths {
         syncDir = new File(rootDir, SYNC_DIR_NAME);
         rumViewDir = new File(rootDir, RUM_VIEW_DIR_NAME);
         rumActionDir = new File(rootDir, RUM_ACTION_DIR_NAME);
+        historicalExitDir = new File(rootDir, HISTORICAL_EXIT_DIR_NAME);
         lockFile = new File(rootDir, LOCK_FILE_NAME);
         sizeFile = new File(rootDir, SIZE_FILE_NAME);
     }
@@ -41,6 +44,7 @@ public class FTFileStorePaths {
         ensureDirectory(syncDir);
         ensureDirectory(rumViewDir);
         ensureDirectory(rumActionDir);
+        ensureDirectory(historicalExitDir);
     }
 
     public File getRootDir() {
@@ -57,6 +61,10 @@ public class FTFileStorePaths {
 
     public File getRumActionDir() {
         return rumActionDir;
+    }
+
+    public File getHistoricalExitDir() {
+        return historicalExitDir;
     }
 
     public File getLockFile() {

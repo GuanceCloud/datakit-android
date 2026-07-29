@@ -39,6 +39,8 @@ public class SyncData implements Cloneable {
 
     String uuid;
 
+    String dedupeKey;
+
 
     public SyncData(DataType dataType) {
         this.dataType = dataType;
@@ -129,6 +131,14 @@ public class SyncData implements Cloneable {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public String getDedupeKey() {
+        return dedupeKey;
+    }
+
+    public void setDedupeKey(String dedupeKey) {
+        this.dedupeKey = dedupeKey;
     }
 
     /**

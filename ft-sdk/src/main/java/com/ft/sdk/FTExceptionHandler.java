@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
@@ -268,7 +270,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         long crashTime = item.lastModified() * 1000000L;
         HashMap<String, Object> property = new HashMap<>();
         property.put(IS_PRE_CRASH, isPreCrash);
-        if (config.isEnableTrackAppANR()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+                && config.isEnableTrackAppANR()
                 && item.getName().contains(ANR_FILE_NAME)) {
             FTRUMInnerManager.get().addAutomaticIssue(
                     crashString,

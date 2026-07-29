@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.db;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RestrictTo;
 
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.DataType;
@@ -66,6 +67,18 @@ public interface FTDataStore {
     void closeAllActionAndView();
 
     boolean updateOrInsertSyncData(@NonNull SyncData data);
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    default InsertResult insertSyncDataIfAbsent(@NonNull String dedupeKey,
+                                                @NonNull SyncData data) {
+        return InsertResult.FAILED;
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    default InsertResult increaseViewErrorOnce(@NonNull String viewId,
+                                               @NonNull String dedupeKey) {
+        return InsertResult.FAILED;
+    }
 
     boolean insertFtOptList(@NonNull List<SyncData> dataList, boolean reInsert);
 

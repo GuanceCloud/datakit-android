@@ -52,6 +52,9 @@ public class ActiveViewBean extends ViewBean {
         bean.loadTime = this.loadTime;
         bean.timeSpent = this.timeSpent;
         bean.sessionId = this.sessionId;
+        bean.processName = this.processName;
+        bean.processRunId = this.processRunId;
+        bean.processStartMs = this.processStartMs;
         bean.memoryMax = this.memoryMax;
         bean.memoryAvg = this.memoryAvg;
         bean.cpuTickCountPerSecond = this.cpuTickCountPerSecond;

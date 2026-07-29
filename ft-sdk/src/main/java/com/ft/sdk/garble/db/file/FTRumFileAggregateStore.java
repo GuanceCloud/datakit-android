@@ -6,9 +6,11 @@ import android.util.Base64;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTSQL;
+import com.ft.sdk.garble.db.InsertResult;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,6 +28,7 @@ import java.util.Comparator;
 public class FTRumFileAggregateStore {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTRumFileAggregateStore";
     private static final String FILE_SUFFIX = ".json";
+    private static final String HISTORICAL_ERROR_KEYS = "historical_error_dedupe_keys";
 
     private final FTFileStorePaths paths;
     private final FTFileLock lock;
@@ -155,6 +158,41 @@ public class FTRumFileAggregateStore {
 
     public void increaseViewError(String viewId) {
         updateViewCount(viewId, FTSQL.RUM_COLUMN_ERROR_COUNT, 1);
+    }
+
+    public InsertResult increaseViewErrorOnce(final String viewId, final String dedupeKey) {
+        if (viewId == null || dedupeKey == null) {
+            return InsertResult.FAILED;
+        }
+        try {
+            return lock.withLock(new FTFileLock.LockedOperation<InsertResult>() {
+                @Override
+                public InsertResult run() throws Exception {
+                    JSONObject json = readJson(getViewFile(viewId));
+                    if (json == null) {
+                        return InsertResult.ALREADY_EXISTS;
+                    }
+                    JSONArray keys = json.optJSONArray(HISTORICAL_ERROR_KEYS);
+                    if (keys == null) {
+                        keys = new JSONArray();
+                    }
+                    for (int i = 0; i < keys.length(); i++) {
+                        if (dedupeKey.equals(keys.optString(i))) {
+                            return InsertResult.ALREADY_EXISTS;
+                        }
+                    }
+                    keys.put(dedupeKey);
+                    json.put(HISTORICAL_ERROR_KEYS, keys);
+                    json.put(FTSQL.RUM_COLUMN_ERROR_COUNT,
+                            json.optInt(FTSQL.RUM_COLUMN_ERROR_COUNT) + 1);
+                    writeJson(getViewFile(viewId), json);
+                    return InsertResult.INSERTED;
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.e(TAG, "increaseViewErrorOnce failed: " + e.getMessage());
+            return InsertResult.FAILED;
+        }
     }
 
     public void increaseViewLongTask(String viewId) {
@@ -431,6 +469,9 @@ public class FTRumFileAggregateStore {
         json.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, data.getLoadTime());
         json.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
         json.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
+        json.put(FTSQL.RUM_COLUMN_PROCESS_NAME, data.getProcessName());
+        json.put(FTSQL.RUM_COLUMN_PROCESS_RUN_ID, data.getProcessRunId());
+        json.put(FTSQL.RUM_COLUMN_PROCESS_START_MS, data.getProcessStartMs());
         json.put(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT, data.getTimeSpent());
         json.put(FTSQL.RUM_DATA_UPDATE_TIME, 0);
         json.put(FTSQL.RUM_DATA_UPLOAD_TIME, 0);
@@ -473,6 +514,9 @@ public class FTRumFileAggregateStore {
         bean.setViewReferrer(json.optString(FTSQL.RUM_COLUMN_VIEW_REFERRER, null));
         bean.setFromAttrJsonString(json.optString(FTSQL.RUM_COLUMN_EXTRA_ATTR, null));
         bean.setViewUpdateTime(json.optLong(FTSQL.RUM_VIEW_UPDATE_TIME));
+        bean.setProcessName(json.optString(FTSQL.RUM_COLUMN_PROCESS_NAME, null));
+        bean.setProcessRunId(json.optString(FTSQL.RUM_COLUMN_PROCESS_RUN_ID, null));
+        bean.setProcessStartMs(json.optLong(FTSQL.RUM_COLUMN_PROCESS_START_MS));
         return new ViewRecord(file, json, bean);
     }
 
