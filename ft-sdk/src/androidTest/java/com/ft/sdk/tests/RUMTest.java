@@ -6,6 +6,8 @@ import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
 import android.os.Looper;
 
 import com.ft.sdk.FTAutoTrack;
+import com.ft.sdk.FTIssueCategory;
+import com.ft.sdk.FTIssueInfo;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTRUMInnerManager;
@@ -50,11 +52,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -670,6 +677,183 @@ public class RUMTest extends FTBaseTest {
     }
 
     @Test
+    public void automaticIssueProviderUsesSnapshotAndAddsOnlyCustomFields() throws Exception {
+        List<FTIssueInfo> issues = Collections.synchronizedList(new ArrayList<FTIssueInfo>());
+        AtomicInteger replacementCalls = new AtomicInteger();
+        FTRUMConfig config = new FTRUMConfig()
+                .setRumAppId(TEST_FAKE_RUM_ID)
+                .addGlobalContext("global_tag", "sdk-tag")
+                .setIssueDataProvider(issue -> {
+                    issues.add(issue);
+                    HashMap<String, Object> fields = new HashMap<>();
+                    fields.put("issue_custom", "provider-value");
+                    fields.put(Constants.KEY_RUM_ERROR_MESSAGE, "provider-message");
+                    fields.put("global_tag", "provider-tag");
+                    fields.put(Constants.KEY_RUM_DISPLAY, "provider-display");
+                    return fields;
+                });
+        FTSdk.initRUMWithConfig(config);
+        config.setIssueDataProvider(issue -> {
+            replacementCalls.incrementAndGet();
+            return null;
+        });
+
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "addAutomaticIssue",
+                ERROR, ERROR_MESSAGE, 123L, FTIssueCategory.CRASH,
+                ErrorType.JAVA.toString(), AppState.RUN, false, "crash-thread", null, null);
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "addAutomaticIssue",
+                ERROR, ERROR_MESSAGE, 456L, FTIssueCategory.ANR,
+                ErrorType.ANR_ERROR.toString(), AppState.RUN, false, "main", null, null);
+        waitEventConsumeInThreadPool();
+        Thread.sleep(2000);
+
+        Assert.assertEquals(2, issues.size());
+        Assert.assertEquals(0, replacementCalls.get());
+        Assert.assertEquals(FTIssueCategory.CRASH, issues.get(0).getCategory());
+        Assert.assertEquals("java_crash", issues.get(0).getErrorType());
+        Assert.assertFalse(issues.get(0).isHistorical());
+        Assert.assertEquals("crash-thread", issues.get(0).getThreadName());
+        Assert.assertEquals(123L, issues.get(0).getOccurredAtNanoseconds());
+        Assert.assertEquals(FTIssueCategory.ANR, issues.get(1).getCategory());
+        Assert.assertEquals("anr_error", issues.get(1).getErrorType());
+        Assert.assertFalse(issues.get(1).isHistorical());
+        Assert.assertEquals(456L, issues.get(1).getOccurredAtNanoseconds());
+
+        LineProtocolData errorData = getLatestErrorLineProtocolData();
+        Assert.assertEquals("provider-value", errorData.getField("issue_custom"));
+        Assert.assertEquals(ERROR_MESSAGE,
+                errorData.getField(Constants.KEY_RUM_ERROR_MESSAGE));
+        Assert.assertEquals("sdk-tag", errorData.getTagAsString("global_tag"));
+        Assert.assertNull(errorData.getField("global_tag"));
+        Assert.assertNotEquals("provider-display",
+                errorData.getField(Constants.KEY_RUM_DISPLAY));
+    }
+
+    @Test
+    public void javaAndNativeCrashAdaptersExposeCurrentAndHistoricalFacts() throws Exception {
+        List<FTIssueInfo> issues = Collections.synchronizedList(new ArrayList<FTIssueInfo>());
+        CountDownLatch providerCalls = new CountDownLatch(5);
+        FTRUMConfig config = new FTRUMConfig()
+                .setRumAppId(TEST_FAKE_RUM_ID)
+                .setIssueDataProvider(issue -> {
+                    issues.add(issue);
+                    providerCalls.countDown();
+                    return null;
+                });
+        FTSdk.initRUMWithConfig(config);
+        config.setEnableTrackAppCrash(true);
+        config.setEnableTrackAppANR(true);
+
+        FTExceptionHandler handler = FTExceptionHandler.get();
+        handler.uploadCrashLog(ERROR, ERROR_MESSAGE, AppState.RUN, null);
+        File currentNative = File.createTempFile("tombstone_native_current", ".dump",
+                getContext().getCacheDir());
+        File currentAnr = File.createTempFile("tombstone_anr_current", ".dump",
+                getContext().getCacheDir());
+        File historyDirectory = new File(getContext().getCacheDir(),
+                "issue-history-" + System.nanoTime());
+        Assert.assertTrue(historyDirectory.mkdirs());
+        File historyNative = new File(historyDirectory, "tombstone_native_history.dump");
+        File historyAnr = new File(historyDirectory, "tombstone_anr_history.dump");
+        Assert.assertTrue(historyNative.createNewFile());
+        Assert.assertTrue(historyAnr.createNewFile());
+        Assert.assertTrue(currentNative.setLastModified(1_000L));
+        Assert.assertTrue(currentAnr.setLastModified(2_000L));
+        Assert.assertTrue(historyNative.setLastModified(3_000L));
+        Assert.assertTrue(historyAnr.setLastModified(4_000L));
+        long currentNativeOccurredAt = currentNative.lastModified() * 1_000_000L;
+        long currentAnrOccurredAt = currentAnr.lastModified() * 1_000_000L;
+        long historyNativeOccurredAt = historyNative.lastModified() * 1_000_000L;
+        long historyAnrOccurredAt = historyAnr.lastModified() * 1_000_000L;
+        try {
+            handler.uploadNativeCrashBackground(currentNative, AppState.RUN, false, null);
+            handler.uploadNativeCrashBackground(currentAnr, AppState.RUN, false, null);
+            handler.checkAndSyncPreDump(historyDirectory.getAbsolutePath(), null);
+            Assert.assertTrue(providerCalls.await(3, TimeUnit.SECONDS));
+            Thread.sleep(100L);
+
+            Assert.assertEquals(5, issues.size());
+            assertIssue(findIssue(issues, ErrorType.JAVA, false),
+                    FTIssueCategory.CRASH, ErrorType.JAVA, false);
+            FTIssueInfo currentNativeIssue = findIssue(issues, ErrorType.NATIVE, false);
+            FTIssueInfo historyNativeIssue = findIssue(issues, ErrorType.NATIVE, true);
+            FTIssueInfo currentAnrIssue = findIssue(issues, ErrorType.ANR_CRASH, false);
+            FTIssueInfo historyAnrIssue = findIssue(issues, ErrorType.ANR_CRASH, true);
+            assertIssue(currentNativeIssue, FTIssueCategory.CRASH, ErrorType.NATIVE, false);
+            assertIssue(historyNativeIssue, FTIssueCategory.CRASH, ErrorType.NATIVE, true);
+            assertIssue(currentAnrIssue, FTIssueCategory.ANR, ErrorType.ANR_CRASH, false);
+            assertIssue(historyAnrIssue, FTIssueCategory.ANR, ErrorType.ANR_CRASH, true);
+            Assert.assertEquals(currentNativeOccurredAt,
+                    currentNativeIssue.getOccurredAtNanoseconds());
+            Assert.assertEquals(historyNativeOccurredAt,
+                    historyNativeIssue.getOccurredAtNanoseconds());
+            Assert.assertEquals(currentAnrOccurredAt,
+                    currentAnrIssue.getOccurredAtNanoseconds());
+            Assert.assertEquals(historyAnrOccurredAt,
+                    historyAnrIssue.getOccurredAtNanoseconds());
+
+            for (int i = 0; i < 20 && (historyNative.exists() || historyAnr.exists()); i++) {
+                Thread.sleep(10L);
+            }
+            Assert.assertFalse(historyNative.exists());
+            Assert.assertFalse(historyAnr.exists());
+        } finally {
+            currentNative.delete();
+            currentAnr.delete();
+            historyNative.delete();
+            historyAnr.delete();
+            historyDirectory.delete();
+        }
+    }
+
+    @Test
+    public void providerThrowableDoesNotSkipDefaultExceptionHandler() throws Exception {
+        AtomicInteger providerCalls = new AtomicInteger();
+        AtomicInteger chainedCalls = new AtomicInteger();
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
+                .setRumAppId(TEST_FAKE_RUM_ID)
+                .setIssueDataProvider(issue -> {
+                    providerCalls.incrementAndGet();
+                    throw new AssertionError("provider failure");
+                }));
+        FTExceptionHandler handler = FTExceptionHandler.get();
+        Thread.UncaughtExceptionHandler previousHandler =
+                Whitebox.getInternalState(handler, "mDefaultExceptionHandler");
+        boolean previousAndroidTest = Whitebox.getInternalState(handler, "isAndroidTest");
+        try {
+            Whitebox.setInternalState(handler, "isAndroidTest", false);
+            Whitebox.setInternalState(handler, "mDefaultExceptionHandler",
+                    (Thread.UncaughtExceptionHandler) (thread, throwable) ->
+                            chainedCalls.incrementAndGet());
+
+            handler.uncaughtException(Thread.currentThread(),
+                    new RuntimeException("crash for handler-chain test"));
+
+            Assert.assertEquals(1, providerCalls.get());
+            Assert.assertEquals(1, chainedCalls.get());
+        } finally {
+            Whitebox.setInternalState(handler, "mDefaultExceptionHandler", previousHandler);
+            Whitebox.setInternalState(handler, "isAndroidTest", previousAndroidTest);
+        }
+    }
+
+    @Test
+    public void manualErrorDoesNotInvokeIssueProvider() throws Exception {
+        AtomicInteger calls = new AtomicInteger();
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
+                .setRumAppId(TEST_FAKE_RUM_ID)
+                .setIssueDataProvider(issue -> {
+                    calls.incrementAndGet();
+                    return null;
+                }));
+
+        FTRUMGlobalManager.get().addError(ERROR, ERROR_MESSAGE, ErrorType.JAVA, AppState.RUN);
+        waitEventConsumeInThreadPool();
+
+        Assert.assertEquals(0, calls.get());
+    }
+
+    @Test
     public void crashErrorForegroundCrashFreeDurationTest() throws Exception {
         seedCrashFreeTracker(200L, 50L, AppState.RUN, 1_000L);
 
@@ -939,6 +1123,28 @@ public class RUMTest extends FTBaseTest {
                 .remove(Constants.FT_CRASH_FREE_APP_STATE)
                 .remove(Constants.FT_CRASH_FREE_STATE_START_TIME)
                 .apply();
+    }
+
+    private void assertIssue(FTIssueInfo issue,
+                             FTIssueCategory category,
+                             ErrorType errorType,
+                             boolean historical) {
+        Assert.assertEquals(category, issue.getCategory());
+        Assert.assertEquals(errorType.toString(), issue.getErrorType());
+        Assert.assertEquals(historical, issue.isHistorical());
+    }
+
+    private FTIssueInfo findIssue(List<FTIssueInfo> issues,
+                                  ErrorType errorType,
+                                  boolean historical) {
+        for (FTIssueInfo issue : issues) {
+            if (errorType.toString().equals(issue.getErrorType())
+                    && historical == issue.isHistorical()) {
+                return issue;
+            }
+        }
+        Assert.fail("Issue not found: " + errorType + ", historical=" + historical);
+        return null;
     }
 
     private LineProtocolData getLatestErrorLineProtocolData() {
