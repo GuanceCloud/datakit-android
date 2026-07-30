@@ -59,6 +59,11 @@ class FTAppStartCounter {
     private long applicationOnCreateTimeLine = 0;
 
     /**
+     * First main-loop timestamp after Application.onCreate() has returned, unit: nanoseconds
+     */
+    private long applicationOnCreateCompletedTimeLine = 0;
+
+    /**
      * Duration from Application.onCreate() to first Activity preOnCreate(), unit: nanoseconds
      */
     private long applicationOnCreateDuration = 0;
@@ -112,11 +117,12 @@ class FTAppStartCounter {
         this.firsDrawnDuration = coldStartEndTimeLine - firstActivityPreOnActivityTimeline;
 
         LogUtils.d(TAG, "coldStart:" + coldStartDuration
-                + ",coldTimeLine:" + coldStartTimeLineForNanoDuration);
+                + ",coldTimeLine:" + coldStartTimeLineForNanoDuration
+                + ",launchFromBackground:" + launchFromBackground);
     }
 
     void checkFirstActivityPreCreate(long nanoTimeLine) {
-        if (!firstDrawDone.get()) {
+        if (!firstDrawDone.get() && firstActivityPreOnActivityTimeline == 0) {
             LogUtils.d(TAG, "checkFirstActivityPreCreate:" + nanoTimeLine);
             firstActivityPreOnActivityTimeline = nanoTimeLine;
         }
@@ -203,9 +209,27 @@ class FTAppStartCounter {
      */
     void appOnCreate(long nanoTimeLine, Application application) {
         if (!firstDrawDone.get()) {
-            LogUtils.d(TAG, "appOnCreate:" + nanoTimeLine);
             applicationOnCreateTimeLine = nanoTimeLine;
             launchFromBackground = isLaunchFromBackground(application);
+            LogUtils.d(TAG, "appOnCreate:" + nanoTimeLine
+                    + ",launchFromBackground:" + launchFromBackground);
+        }
+    }
+
+    /**
+     * Records the first main-loop opportunity after Application.onCreate() returns.
+     *
+     * @param nanoTimeLine completion timestamp, unit: nanoseconds
+     */
+    void appOnCreateCompleted(long nanoTimeLine) {
+        if (!firstDrawDone.get() && applicationOnCreateCompletedTimeLine == 0) {
+            applicationOnCreateCompletedTimeLine = nanoTimeLine;
+            LogUtils.d(TAG, "appOnCreateCompleted:" + nanoTimeLine
+                    + ",firstActivityPreCreate:" + firstActivityPreOnActivityTimeline);
+            if (firstActivityPreOnActivityTimeline == 0) {
+                launchFromBackground = true;
+                LogUtils.d(TAG, "launchFromBackground:true,noActivityAfterApplication");
+            }
         }
     }
 

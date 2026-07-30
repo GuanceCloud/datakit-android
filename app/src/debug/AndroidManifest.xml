@@ -35,6 +35,24 @@
             android:foregroundServiceType="dataSync" />
 
         <service
+            android:name=".BackgroundBoundService"
+            android:exported="true" />
+
+        <service
+            android:name=".BackgroundLaunchJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver
+            android:name=".BackgroundLaunchReceiver"
+            android:exported="true" />
+
+        <provider
+            android:name=".BackgroundLaunchProvider"
+            android:authorities="com.ft.background-launch"
+            android:exported="true" />
+
+        <service
             android:name=".service.HistoricalAnrWorkerService"
             android:exported="false"
             android:process=":anr_worker" />

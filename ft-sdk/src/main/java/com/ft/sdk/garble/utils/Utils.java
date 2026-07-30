@@ -882,11 +882,20 @@ public class Utils {
      */
     public static long getAppStartTimeNs() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            long diffMs = SystemClock.elapsedRealtime() - Process.getStartElapsedRealtime();
-            return System.nanoTime()- TimeUnit.MILLISECONDS.toNanos(diffMs);
+            return calculateAppStartTimeNs(
+                    System.nanoTime(),
+                    SystemClock.uptimeMillis(),
+                    Process.getStartUptimeMillis());
         } else {
             return FTApplication.APP_START_TIME;
         }
+    }
+
+    static long calculateAppStartTimeNs(long currentNanoTime,
+                                        long currentUptimeMs,
+                                        long processStartUptimeMs) {
+        long processUptimeMs = Math.max(0, currentUptimeMs - processStartUptimeMs);
+        return currentNanoTime - TimeUnit.MILLISECONDS.toNanos(processUptimeMs);
     }
 
     public static String toMD5(String input) {
