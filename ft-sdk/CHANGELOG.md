@@ -1,6 +1,8 @@
 # Unreleased
-1. Added `FTRUMConfig.setIssueDataProvider` to attach validated custom fields to automatically collected Java/native Crash and watchdog/native ANR RUM Errors, including historical native dump context.
-2. Fixed Java watchdog ANR detection so it rearms after the main thread recovers and exits promptly during SDK shutdown.
+1. Fixed cold-start `app_launch_type` classification when a background component starts the process long before the first Activity.
+2. Aligned cold-start duration calculation with the uptime clock so device deep sleep is not counted as launch work.
+3. Added `FTRUMConfig.setIssueDataProvider` to attach validated custom fields to automatically collected Java/native Crash and watchdog/native ANR RUM Errors, including historical native dump context.
+4. Fixed Java watchdog ANR detection so it rearms after the main thread recovers and exits promptly during SDK shutdown.
 
 ---
 # agent 1.7.4

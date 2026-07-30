@@ -7,6 +7,8 @@ import android.app.Application;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -62,6 +64,12 @@ public class FTAutoTrack {
             } else {
                 getApplication().registerActivityLifecycleCallbacks(life);
             }
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    FTAppStartCounter.get().appOnCreateCompleted(System.nanoTime());
+                }
+            });
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }

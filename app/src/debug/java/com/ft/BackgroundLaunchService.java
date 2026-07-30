@@ -18,29 +18,17 @@ import androidx.annotation.Nullable;
 /**
  * Debug-only foreground service used to simulate a real non-Activity process launch.
  *
- * Verification:
- * 1. Build and install the prodTest debug APK.
- * 2. Reset the app and logcat:
- *    adb shell pm clear com.ft
- *    adb logcat -c
- * 3. Start this service while no Activity is visible:
- *    adb shell am start-foreground-service \
- *      -n com.ft/.BackgroundLaunchService \
- *      -a com.ft.action.SIMULATE_BACKGROUND_LAUNCH
- * 4. Open the first Activity before this service stops:
- *    adb shell am start -n com.ft/.DebugMainActivity
- * 5. Check logcat. The service log should show foreground=false, and the RUM cold
- *    launch action should contain app_launch_type="background".
- *
- * Use start-foreground-service instead of startservice on Android 8.0+ because normal
- * background service starts are blocked by the platform.
+ * Build the prodTest debug and AndroidTest APKs, then run
+ * {@code app/scripts/verify_app_launch_type.sh} to verify this service together with Activity,
+ * receiver, bound-service, provider, and JobService launches.
  */
 public class BackgroundLaunchService extends Service {
     public static final String ACTION = "com.ft.action.SIMULATE_BACKGROUND_LAUNCH";
+    public static final String EXTRA_KEEP_ALIVE_MS = "keep_alive_ms";
+    public static final long DEFAULT_KEEP_ALIVE_MS = 5 * 60 * 1000L;
     private static final String TAG = "BackgroundLaunchService";
     private static final String CHANNEL_ID = "background_launch_debug";
     private static final int NOTIFICATION_ID = 1001;
-    private static final long STOP_DELAY_MS = 60000L;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable stopRunnable = new Runnable() {
@@ -59,6 +47,13 @@ public class BackgroundLaunchService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        long keepAliveMs = intent == null
+                ? DEFAULT_KEEP_ALIVE_MS
+                : intent.getLongExtra(EXTRA_KEEP_ALIVE_MS, DEFAULT_KEEP_ALIVE_MS);
+        if (keepAliveMs <= 0) {
+            keepAliveMs = DEFAULT_KEEP_ALIVE_MS;
+        }
+
         ActivityManager.RunningAppProcessInfo processInfo =
                 new ActivityManager.RunningAppProcessInfo();
         ActivityManager.getMyMemoryState(processInfo);
@@ -67,10 +62,11 @@ public class BackgroundLaunchService extends Service {
                 + ", importance=" + processInfo.importance
                 + ", foreground="
                 + (processInfo.importance
-                <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND));
+                <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
+                + ", keepAliveMs=" + keepAliveMs);
 
         handler.removeCallbacks(stopRunnable);
-        handler.postDelayed(stopRunnable, STOP_DELAY_MS);
+        handler.postDelayed(stopRunnable, keepAliveMs);
         return START_NOT_STICKY;
     }
 
