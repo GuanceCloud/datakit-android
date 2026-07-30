@@ -16,16 +16,20 @@ public interface SessionReplayResourceUploadCallback {
      *
      * @param appId the application id associated with the resources
      * @param fileNames resource file names to check
+     * @param globalContext RUM link context associated with the resources
      * @return upload result describing the check outcome
      */
-    UploadResult onCheckFilesExist(String appId, List<String> fileNames);
+    UploadResult onCheckFilesExist(String appId, List<String> fileNames,
+                                   Map<String, Object> globalContext);
 
     /**
      * Uploads resource files required by Session Replay segments.
      *
      * @param appId the application id associated with the resources
      * @param files resource files to upload
+     * @param globalContext RUM link context associated with the resources
      * @return upload result describing the upload outcome
      */
-    UploadResult onUploadFiles(String appId, List<RawBatchEvent> files);
+    UploadResult onUploadFiles(String appId, List<RawBatchEvent> files,
+                               Map<String, Object> globalContext);
 }
