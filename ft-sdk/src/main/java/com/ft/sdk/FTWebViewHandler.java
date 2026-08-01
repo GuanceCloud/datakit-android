@@ -19,6 +19,7 @@ import com.ft.sdk.garble.utils.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -200,24 +201,47 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      * Bind callback to slotId with the given globalContextViewId
      */
     private void registerViewChangeCallback(long slotId, String globalContextViewId) {
-        SessionReplayBridge.bindSlot(slotId, globalContextViewId, new SessionReplayBridge.ViewChangeCallback() {
-            @Override
-            public void onViewChanged(String viewId) {
-                rebindView(viewId);
-            }
-        });
+        SessionReplayBridge.bindSlot(slotId, globalContextViewId,
+                new WeakViewChangeCallback(this));
 
         // Register slot rebind callback to restore timer when same slotId is rebound
-        SessionReplayBridge.setSlotRebindCallback(slotId, new SessionReplayBridge.SlotRebindCallback() {
-            @Override
-            public void onSlotRebound(long slotId) {
-                // Restore timer when slotId is rebound
-                if (slotID == slotId) {
-                    checkAndStartSnapshotTimer();
-                    LogUtils.d(LOG_TAG, "Slot rebind detected, restored snapshot timer and resumed accepting Session Replay data for slotId:" + slotId);
-                }
+        SessionReplayBridge.setSlotRebindCallback(slotId,
+                new WeakSlotRebindCallback(this));
+    }
+
+    private static final class WeakViewChangeCallback
+            implements SessionReplayBridge.ViewChangeCallback {
+        private final WeakReference<FTWebViewHandler> handlerReference;
+
+        private WeakViewChangeCallback(FTWebViewHandler handler) {
+            handlerReference = new WeakReference<>(handler);
+        }
+
+        @Override
+        public void onViewChanged(String viewId) {
+            FTWebViewHandler handler = handlerReference.get();
+            if (handler != null) {
+                handler.rebindView(viewId);
             }
-        });
+        }
+    }
+
+    private static final class WeakSlotRebindCallback
+            implements SessionReplayBridge.SlotRebindCallback {
+        private final WeakReference<FTWebViewHandler> handlerReference;
+
+        private WeakSlotRebindCallback(FTWebViewHandler handler) {
+            handlerReference = new WeakReference<>(handler);
+        }
+
+        @Override
+        public void onSlotRebound(long slotId) {
+            FTWebViewHandler handler = handlerReference.get();
+            if (handler != null && handler.slotID == slotId) {
+                handler.checkAndStartSnapshotTimer();
+                LogUtils.d(LOG_TAG, "Slot rebind detected, restored snapshot timer and resumed accepting Session Replay data for slotId:" + slotId);
+            }
+        }
     }
 
     /**

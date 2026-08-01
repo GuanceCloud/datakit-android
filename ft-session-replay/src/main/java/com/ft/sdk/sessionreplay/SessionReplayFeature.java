@@ -302,6 +302,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         stopRecording();
         sessionReplayRecorder.unregisterCallbacks();
         sessionReplayRecorder.stopProcessingRecords();
+        slotIdWebviewBinder.clear();
         dataWriter = new NoOpRecordWriter();
         sessionReplayRecorder = new NoOpRecorder();
         initialized.set(false);

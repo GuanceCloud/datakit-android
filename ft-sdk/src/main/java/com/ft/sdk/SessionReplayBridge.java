@@ -341,6 +341,11 @@ final class SessionReplayBridge {
         }
     }
 
+    static void unbindSlot(long slotId) {
+        Object binder = getSlotIdWebviewBinder();
+        invoke(binder, "unbind", new Class[]{long.class}, slotId);
+    }
+
     static boolean isSlotActive(long slotId) {
         Object binder = getSlotIdWebviewBinder();
         Boolean active = invokeBoolean(binder, "isActive", new Class[]{long.class}, slotId);

@@ -234,6 +234,38 @@ public class SlotIdWebviewBinder {
     }
 
     /**
+     * Remove the binding for a WebView slot.
+     *
+     * @param slotId WebView's slotId
+     */
+    public void unbind(String slotId) {
+        if (slotId == null) {
+            return;
+        }
+        ViewBindingInfo removed = slotIdToViewIdMap.remove(slotId);
+        if (removed == null) {
+            return;
+        }
+        updateHasActiveEntries();
+        try {
+            if (latestSlotId == Long.parseLong(slotId)) {
+                latestSlotId = 0;
+            }
+        } catch (NumberFormatException ignored) {
+            // Ignore if slotId cannot be parsed.
+        }
+    }
+
+    /**
+     * Remove the binding for a WebView slot.
+     *
+     * @param slotId WebView's slotId
+     */
+    public void unbind(long slotId) {
+        unbind(String.valueOf(slotId));
+    }
+
+    /**
      * Set slot rebind callback for a slotId
      *
      * @param slotId   WebView's slotId
