@@ -1,3 +1,7 @@
+# Unreleased
+1. Fixed WebView slot binding cleanup so stopped Session Replay instances no longer retain stale bindings, and added per-slot unbinding support.
+
+---
 # replay 0.1.7
 1. Added `Wireframe.getPermanentId()` and `Wireframe.setPermanentId(String)` for experimental Android Heatmap element association; requires `ft-sdk >= 1.7.4`.
 2. Fixed pointer IDs and coordinates for multi-touch and cancelled gestures.

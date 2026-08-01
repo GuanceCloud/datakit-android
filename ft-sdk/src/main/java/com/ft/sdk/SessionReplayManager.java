@@ -485,6 +485,7 @@ public class SessionReplayManager implements FeatureSdkCore {
             value.stop();
         }
         features.clear();
+        sessionReplayFeature = null;
     }
 
     @Override
