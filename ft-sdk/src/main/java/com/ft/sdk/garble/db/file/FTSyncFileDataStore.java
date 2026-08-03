@@ -9,6 +9,7 @@ import com.ft.sdk.garble.db.InsertResult;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.anr.historical.HistoricalAnrDataId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,9 +73,10 @@ public class FTSyncFileDataStore {
         }
     }
 
-    public InsertResult insertSyncDataIfAbsent(@NonNull final String dedupeKey,
-                                               @NonNull final SyncData data) {
-        if (dedupeKey.length() == 0) {
+    InsertResult prepareHistoricalRum(@NonNull final String dedupeKey,
+                                      @NonNull final SyncData data) {
+        final String pendingType = HistoricalAnrDataId.pendingType(data.getDataType());
+        if (pendingType == null || data.getUuid() == null || data.getUuid().length() == 0) {
             return InsertResult.FAILED;
         }
         try {
@@ -82,8 +84,15 @@ public class FTSyncFileDataStore {
                 @Override
                 public InsertResult run() throws Exception {
                     paths.ensureReady();
-                    for (SyncRecord record : readRecords()) {
-                        if (dedupeKey.equals(record.data.getDedupeKey())) {
+                    for (File file : recordFiles()) {
+                        JSONObject json = readRawRecord(file);
+                        if (json == null) {
+                            continue;
+                        }
+                        if (dedupeKey.equals(json.optString(
+                                FTSQL.RECORD_COLUMN_DEDUPE_KEY, null))
+                                || data.getUuid().equals(json.optString(
+                                FTSQL.RECORD_COLUMN_DATA_UUID, null))) {
                             return InsertResult.ALREADY_EXISTS;
                         }
                     }
@@ -91,12 +100,51 @@ public class FTSyncFileDataStore {
                     data.setId(nextId);
                     data.setDedupeKey(dedupeKey);
                     writeNextId(nextId + 1);
-                    writeRecord(getRecordFile(nextId), data);
+                    writeRecord(getRecordFile(nextId), data, pendingType);
                     return InsertResult.INSERTED;
                 }
             });
         } catch (Exception e) {
-            LogUtils.e(TAG, "insertSyncDataIfAbsent failed: " + e.getMessage());
+            LogUtils.e(TAG, "prepareHistoricalRum failed: " + e.getMessage());
+            return InsertResult.FAILED;
+        }
+    }
+
+    InsertResult commitHistoricalRum(@NonNull final String uuid,
+                                     @NonNull final DataType committedType) {
+        final String pendingType = HistoricalAnrDataId.pendingType(committedType);
+        if (pendingType == null || uuid.length() == 0) {
+            return InsertResult.FAILED;
+        }
+        try {
+            return lock.withLock(new FTFileLock.LockedOperation<InsertResult>() {
+                @Override
+                public InsertResult run() throws Exception {
+                    paths.ensureReady();
+                    for (File file : recordFiles()) {
+                        JSONObject json = readRawRecord(file);
+                        if (json == null || !uuid.equals(json.optString(
+                                FTSQL.RECORD_COLUMN_DATA_UUID, null))) {
+                            continue;
+                        }
+                        String storedType = json.optString(
+                                FTSQL.RECORD_COLUMN_DATA_TYPE, null);
+                        if (committedType.getValue().equals(storedType)) {
+                            return InsertResult.ALREADY_EXISTS;
+                        }
+                        if (!pendingType.equals(storedType)) {
+                            return InsertResult.FAILED;
+                        }
+                        json.put(FTSQL.RECORD_COLUMN_DATA_TYPE,
+                                committedType.getValue());
+                        sizeTracker.writeUtf8(file, json.toString());
+                        return InsertResult.INSERTED;
+                    }
+                    return InsertResult.FAILED;
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.e(TAG, "commitHistoricalRum failed: " + e.getMessage());
             return InsertResult.FAILED;
         }
     }
@@ -172,6 +220,7 @@ public class FTSyncFileDataStore {
                             updated.setTime(data.getTime());
                             updated.setUuid(data.getUuid());
                             updated.setDataString(data.getDataString());
+                            updated.setDedupeKey(data.getDedupeKey());
                             writeRecord(record.file, updated);
                             count++;
                         }
@@ -361,8 +410,17 @@ public class FTSyncFileDataStore {
                 @Override
                 public Void run() throws Exception {
                     paths.ensureReady();
+                    ArrayList<JSONObject> pendingRecords = new ArrayList<>();
+                    for (File file : recordFiles()) {
+                        JSONObject json = readRawRecord(file);
+                        if (json != null && HistoricalAnrDataId.isPendingType(
+                                json.optString(FTSQL.RECORD_COLUMN_DATA_TYPE))) {
+                            pendingRecords.add(json);
+                        }
+                    }
                     deleteAllFiles();
                     long nextId = 1;
+                    Set<String> visibleUuids = new HashSet<>();
                     if (list != null) {
                         for (SyncData data : list) {
                             if (data.getId() <= 0) {
@@ -370,7 +428,19 @@ public class FTSyncFileDataStore {
                             }
                             nextId = Math.max(nextId, data.getId() + 1);
                             writeRecord(getRecordFile(data.getId()), data);
+                            visibleUuids.add(data.getUuid());
                         }
+                    }
+                    for (JSONObject pending : pendingRecords) {
+                        String uuid = pending.optString(
+                                FTSQL.RECORD_COLUMN_DATA_UUID, null);
+                        if (uuid != null && visibleUuids.contains(uuid)) {
+                            continue;
+                        }
+                        pending.put(FTSQL.RECORD_COLUMN_ID, nextId);
+                        sizeTracker.writeUtf8(
+                                getRecordFile(nextId), pending.toString());
+                        nextId++;
                     }
                     writeNextId(nextId);
                     return null;
@@ -448,15 +518,7 @@ public class FTSyncFileDataStore {
     private ArrayList<SyncRecord> readRecords() throws IOException {
         paths.ensureReady();
         ArrayList<SyncRecord> records = new ArrayList<>();
-        File[] files = paths.getSyncDir().listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isFile() && pathname.getName().endsWith(FILE_SUFFIX);
-            }
-        });
-        if (files == null) {
-            return records;
-        }
+        File[] files = recordFiles();
         for (File file : files) {
             SyncData data = readRecord(file);
             if (data != null) {
@@ -464,6 +526,16 @@ public class FTSyncFileDataStore {
             }
         }
         return records;
+    }
+
+    private File[] recordFiles() {
+        File[] files = paths.getSyncDir().listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile() && pathname.getName().endsWith(FILE_SUFFIX);
+            }
+        });
+        return files == null ? new File[0] : files;
     }
 
     private int countRecordsByType(DataType[] types) throws IOException {
@@ -478,7 +550,7 @@ public class FTSyncFileDataStore {
             return 0;
         }
         if (types == null || types.length == 0) {
-            return files.length;
+            return readRecords().size();
         }
         Set<DataType> typeSet = new HashSet<>();
         Collections.addAll(typeSet, types);
@@ -543,20 +615,31 @@ public class FTSyncFileDataStore {
     }
 
     private SyncData readRecord(File file) throws IOException {
+        JSONObject json = readRawRecord(file);
+        if (json == null) {
+            return null;
+        }
+        String storedType = json.optString(FTSQL.RECORD_COLUMN_DATA_TYPE);
+        if (HistoricalAnrDataId.isPendingType(storedType)) {
+            return null;
+        }
+        DataType dataType = findDataType(storedType);
+        if (dataType == null) {
+            LogUtils.e(TAG, "Unknown sync data type in file: " + file.getAbsolutePath());
+            return null;
+        }
+        SyncData data = new SyncData(dataType);
+        data.setId(json.optLong(FTSQL.RECORD_COLUMN_ID));
+        data.setTime(json.optLong(FTSQL.RECORD_COLUMN_TM));
+        data.setUuid(json.optString(FTSQL.RECORD_COLUMN_DATA_UUID, null));
+        data.setDataString(json.optString(FTSQL.RECORD_COLUMN_DATA, null));
+        data.setDedupeKey(json.optString(FTSQL.RECORD_COLUMN_DEDUPE_KEY, null));
+        return data;
+    }
+
+    private JSONObject readRawRecord(File file) throws IOException {
         try {
-            JSONObject json = new JSONObject(FTAtomicFileHelper.readUtf8(file));
-            DataType dataType = findDataType(json.optString(FTSQL.RECORD_COLUMN_DATA_TYPE));
-            if (dataType == null) {
-                LogUtils.e(TAG, "Unknown sync data type in file: " + file.getAbsolutePath());
-                return null;
-            }
-            SyncData data = new SyncData(dataType);
-            data.setId(json.optLong(FTSQL.RECORD_COLUMN_ID));
-            data.setTime(json.optLong(FTSQL.RECORD_COLUMN_TM));
-            data.setUuid(json.optString(FTSQL.RECORD_COLUMN_DATA_UUID, null));
-            data.setDataString(json.optString(FTSQL.RECORD_COLUMN_DATA, null));
-            data.setDedupeKey(json.optString(FTSQL.RECORD_COLUMN_DEDUPE_KEY, null));
-            return data;
+            return new JSONObject(FTAtomicFileHelper.readUtf8(file));
         } catch (JSONException e) {
             LogUtils.e(TAG, "Failed to parse sync file: " + file.getAbsolutePath());
             return null;
@@ -564,12 +647,17 @@ public class FTSyncFileDataStore {
     }
 
     private void writeRecord(File file, SyncData data) throws IOException, JSONException {
+        writeRecord(file, data, data.getDataType().getValue());
+    }
+
+    private void writeRecord(File file, SyncData data, String type)
+            throws IOException, JSONException {
         JSONObject json = new JSONObject();
         json.put(FTSQL.RECORD_COLUMN_ID, data.getId());
         json.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
         json.put(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
         json.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
-        json.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
+        json.put(FTSQL.RECORD_COLUMN_DATA_TYPE, type);
         json.put(FTSQL.RECORD_COLUMN_DEDUPE_KEY, data.getDedupeKey());
         sizeTracker.writeUtf8(file, json.toString());
     }

@@ -4,7 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.RestrictTo;
 
-import com.ft.sdk.garble.db.FTDataStoreManager;
+import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.db.file.FTFileStorePaths;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
@@ -66,14 +66,16 @@ public final class HistoricalAnrCoordinator {
     }
 
     public static HistoricalAnrCoordinator create(Context context) {
-        HistoricalExitLedger ledger = FTDataStoreManager.isFileDataStorePrimary()
-                ? new FileHistoricalExitLedger(new FTFileStorePaths(context))
-                : new ProviderHistoricalExitLedger(context);
+        HistoricalExitLedger ledger =
+                new FileHistoricalExitLedger(new FTFileStorePaths(context));
+        HistoricalRumContextStore contextStore =
+                new V4MigratingHistoricalRumContextStore(
+                        context, FileHistoricalRumContextStore.get(context));
         return new HistoricalAnrCoordinator(
                 context.getPackageName(),
                 ProcessRunIdentity.get(),
                 new AndroidProcessExitSource(context),
-                new DataStoreHistoricalRumContextStore(FTDataStoreManager.get()),
+                contextStore,
                 ledger,
                 new DefaultHistoricalAnrReporter(),
                 new Executor() {
@@ -117,6 +119,11 @@ public final class HistoricalAnrCoordinator {
         }
         long nowMs = clock.nowMs();
         try {
+            contextStore.ensureReady();
+            recoverPendingCommits();
+            if (released) {
+                return;
+            }
             List<ProcessExitRecord> loaded = exitSource.load();
             ArrayList<ProcessExitRecord> exits = new ArrayList<>();
             if (loaded != null) {
@@ -152,18 +159,26 @@ public final class HistoricalAnrCoordinator {
         String eventDedupeKey = "historical-anr:v1:" + exitKey;
         HistoricalRumContext context = null;
         boolean contextLoadFailed = false;
+        List<HistoricalRumContext> views = Collections.emptyList();
         try {
-            List<HistoricalRumContext> views = contextStore.load(exit.getProcessName());
-            context = HistoricalViewMatcher.match(
-                    views,
-                    exit,
-                    processIdentity.getProcessRunId(),
-                    CLOCK_TOLERANCE_MS,
-                    MAX_VIEW_DISTANCE_MS);
+            views = contextStore.load(exit.getProcessName());
+        } catch (HistoricalAnrMigrationException e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+            return false;
+        } catch (HistoricalRumContextLoadException e) {
+            views = e.getLoadedContexts();
+            contextLoadFailed = true;
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         } catch (Exception e) {
             contextLoadFailed = true;
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
+        context = HistoricalViewMatcher.match(
+                views,
+                exit,
+                processIdentity.getProcessRunId(),
+                CLOCK_TOLERANCE_MS,
+                MAX_VIEW_DISTANCE_MS);
 
         long nowMs = clock.nowMs();
         if (released) {
@@ -177,6 +192,19 @@ public final class HistoricalAnrCoordinator {
                 exit,
                 context,
                 eventDedupeKey);
+        if (claim.isCommitted()) {
+            HistoricalRumContext committedContext = claim.getContext() == null
+                    ? context
+                    : claim.getContext();
+            if (committedContext != null) {
+                completeCommittedEvent(
+                        HistoricalAnrReporter.ReportResult.ALREADY_EXISTS,
+                        exitKey,
+                        eventDedupeKey,
+                        committedContext.getCollectType());
+            }
+            return false;
+        }
         if (!claim.isAcquired()) {
             return false;
         }
@@ -205,7 +233,13 @@ public final class HistoricalAnrCoordinator {
                     reporter.report(exit, context, stack, eventDedupeKey);
             if (result == HistoricalAnrReporter.ReportResult.INSERTED
                     || result == HistoricalAnrReporter.ReportResult.ALREADY_EXISTS) {
-                ledger.markCommitted(exitKey, processIdentity.getProcessRunId(), clock.nowMs());
+                if (ledger.markCommitted(
+                        exitKey, processIdentity.getProcessRunId(), clock.nowMs())) {
+                    completeCommittedEvent(
+                            result, exitKey, eventDedupeKey, context.getCollectType());
+                } else {
+                    markRetry(exitKey);
+                }
             } else {
                 markRetry(exitKey);
             }
@@ -217,6 +251,33 @@ public final class HistoricalAnrCoordinator {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         return true;
+    }
+
+    private void recoverPendingCommits() {
+        List<HistoricalExitLedger.PendingCommit> pending = ledger.loadPendingCommits();
+        if (pending == null) {
+            return;
+        }
+        for (HistoricalExitLedger.PendingCommit commit : pending) {
+            if (released) {
+                return;
+            }
+            completeCommittedEvent(
+                    HistoricalAnrReporter.ReportResult.ALREADY_EXISTS,
+                    commit.getExitKey(),
+                    commit.getEventDedupeKey(),
+                    commit.getCollectType());
+        }
+    }
+
+    private boolean completeCommittedEvent(HistoricalAnrReporter.ReportResult result,
+                                           String exitKey,
+                                           String eventDedupeKey,
+                                           CollectType collectType) {
+        boolean visible = collectType == CollectType.NOT_COLLECT
+                || reporter.onCommitted(result, eventDedupeKey, collectType);
+        return visible && ledger.markEventVisible(
+                exitKey, eventDedupeKey, clock.nowMs());
     }
 
     private void markRetry(String exitKey) {

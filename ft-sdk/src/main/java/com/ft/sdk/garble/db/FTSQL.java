@@ -50,10 +50,11 @@ public class FTSQL {
             RECORD_COLUMN_TM + " INTEGER," +
             RECORD_COLUMN_DATA_UUID + " TEXT," +
             RECORD_COLUMN_DATA + " TEXT," +
-            RECORD_COLUMN_DATA_TYPE + " TEXT," +
-            RECORD_COLUMN_DEDUPE_KEY + " TEXT" +
+            RECORD_COLUMN_DATA_TYPE + " TEXT" +
             ")";
 
+    /** @deprecated Kept only for reading databases created by the v4 preview. */
+    @Deprecated
     public static final String FT_SYNC_DEDUPE_INDEX_CREATE =
             "CREATE UNIQUE INDEX if not exists idx_sync_data_dedupe_key ON "
                     + FT_SYNC_DATA_FLAT_TABLE_NAME + "(" + RECORD_COLUMN_DEDUPE_KEY + ")";
@@ -213,17 +214,26 @@ public class FTSQL {
             RUM_DATA_UPDATE_TIME + " BIGINT DEFAULT 0," +
             RUM_DATA_UPLOAD_TIME + " BIGINT DEFAULT 0," +
             RUM_VIEW_UPDATE_TIME + " BIGINT DEFAULT 1," +
-            RUM_COLUMN_EXTRA_ATTR + " TEXT," +
-            RUM_COLUMN_PROCESS_NAME + " TEXT," +
-            RUM_COLUMN_PROCESS_RUN_ID + " TEXT," +
-            RUM_COLUMN_PROCESS_START_MS + " BIGINT DEFAULT 0" +
+            RUM_COLUMN_EXTRA_ATTR + " TEXT" +
             ")";
 
+    /** @deprecated Kept only for reading databases created by the v4 preview. */
+    @Deprecated
     public static final String FT_HISTORICAL_EXIT_CLAIM_TABLE = "historical_exit_claim";
+    /** @deprecated Kept only for reading databases created by the v4 preview. */
+    @Deprecated
     public static final int HISTORICAL_EXIT_STATE_CLAIMED = 1;
+    /** @deprecated Kept only for reading databases created by the v4 preview. */
+    @Deprecated
     public static final int HISTORICAL_EXIT_STATE_COMMITTED = 2;
+    /** @deprecated Kept only for reading databases created by the v4 preview. */
+    @Deprecated
     public static final int HISTORICAL_EXIT_STATE_RETRY = 3;
+    /** @deprecated Kept only for reading databases created by the v4 preview. */
+    @Deprecated
     public static final int HISTORICAL_EXIT_STATE_DROPPED = 4;
+    /** @deprecated Kept only for compatibility tests and v4 preview migration. */
+    @Deprecated
     public static final String FT_HISTORICAL_EXIT_CLAIM_CREATE =
             "CREATE TABLE if not exists " + FT_HISTORICAL_EXIT_CLAIM_TABLE + " ("
                     + "exit_key TEXT PRIMARY KEY,"

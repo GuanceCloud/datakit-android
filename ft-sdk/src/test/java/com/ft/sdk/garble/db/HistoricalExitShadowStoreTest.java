@@ -22,39 +22,29 @@ public class HistoricalExitShadowStoreTest {
     public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void shadowMirrorsOnlyPrimaryFirstInsert() throws Exception {
+    public void shadowMirrorsCombinedHistoricalRumPersistence() throws Exception {
         FTFileDataStore primary = new FTFileDataStore(
-                new FTFileStorePaths(temporaryFolder.newFolder("primary")));
+                new FTFileStorePaths(temporaryFolder.newFolder("combined-primary")));
         FTFileDataStore shadow = new FTFileDataStore(
-                new FTFileStorePaths(temporaryFolder.newFolder("shadow")));
-        FTShadowDataStore store = new FTShadowDataStore(primary, shadow);
-
-        assertEquals(InsertResult.INSERTED,
-                store.insertSyncDataIfAbsent("dedupe", data("first")));
-        assertEquals(InsertResult.ALREADY_EXISTS,
-                store.insertSyncDataIfAbsent("dedupe", data("second")));
-
-        assertEquals(1, primary.queryDataByDescLimit(0).size());
-        assertEquals(1, shadow.queryDataByDescLimit(0).size());
-        assertEquals("first", shadow.queryDataByDescLimit(0).get(0).getDataString());
-    }
-
-    @Test
-    public void shadowMirrorsHistoricalViewCountIdempotently() throws Exception {
-        FTFileDataStore primary = new FTFileDataStore(
-                new FTFileStorePaths(temporaryFolder.newFolder("primary")));
-        FTFileDataStore shadow = new FTFileDataStore(
-                new FTFileStorePaths(temporaryFolder.newFolder("shadow")));
+                new FTFileStorePaths(temporaryFolder.newFolder("combined-shadow")));
         FTShadowDataStore store = new FTShadowDataStore(primary, shadow);
         ViewBean view = new ViewBean();
         view.setId("view");
         store.initSumView(view);
 
         assertEquals(InsertResult.INSERTED,
-                store.increaseViewErrorOnce("view", "dedupe"));
+                store.prepareHistoricalRum("dedupe", "view", data("first")));
         assertEquals(InsertResult.ALREADY_EXISTS,
-                store.increaseViewErrorOnce("view", "dedupe"));
+                store.prepareHistoricalRum("dedupe", "view", data("second")));
 
+        store.updateDataType(DataType.RUM_APP_ERROR_SAMPLED, 123);
+        assertEquals(0, primary.queryDataByDescLimit(0).size());
+        assertEquals(0, shadow.queryDataByDescLimit(0).size());
+        assertEquals(InsertResult.INSERTED,
+                store.commitHistoricalRum("dedupe", DataType.RUM_APP));
+
+        assertEquals(1, primary.queryDataByDescLimit(0).size());
+        assertEquals(1, shadow.queryDataByDescLimit(0).size());
         assertEquals(1, primary.querySumView(0, true).get(0).getErrorCount());
         assertEquals(1, shadow.querySumView(0, true).get(0).getErrorCount());
     }

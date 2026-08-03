@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Reads from the primary store and mirrors writes to a shadow store.
  */
-class FTShadowDataStore implements FTDataStore {
+class FTShadowDataStore implements FTDataStore, HistoricalRumDataStore {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTShadowDataStore";
 
     private final FTDataStore primary;
@@ -290,14 +290,21 @@ class FTShadowDataStore implements FTDataStore {
     }
 
     @Override
-    public InsertResult insertSyncDataIfAbsent(@NonNull String dedupeKey,
-                                               @NonNull SyncData data) {
-        InsertResult result = primary.insertSyncDataIfAbsent(dedupeKey, data);
-        if (result == InsertResult.INSERTED) {
+    public InsertResult prepareHistoricalRum(@NonNull String dedupeKey,
+                                             @NonNull String viewId,
+                                             @NonNull SyncData data) {
+        if (!(primary instanceof HistoricalRumDataStore)
+                || !(shadow instanceof HistoricalRumDataStore)) {
+            return InsertResult.FAILED;
+        }
+        InsertResult result = ((HistoricalRumDataStore) primary)
+                .prepareHistoricalRum(dedupeKey, viewId, data);
+        if (result != InsertResult.FAILED) {
             mirror(new Runnable() {
                 @Override
                 public void run() {
-                    shadow.insertSyncDataIfAbsent(dedupeKey, data);
+                    ((HistoricalRumDataStore) shadow)
+                            .prepareHistoricalRum(dedupeKey, viewId, data);
                 }
             });
         }
@@ -305,14 +312,20 @@ class FTShadowDataStore implements FTDataStore {
     }
 
     @Override
-    public InsertResult increaseViewErrorOnce(@NonNull String viewId,
-                                              @NonNull String dedupeKey) {
-        InsertResult result = primary.increaseViewErrorOnce(viewId, dedupeKey);
-        if (result == InsertResult.INSERTED) {
+    public InsertResult commitHistoricalRum(@NonNull String dedupeKey,
+                                            @NonNull DataType committedType) {
+        if (!(primary instanceof HistoricalRumDataStore)
+                || !(shadow instanceof HistoricalRumDataStore)) {
+            return InsertResult.FAILED;
+        }
+        InsertResult result = ((HistoricalRumDataStore) primary)
+                .commitHistoricalRum(dedupeKey, committedType);
+        if (result != InsertResult.FAILED) {
             mirror(new Runnable() {
                 @Override
                 public void run() {
-                    shadow.increaseViewErrorOnce(viewId, dedupeKey);
+                    ((HistoricalRumDataStore) shadow)
+                            .commitHistoricalRum(dedupeKey, committedType);
                 }
             });
         }

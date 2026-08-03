@@ -12,9 +12,11 @@ import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.db.FTDataStore;
+import com.ft.sdk.garble.db.HistoricalRumDataStore;
 import com.ft.sdk.garble.db.InsertResult;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.internal.anr.historical.HistoricalAnrDataId;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +26,7 @@ import java.util.List;
 /**
  * File-backed SDK data store.
  */
-public class FTFileDataStore implements FTDataStore {
+public class FTFileDataStore implements FTDataStore, HistoricalRumDataStore {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTFileDataStore";
     private static final String DB_FLAT_MIGRATION_MARKER = "db_flat_migrated";
 
@@ -214,20 +216,30 @@ public class FTFileDataStore implements FTDataStore {
     }
 
     @Override
-    public InsertResult insertSyncDataIfAbsent(@NonNull String dedupeKey,
-                                               @NonNull SyncData data) {
-        InsertResult result = syncStore.insertSyncDataIfAbsent(dedupeKey, data);
-        if (result == InsertResult.INSERTED) {
-            updateFileSizeCache();
+    public InsertResult prepareHistoricalRum(@NonNull String dedupeKey,
+                                             @NonNull String viewId,
+                                             @NonNull SyncData data) {
+        if (!HistoricalAnrDataId.canonicalize(dedupeKey, data)) {
+            return InsertResult.FAILED;
         }
-        return result;
+        InsertResult insertResult = syncStore.prepareHistoricalRum(dedupeKey, data);
+        if (insertResult == InsertResult.FAILED) {
+            return InsertResult.FAILED;
+        }
+        InsertResult countResult = rumStore.increaseViewErrorOnce(viewId, dedupeKey);
+        updateFileSizeCache();
+        return countResult == InsertResult.FAILED ? InsertResult.FAILED : insertResult;
     }
 
     @Override
-    public InsertResult increaseViewErrorOnce(@NonNull String viewId,
-                                              @NonNull String dedupeKey) {
-        InsertResult result = rumStore.increaseViewErrorOnce(viewId, dedupeKey);
-        if (result == InsertResult.INSERTED) {
+    public InsertResult commitHistoricalRum(@NonNull String dedupeKey,
+                                            @NonNull DataType committedType) {
+        String uuid = HistoricalAnrDataId.fromDedupeKey(dedupeKey);
+        if (uuid == null) {
+            return InsertResult.FAILED;
+        }
+        InsertResult result = syncStore.commitHistoricalRum(uuid, committedType);
+        if (result != InsertResult.FAILED) {
             updateFileSizeCache();
         }
         return result;
@@ -318,23 +330,7 @@ public class FTFileDataStore implements FTDataStore {
     public void delete() {
         syncStore.deleteAll();
         rumStore.deleteAll();
-        try {
-            storeLock.withLock(new FTFileLock.LockedOperation<Void>() {
-                @Override
-                public Void run() throws Exception {
-                    paths.ensureReady();
-                    File[] claims = paths.getHistoricalExitDir().listFiles();
-                    if (claims != null) {
-                        for (File claim : claims) {
-                            claim.delete();
-                        }
-                    }
-                    return null;
-                }
-            });
-        } catch (Exception e) {
-            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
-        }
+        new FTHistoricalFileStore(paths).deleteAll();
         updateFileSizeCache();
     }
 
