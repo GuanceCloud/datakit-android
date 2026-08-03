@@ -21,6 +21,7 @@ import com.ft.sdk.garble.db.base.DataBaseCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.anr.historical.HistoricalAnrDataId;
 
 import java.util.ArrayList;
 
@@ -46,9 +47,19 @@ public class FTContentProvider extends ContentProvider {
     // Call method name constants
     public static final String METHOD_EXEC_SQL = "execSQL";
     public static final String METHOD_EXEC_SQL_BATCH = "execSQLBatch";
+    public static final String METHOD_HISTORICAL_RUM_PERSIST = "historicalRumPersist";
+    public static final String METHOD_HISTORICAL_RUM_COMMIT = "historicalRumCommit";
+    /** @deprecated Historical ANR claims are now persisted in sidecar files. */
+    @Deprecated
     public static final String METHOD_HISTORICAL_EXIT_CLAIM = "historicalExitClaim";
+    /** @deprecated Historical ANR claims are now persisted in sidecar files. */
+    @Deprecated
     public static final String METHOD_HISTORICAL_EXIT_UPDATE = "historicalExitUpdate";
+    /** @deprecated Historical ANR claims are now persisted in sidecar files. */
+    @Deprecated
     public static final String METHOD_HISTORICAL_EXIT_CLEANUP = "historicalExitCleanup";
+    /** @deprecated Historical View error counting is part of historicalRumPersist. */
+    @Deprecated
     public static final String METHOD_HISTORICAL_VIEW_ERROR_COUNT =
             "historicalViewErrorCount";
 
@@ -365,22 +376,19 @@ public class FTContentProvider extends ContentProvider {
                 return handleExecSQL(arg, extras);
             case METHOD_EXEC_SQL_BATCH:
                 return handleExecSQLBatch(arg, extras);
-            case METHOD_HISTORICAL_EXIT_CLAIM:
-                return handleHistoricalExitClaim(extras);
-            case METHOD_HISTORICAL_EXIT_UPDATE:
-                return handleHistoricalExitUpdate(extras);
-            case METHOD_HISTORICAL_EXIT_CLEANUP:
-                return handleHistoricalExitCleanup(extras);
-            case METHOD_HISTORICAL_VIEW_ERROR_COUNT:
-                return handleHistoricalViewErrorCount(extras);
+            case METHOD_HISTORICAL_RUM_PERSIST:
+                return handleHistoricalRumPersist(extras);
+            case METHOD_HISTORICAL_RUM_COMMIT:
+                return handleHistoricalRumCommit(extras);
             default:
                 return super.call(method, arg, extras);
         }
     }
 
-    private Bundle handleHistoricalExitClaim(final Bundle extras) {
+    private Bundle handleHistoricalRumPersist(final Bundle extras) {
         final Bundle result = new Bundle();
-        result.putBoolean("acquired", false);
+        result.putBoolean("success", false);
+        result.putBoolean("inserted", false);
         if (extras == null) {
             return result;
         }
@@ -391,80 +399,55 @@ public class FTContentProvider extends ContentProvider {
                     db.beginTransaction();
                     Cursor cursor = null;
                     try {
-                        String exitKey = extras.getString("exit_key");
-                        long nowMs = extras.getLong("now_ms");
+                        String uuid = extras.getString(FTSQL.RECORD_COLUMN_DATA_UUID);
+                        String dedupeKey = extras.getString(FTSQL.RECORD_COLUMN_DEDUPE_KEY);
+                        String stableUuid = HistoricalAnrDataId.fromDedupeKey(dedupeKey);
+                        if (stableUuid != null) {
+                            uuid = stableUuid;
+                        }
+                        if (uuid == null || uuid.length() == 0) {
+                            return;
+                        }
                         cursor = db.query(
-                                FTSQL.FT_HISTORICAL_EXIT_CLAIM_TABLE,
-                                new String[]{
-                                        "state", "lease_until_ms", "attempt_count",
-                                        "session_id", "view_id", "view_name", "collect_type",
-                                        "view_error_counted"
-                                },
-                                "exit_key=?",
-                                new String[]{exitKey},
+                                FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME,
+                                new String[]{FTSQL.RECORD_COLUMN_ID},
+                                FTSQL.RECORD_COLUMN_DATA_UUID + "=?",
+                                new String[]{uuid},
                                 null,
                                 null,
                                 null);
-                        int attemptCount = 0;
-                        String sessionId = null;
-                        String viewId = null;
-                        String viewName = null;
-                        String collectType = null;
-                        int viewErrorCounted = 0;
                         if (cursor.moveToFirst()) {
-                            int state = cursor.getInt(0);
-                            long leaseUntilMs = cursor.getLong(1);
-                            attemptCount = cursor.getInt(2);
-                            sessionId = cursor.getString(3);
-                            viewId = cursor.getString(4);
-                            viewName = cursor.getString(5);
-                            collectType = cursor.getString(6);
-                            viewErrorCounted = cursor.getInt(7);
-                            if (state == FTSQL.HISTORICAL_EXIT_STATE_COMMITTED
-                                    || state == FTSQL.HISTORICAL_EXIT_STATE_DROPPED
-                                    || leaseUntilMs > nowMs) {
-                                db.setTransactionSuccessful();
-                                return;
-                            }
-                        }
-                        if (sessionId == null || viewId == null) {
-                            sessionId = extras.getString("session_id");
-                            viewId = extras.getString("view_id");
-                            viewName = extras.getString("view_name");
-                            collectType = extras.getString("collect_type");
+                            result.putBoolean("success", true);
+                            db.setTransactionSuccessful();
+                            return;
                         }
                         ContentValues values = new ContentValues();
-                        values.put("exit_key", exitKey);
-                        values.put("state", FTSQL.HISTORICAL_EXIT_STATE_CLAIMED);
-                        values.put("owner_run_id", extras.getString("owner_run_id"));
-                        values.put("lease_until_ms", extras.getLong("lease_until_ms"));
-                        values.put("attempt_count", attemptCount + 1);
-                        values.put("process_name", extras.getString("process_name"));
-                        values.put("pid", extras.getInt("pid"));
-                        values.put("exit_time_ms", extras.getLong("exit_time_ms"));
-                        values.put("reason", extras.getInt("reason"));
-                        values.put("session_id", sessionId);
-                        values.put("view_id", viewId);
-                        values.put("view_name", viewName);
-                        values.put("collect_type", collectType);
-                        values.put("event_dedupe_key", extras.getString("event_dedupe_key"));
-                        values.put("view_error_counted", viewErrorCounted);
-                        values.putNull("drop_reason");
-                        values.put("updated_at_ms", nowMs);
-                        long inserted = db.insertWithOnConflict(
-                                FTSQL.FT_HISTORICAL_EXIT_CLAIM_TABLE,
+                        values.put(FTSQL.RECORD_COLUMN_TM,
+                                extras.getLong(FTSQL.RECORD_COLUMN_TM));
+                        values.put(FTSQL.RECORD_COLUMN_DATA_UUID, uuid);
+                        values.put(FTSQL.RECORD_COLUMN_DATA,
+                                extras.getString(FTSQL.RECORD_COLUMN_DATA));
+                        values.put(FTSQL.RECORD_COLUMN_DATA_TYPE,
+                                extras.getString(FTSQL.RECORD_COLUMN_DATA_TYPE));
+                        long inserted = db.insert(
+                                FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME,
                                 null,
-                                values,
-                                SQLiteDatabase.CONFLICT_REPLACE);
+                                values);
                         if (inserted == -1) {
                             return;
                         }
+                        String viewId = extras.getString(FTSQL.RUM_COLUMN_VIEW_ID);
+                        if (viewId != null && viewId.length() > 0) {
+                            db.execSQL(
+                                    "UPDATE " + FTSQL.FT_TABLE_VIEW
+                                            + " SET " + FTSQL.RUM_COLUMN_ERROR_COUNT
+                                            + "=COALESCE(" + FTSQL.RUM_COLUMN_ERROR_COUNT
+                                            + ",0)+1 WHERE " + FTSQL.RUM_COLUMN_ID + "=?",
+                                    new Object[]{viewId});
+                        }
+                        result.putBoolean("success", true);
+                        result.putBoolean("inserted", true);
                         db.setTransactionSuccessful();
-                        result.putBoolean("acquired", true);
-                        result.putString("session_id", sessionId);
-                        result.putString("view_id", viewId);
-                        result.putString("view_name", viewName);
-                        result.putString("collect_type", collectType);
                     } finally {
                         if (cursor != null) {
                             cursor.close();
@@ -474,15 +457,15 @@ public class FTContentProvider extends ContentProvider {
                 }
             });
         } catch (Exception e) {
-            LogUtils.e(TAG, "Historical exit claim failed: " + e.getMessage());
+            LogUtils.e(TAG, "Historical RUM persist failed: " + e.getMessage());
         }
         return result;
     }
 
-    private Bundle handleHistoricalViewErrorCount(final Bundle extras) {
+    private Bundle handleHistoricalRumCommit(final Bundle extras) {
         final Bundle result = new Bundle();
         result.putBoolean("success", false);
-        result.putBoolean("applied", false);
+        result.putBoolean("promoted", false);
         if (extras == null) {
             return result;
         }
@@ -491,96 +474,53 @@ public class FTContentProvider extends ContentProvider {
                 @Override
                 public void run(SQLiteDatabase db) {
                     db.beginTransaction();
+                    Cursor cursor = null;
                     try {
-                        ContentValues counted = new ContentValues();
-                        counted.put("view_error_counted", 1);
-                        int marked = db.update(
-                                FTSQL.FT_HISTORICAL_EXIT_CLAIM_TABLE,
-                                counted,
-                                "event_dedupe_key=? AND view_error_counted=0",
-                                new String[]{extras.getString("event_dedupe_key")});
-                        if (marked == 1) {
-                            db.execSQL(
-                                    "UPDATE " + FTSQL.FT_TABLE_VIEW
-                                            + " SET " + FTSQL.RUM_COLUMN_ERROR_COUNT
-                                            + "=" + FTSQL.RUM_COLUMN_ERROR_COUNT
-                                            + "+1 WHERE " + FTSQL.RUM_COLUMN_ID + "=?",
-                                    new Object[]{extras.getString("view_id")});
-                            result.putBoolean("applied", true);
+                        String uuid = extras.getString(FTSQL.RECORD_COLUMN_DATA_UUID);
+                        String pendingType = extras.getString("pending_type");
+                        String committedType =
+                                extras.getString(FTSQL.RECORD_COLUMN_DATA_TYPE);
+                        cursor = db.query(
+                                FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME,
+                                new String[]{FTSQL.RECORD_COLUMN_DATA_TYPE},
+                                FTSQL.RECORD_COLUMN_DATA_UUID + "=?",
+                                new String[]{uuid}, null, null, null);
+                        if (!cursor.moveToFirst()) {
+                            return;
                         }
-                        result.putBoolean("success", marked == 0 || marked == 1);
+                        String storedType = cursor.getString(0);
+                        if (committedType.equals(storedType)) {
+                            result.putBoolean("success", true);
+                            db.setTransactionSuccessful();
+                            return;
+                        }
+                        if (!pendingType.equals(storedType)) {
+                            return;
+                        }
+                        ContentValues values = new ContentValues();
+                        values.put(FTSQL.RECORD_COLUMN_DATA_TYPE, committedType);
+                        int updated = db.update(
+                                FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME,
+                                values,
+                                FTSQL.RECORD_COLUMN_DATA_UUID + "=? AND "
+                                        + FTSQL.RECORD_COLUMN_DATA_TYPE + "=?",
+                                new String[]{uuid, pendingType});
+                        if (updated != 1) {
+                            return;
+                        }
+                        result.putBoolean("success", true);
+                        result.putBoolean("promoted", true);
                         db.setTransactionSuccessful();
                     } finally {
+                        if (cursor != null) {
+                            cursor.close();
+                        }
                         db.endTransaction();
                     }
                 }
             });
         } catch (Exception e) {
-            LogUtils.e(TAG, "Historical view error count failed: " + e.getMessage());
-        }
-        return result;
-    }
-
-    private Bundle handleHistoricalExitUpdate(final Bundle extras) {
-        final Bundle result = new Bundle();
-        result.putBoolean("success", false);
-        if (extras == null) {
-            return result;
-        }
-        try {
-            getDbManager().getDB(true, new DataBaseCallBack() {
-                @Override
-                public void run(SQLiteDatabase db) {
-                    ContentValues values = new ContentValues();
-                    values.put("state", extras.getInt("state"));
-                    values.put("lease_until_ms", extras.getLong("lease_until_ms"));
-                    values.put("updated_at_ms", extras.getLong("updated_at_ms"));
-                    String dropReason = extras.getString("drop_reason");
-                    if (dropReason == null) {
-                        values.putNull("drop_reason");
-                    } else {
-                        values.put("drop_reason", dropReason);
-                    }
-                    int updated = db.update(
-                            FTSQL.FT_HISTORICAL_EXIT_CLAIM_TABLE,
-                            values,
-                            "exit_key=? AND owner_run_id=? AND state=?",
-                            new String[]{
-                                    extras.getString("exit_key"),
-                                    extras.getString("owner_run_id"),
-                                    String.valueOf(FTSQL.HISTORICAL_EXIT_STATE_CLAIMED)
-                            });
-                    result.putBoolean("success", updated == 1);
-                }
-            });
-        } catch (Exception e) {
-            LogUtils.e(TAG, "Historical exit update failed: " + e.getMessage());
-        }
-        return result;
-    }
-
-    private Bundle handleHistoricalExitCleanup(final Bundle extras) {
-        final Bundle result = new Bundle();
-        if (extras == null) {
-            return result;
-        }
-        try {
-            getDbManager().getDB(true, new DataBaseCallBack() {
-                @Override
-                public void run(SQLiteDatabase db) {
-                    int deleted = db.delete(
-                            FTSQL.FT_HISTORICAL_EXIT_CLAIM_TABLE,
-                            "state IN (?,?) AND updated_at_ms<?",
-                            new String[]{
-                                    String.valueOf(FTSQL.HISTORICAL_EXIT_STATE_COMMITTED),
-                                    String.valueOf(FTSQL.HISTORICAL_EXIT_STATE_DROPPED),
-                                    String.valueOf(extras.getLong("terminal_before_ms"))
-                            });
-                    result.putInt("deleted", deleted);
-                }
-            });
-        } catch (Exception e) {
-            LogUtils.e(TAG, "Historical exit cleanup failed: " + e.getMessage());
+            LogUtils.e(TAG, "Historical RUM commit failed: " + e.getMessage());
         }
         return result;
     }

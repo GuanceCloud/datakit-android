@@ -94,6 +94,14 @@ final class DefaultHistoricalAnrReporter implements HistoricalAnrReporter {
         return ReportResult.FAILED;
     }
 
+    @Override
+    public boolean onCommitted(ReportResult result,
+                               String eventDedupeKey,
+                               CollectType collectType) {
+        return FTTrackInner.getInstance().commitHistoricalRum(
+                eventDedupeKey, collectType) != InsertResult.FAILED;
+    }
+
     interface IssueFieldsEnricher {
         void enrich(String stack,
                     long occurredAtNs,

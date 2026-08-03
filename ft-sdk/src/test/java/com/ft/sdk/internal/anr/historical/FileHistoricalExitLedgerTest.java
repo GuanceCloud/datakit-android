@@ -14,6 +14,7 @@ import org.robolectric.annotation.Config;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -46,7 +47,7 @@ public class FileHistoricalExitLedgerTest {
 
         secondProcess.markCommitted("exit", "owner-two", 220);
 
-        assertEquals(HistoricalExitLedger.ClaimResult.SKIPPED,
+        assertEquals(HistoricalExitLedger.ClaimResult.COMMITTED,
                 firstProcess.tryClaim("exit", "owner-one", 500, 600,
                         exit, context, "dedupe").getResult());
     }
@@ -78,5 +79,56 @@ public class FileHistoricalExitLedgerTest {
         assertEquals("session-one", takeover.getContext().getSessionId());
         assertEquals("view-one", takeover.getContext().getViewId());
         assertEquals(CollectType.COLLECT_BY_SAMPLE, takeover.getContext().getCollectType());
+    }
+
+    @Test
+    public void committedEventRemainsRecoverableUntilItIsVisible() throws Exception {
+        FTFileStorePaths paths = new FTFileStorePaths(temporaryFolder.newFolder());
+        FileHistoricalExitLedger ledger = new FileHistoricalExitLedger(paths);
+        ProcessExitRecord exit = new ProcessExitRecord(
+                "com.example.app", 123, 20_000, ProcessExitRecord.REASON_ANR, 100, null);
+        HistoricalRumContext context = new HistoricalRumContext(
+                "com.example.app", "old-run", 1_000, "session", "view", "Home",
+                10_000_000_000L, 0, false);
+
+        ledger.tryClaim("exit", "owner", 100, 200, exit, context, "dedupe");
+        ledger.markCommitted("exit", "owner", 150);
+
+        List<HistoricalExitLedger.PendingCommit> pending = ledger.loadPendingCommits();
+        assertEquals(1, pending.size());
+        assertEquals("exit", pending.get(0).getExitKey());
+        assertEquals("dedupe", pending.get(0).getEventDedupeKey());
+        assertEquals(CollectType.COLLECT_BY_SAMPLE, pending.get(0).getCollectType());
+
+        ledger.markEventVisible("exit", "dedupe", 160);
+
+        assertEquals(0, ledger.loadPendingCommits().size());
+        assertEquals(HistoricalExitLedger.ClaimResult.SKIPPED,
+                ledger.tryClaim("exit", "other-owner", 300, 400,
+                        exit, context, "dedupe").getResult());
+    }
+
+    @Test
+    public void cleanupRetainsCommittedEventUntilItIsVisible() throws Exception {
+        FTFileStorePaths paths = new FTFileStorePaths(temporaryFolder.newFolder());
+        FileHistoricalExitLedger ledger = new FileHistoricalExitLedger(paths);
+        ProcessExitRecord exit = new ProcessExitRecord(
+                "com.example.app", 123, 20_000, ProcessExitRecord.REASON_ANR, 100, null);
+        HistoricalRumContext context = new HistoricalRumContext(
+                "com.example.app", "old-run", 1_000, "session", "view", "Home",
+                10_000_000_000L, 0, false);
+
+        ledger.tryClaim("exit", "owner", 100, 200, exit, context, "dedupe");
+        ledger.markCommitted("exit", "owner", 150);
+
+        ledger.cleanup(200);
+
+        assertEquals(1, ledger.loadPendingCommits().size());
+
+        ledger.markEventVisible("exit", "dedupe", 210);
+        ledger.cleanup(220);
+
+        File[] files = paths.getHistoricalExitDir().listFiles();
+        assertEquals(0, files == null ? 0 : files.length);
     }
 }

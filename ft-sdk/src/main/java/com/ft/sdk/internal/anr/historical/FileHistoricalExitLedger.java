@@ -2,6 +2,7 @@ package com.ft.sdk.internal.anr.historical;
 
 import android.util.Base64;
 
+import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.db.file.FTAtomicFileHelper;
 import com.ft.sdk.garble.db.file.FTFileLock;
 import com.ft.sdk.garble.db.file.FTFileStorePaths;
@@ -13,6 +14,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileFilter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 final class FileHistoricalExitLedger implements HistoricalExitLedger {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FileExitLedger";
@@ -30,6 +34,31 @@ final class FileHistoricalExitLedger implements HistoricalExitLedger {
         this.lock = new FTFileLock(paths.getLockFile());
     }
 
+    void importV4Claim(final JSONObject imported) throws Exception {
+        lock.withLock(new FTFileLock.LockedOperation<Void>() {
+            @Override
+            public Void run() throws Exception {
+                paths.ensureReady();
+                String exitKey = imported.optString("exit_key", null);
+                if (exitKey == null || exitKey.length() == 0) {
+                    return null;
+                }
+                File file = claimFile(exitKey);
+                JSONObject existing = read(file);
+                if (existing == null
+                        || (isTerminal(imported.optInt("state"))
+                        && !isTerminal(existing.optInt("state")))) {
+                    FTAtomicFileHelper.writeUtf8(file, imported.toString());
+                }
+                return null;
+            }
+        });
+    }
+
+    private static boolean isTerminal(int state) {
+        return state == STATE_COMMITTED || state == STATE_DROPPED;
+    }
+
     @Override
     public Claim tryClaim(final String exitKey, final String ownerRunId,
                           final long nowMs, final long leaseUntilMs,
@@ -45,7 +74,15 @@ final class FileHistoricalExitLedger implements HistoricalExitLedger {
                     JSONObject claim = read(file);
                     if (claim != null) {
                         int state = claim.optInt("state");
-                        if (state == STATE_COMMITTED || state == STATE_DROPPED) {
+                        HistoricalRumContext snapshot = snapshot(
+                                claim, exit.getProcessName());
+                        if (state == STATE_COMMITTED) {
+                            if (claim.optBoolean("event_visible")) {
+                                return Claim.skipped();
+                            }
+                            return Claim.committed(snapshot);
+                        }
+                        if (state == STATE_DROPPED) {
                             return Claim.skipped();
                         }
                         if ((state == STATE_CLAIMED || state == STATE_RETRY)
@@ -85,8 +122,83 @@ final class FileHistoricalExitLedger implements HistoricalExitLedger {
     }
 
     @Override
-    public void markCommitted(String exitKey, String ownerRunId, long nowMs) {
-        updateState(exitKey, ownerRunId, STATE_COMMITTED, 0, null, nowMs);
+    public boolean markCommitted(String exitKey, String ownerRunId, long nowMs) {
+        return updateState(exitKey, ownerRunId, STATE_COMMITTED, 0, null, nowMs);
+    }
+
+    @Override
+    public List<PendingCommit> loadPendingCommits() {
+        try {
+            return lock.withLock(new FTFileLock.LockedOperation<List<PendingCommit>>() {
+                @Override
+                public List<PendingCommit> run() throws Exception {
+                    paths.ensureReady();
+                    File[] files = claimFiles();
+                    if (files == null) {
+                        return Collections.emptyList();
+                    }
+                    ArrayList<PendingCommit> pending = new ArrayList<>();
+                    for (File file : files) {
+                        try {
+                            JSONObject claim = read(file);
+                            if (claim == null
+                                    || claim.optInt("state") != STATE_COMMITTED
+                                    || claim.optBoolean("event_visible")) {
+                                continue;
+                            }
+                            String exitKey = claim.optString("exit_key", null);
+                            String eventDedupeKey = claim.optString(
+                                    "event_dedupe_key", null);
+                            if (exitKey == null || exitKey.length() == 0
+                                    || eventDedupeKey == null
+                                    || eventDedupeKey.length() == 0) {
+                                continue;
+                            }
+                            pending.add(new PendingCommit(
+                                    exitKey,
+                                    eventDedupeKey,
+                                    CollectType.fromValue(
+                                            claim.optString("collect_type", null))));
+                        } catch (Exception e) {
+                            LogUtils.e(TAG, "loadPendingCommits skipped corrupt claim: "
+                                    + e.getMessage());
+                        }
+                    }
+                    return pending;
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.e(TAG, "loadPendingCommits failed: " + e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public boolean markEventVisible(final String exitKey,
+                                    final String eventDedupeKey,
+                                    final long nowMs) {
+        try {
+            return lock.withLock(new FTFileLock.LockedOperation<Boolean>() {
+                @Override
+                public Boolean run() throws Exception {
+                    File file = claimFile(exitKey);
+                    JSONObject claim = read(file);
+                    if (claim == null
+                            || claim.optInt("state") != STATE_COMMITTED
+                            || !eventDedupeKey.equals(claim.optString(
+                                    "event_dedupe_key", null))) {
+                        return false;
+                    }
+                    claim.put("event_visible", true);
+                    claim.put("updated_at_ms", nowMs);
+                    FTAtomicFileHelper.writeUtf8(file, claim.toString());
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.e(TAG, "markEventVisible failed: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
@@ -106,13 +218,7 @@ final class FileHistoricalExitLedger implements HistoricalExitLedger {
                 @Override
                 public Void run() throws Exception {
                     paths.ensureReady();
-                    File[] files = paths.getHistoricalExitDir().listFiles(new FileFilter() {
-                        @Override
-                        public boolean accept(File pathname) {
-                            return pathname.isFile()
-                                    && pathname.getName().endsWith(FILE_SUFFIX);
-                        }
-                    });
+                    File[] files = claimFiles();
                     if (files == null) {
                         return null;
                     }
@@ -122,7 +228,10 @@ final class FileHistoricalExitLedger implements HistoricalExitLedger {
                             continue;
                         }
                         int state = claim.optInt("state");
-                        if ((state == STATE_COMMITTED || state == STATE_DROPPED)
+                        boolean removable = state == STATE_DROPPED
+                                || (state == STATE_COMMITTED
+                                && claim.optBoolean("event_visible"));
+                        if (removable
                                 && claim.optLong("updated_at_ms") < terminalBeforeMs) {
                             file.delete();
                         }
@@ -135,19 +244,19 @@ final class FileHistoricalExitLedger implements HistoricalExitLedger {
         }
     }
 
-    private void updateState(final String exitKey, final String ownerRunId,
-                             final int state, final long leaseUntilMs,
-                             final String dropReason, final long nowMs) {
+    private boolean updateState(final String exitKey, final String ownerRunId,
+                                final int state, final long leaseUntilMs,
+                                final String dropReason, final long nowMs) {
         try {
-            lock.withLock(new FTFileLock.LockedOperation<Void>() {
+            return lock.withLock(new FTFileLock.LockedOperation<Boolean>() {
                 @Override
-                public Void run() throws Exception {
+                public Boolean run() throws Exception {
                     File file = claimFile(exitKey);
                     JSONObject claim = read(file);
                     if (claim == null
                             || claim.optInt("state") != STATE_CLAIMED
                             || !ownerRunId.equals(claim.optString("owner_run_id"))) {
-                        return null;
+                        return false;
                     }
                     claim.put("state", state);
                     claim.put("lease_until_ms", leaseUntilMs);
@@ -156,11 +265,12 @@ final class FileHistoricalExitLedger implements HistoricalExitLedger {
                         claim.put("drop_reason", dropReason);
                     }
                     FTAtomicFileHelper.writeUtf8(file, claim.toString());
-                    return null;
+                    return true;
                 }
             });
         } catch (Exception e) {
             LogUtils.e(TAG, "updateState failed: " + e.getMessage());
+            return false;
         }
     }
 
@@ -188,5 +298,15 @@ final class FileHistoricalExitLedger implements HistoricalExitLedger {
                 exitKey.getBytes(StandardCharsets.UTF_8),
                 Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING);
         return new File(paths.getHistoricalExitDir(), encoded + FILE_SUFFIX);
+    }
+
+    private File[] claimFiles() {
+        return paths.getHistoricalExitDir().listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile()
+                        && pathname.getName().endsWith(FILE_SUFFIX);
+            }
+        });
     }
 }

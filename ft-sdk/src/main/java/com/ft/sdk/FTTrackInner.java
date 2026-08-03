@@ -10,7 +10,9 @@ import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
+import com.ft.sdk.garble.db.FTDataStore;
 import com.ft.sdk.garble.db.FTDataStoreManager;
+import com.ft.sdk.garble.db.HistoricalRumDataStore;
 import com.ft.sdk.garble.db.InsertResult;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -25,6 +27,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.anr.historical.HistoricalAnrDataId;
 
 import org.json.JSONObject;
 
@@ -135,18 +138,15 @@ public class FTTrackInner {
             if (recordData == null) {
                 return InsertResult.FAILED;
             }
-            InsertResult result =
-                    FTDataStoreManager.get().insertSyncDataIfAbsent(dedupeKey, recordData);
-            if (result != InsertResult.FAILED) {
-                InsertResult countResult =
-                        FTDataStoreManager.get().increaseViewErrorOnce(viewId, dedupeKey);
-                if (countResult == InsertResult.FAILED) {
-                    return InsertResult.FAILED;
-                }
+            if (!HistoricalAnrDataId.canonicalize(dedupeKey, recordData)) {
+                return InsertResult.FAILED;
             }
-            if (result == InsertResult.INSERTED) {
-                SyncTaskManager.get().executeSyncPoll();
+            FTDataStore store = FTDataStoreManager.get();
+            if (!(store instanceof HistoricalRumDataStore)) {
+                return InsertResult.FAILED;
             }
+            InsertResult result = ((HistoricalRumDataStore) store)
+                    .prepareHistoricalRum(dedupeKey, viewId, recordData);
             return result;
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -158,6 +158,20 @@ public class FTTrackInner {
         return collectType == CollectType.COLLECT_BY_ERROR_SAMPLE
                 ? DataType.RUM_APP_ERROR_SAMPLED
                 : DataType.RUM_APP;
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public InsertResult commitHistoricalRum(String dedupeKey, CollectType collectType) {
+        FTDataStore store = FTDataStoreManager.get();
+        if (!(store instanceof HistoricalRumDataStore)) {
+            return InsertResult.FAILED;
+        }
+        InsertResult result = ((HistoricalRumDataStore) store).commitHistoricalRum(
+                dedupeKey, historicalRumDataType(collectType));
+        if (result != InsertResult.FAILED) {
+            SyncTaskManager.get().executeSyncPoll();
+        }
+        return result;
     }
 
     HashMap<String, Object> getSessionReplayRUMLinksKeys(String[] links) {

@@ -25,15 +25,57 @@ public class HistoricalSyncDataFileStoreTest {
         FTSyncFileDataStore store = new FTSyncFileDataStore(paths);
 
         assertEquals(InsertResult.INSERTED,
-                store.insertSyncDataIfAbsent("historical-anr:v1:key", data("first")));
+                store.prepareHistoricalRum("historical-anr:v1:key", data("first")));
         assertEquals(InsertResult.ALREADY_EXISTS,
-                store.insertSyncDataIfAbsent("historical-anr:v1:key", data("second")));
+                store.prepareHistoricalRum("historical-anr:v1:key", data("second")));
+        assertEquals(InsertResult.INSERTED,
+                store.commitHistoricalRum("first", DataType.RUM_APP));
         assertEquals(1, store.queryDataByDescLimit(0).size());
         assertEquals("first", store.queryDataByDescLimit(0).get(0).getDataString());
     }
 
+    @Test
+    public void dataTypeRewriteKeepsHistoricalDedupeKey() throws Exception {
+        FTFileStorePaths paths = new FTFileStorePaths(temporaryFolder.newFolder());
+        FTSyncFileDataStore store = new FTSyncFileDataStore(paths);
+
+        assertEquals(InsertResult.INSERTED,
+                store.prepareHistoricalRum(
+                        "historical-anr:v1:key",
+                        data(DataType.RUM_APP_ERROR_SAMPLED, "first")));
+        assertEquals(InsertResult.INSERTED,
+                store.commitHistoricalRum("first", DataType.RUM_APP_ERROR_SAMPLED));
+
+        store.updateDataType(DataType.RUM_APP_ERROR_SAMPLED, 123);
+
+        assertEquals(InsertResult.ALREADY_EXISTS,
+                store.prepareHistoricalRum(
+                        "historical-anr:v1:key",
+                        data(DataType.RUM_APP, "second")));
+        assertEquals(1, store.queryDataByDescLimit(0).size());
+    }
+
+    @Test
+    public void stableUuidPreventsDuplicateAfterDedupeMetadataIsLost() throws Exception {
+        FTFileStorePaths paths = new FTFileStorePaths(temporaryFolder.newFolder());
+        FTSyncFileDataStore store = new FTSyncFileDataStore(paths);
+        SyncData resyncedFromDatabase = data("stable-uuid");
+        resyncedFromDatabase.setUuid("stable-uuid");
+        store.replaceAll(java.util.Collections.singletonList(resyncedFromDatabase));
+
+        SyncData retry = data("retry");
+        retry.setUuid("stable-uuid");
+        assertEquals(InsertResult.ALREADY_EXISTS,
+                store.prepareHistoricalRum("historical-anr:v1:key", retry));
+        assertEquals(1, store.queryDataByDescLimit(0).size());
+    }
+
     private static SyncData data(String body) {
-        SyncData data = new SyncData(DataType.RUM_APP);
+        return data(DataType.RUM_APP, body);
+    }
+
+    private static SyncData data(DataType type, String body) {
+        SyncData data = new SyncData(type);
         data.setTime(123);
         data.setUuid(body);
         data.setDataString(body);

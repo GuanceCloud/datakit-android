@@ -1,5 +1,6 @@
 package com.ft.sdk;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -27,6 +28,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.anr.historical.FileHistoricalRumContextStore;
 import com.ft.sdk.internal.anr.historical.ProcessRunIdentity;
 import com.ft.sdk.internal.issue.FTIssueFieldEnricher;
 
@@ -88,6 +90,7 @@ public class FTRUMInnerManager {
      */
     private String sessionId = Utils.getEmptyUUID();
     private String rumAppId;
+    private boolean persistHistoricalAnrContext;
 
     /**
      * Do not collect
@@ -835,6 +838,10 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
+                if (persistHistoricalAnrContext) {
+                    FileHistoricalRumContextStore.get(
+                            FTApplication.getApplication()).save(bean);
+                }
                 FTDataStoreManager.get().initSumView(bean);
             }
         });
@@ -1561,6 +1568,10 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
+                if (persistHistoricalAnrContext) {
+                    FileHistoricalRumContextStore.get(
+                            FTApplication.getApplication()).save(viewBean);
+                }
                 FTDataStoreManager.get().closeView(viewId, loadTIme, timeSpent, viewBean.getAttrJsonString());
                 FTDataStoreManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
                 if (callBack != null) {
@@ -1883,6 +1894,8 @@ public class FTRUMInnerManager {
     void initParams(FTRUMConfig config) {
         sampleRate = config.getSamplingRate();
         rumAppId = config.getRumAppId();
+        persistHistoricalAnrContext = config.isEnableTrackAppANR()
+                && ANRStrategy.shouldUseHistoricalAnr(Build.VERSION.SDK_INT);
         sessionErrorSampleError = config.getSessionErrorSampleRate();
         issueFieldEnricher = new FTIssueFieldEnricher(config.getIssueDataProvider());
         sessionId = Utils.randomUUID();

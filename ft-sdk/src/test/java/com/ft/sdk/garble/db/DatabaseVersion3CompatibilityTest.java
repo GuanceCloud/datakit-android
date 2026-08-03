@@ -17,11 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
-public class DatabaseUpgradeV4Test {
+public class DatabaseVersion3CompatibilityTest {
     private final List<String> databaseNames = new ArrayList<>();
 
     @After
@@ -33,29 +34,35 @@ public class DatabaseUpgradeV4Test {
     }
 
     @Test
-    public void versionsOneTwoAndThreeUpgradeWithoutLosingExistingRows() {
+    public void databaseVersionRemainsThreeWithoutHistoricalAnrSchema() {
+        assertEquals(3, FTDBConfig.DATABASE_VERSION);
+        String name = "new-v3-" + System.nanoTime() + ".db";
+        databaseNames.add(name);
+
+        DatabaseHelper helper = new DatabaseHelper(
+                RuntimeEnvironment.getApplication(), name, FTDBConfig.DATABASE_VERSION);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        assertEquals(3, db.getVersion());
+        assertHistoricalAnrSchemaIsAbsent(db);
+        helper.close();
+    }
+
+    @Test
+    public void versionsOneTwoAndThreeOpenWithoutLosingExistingRows() {
         for (int oldVersion = 1; oldVersion <= 3; oldVersion++) {
             String name = "upgrade-" + oldVersion + "-" + System.nanoTime() + ".db";
             databaseNames.add(name);
             createLegacyDatabase(name, oldVersion);
 
             DatabaseHelper helper = new DatabaseHelper(
-                    RuntimeEnvironment.getApplication(), name, 4);
+                    RuntimeEnvironment.getApplication(), name, 3);
             SQLiteDatabase db = helper.getWritableDatabase();
 
-            assertEquals(4, db.getVersion());
+            assertEquals(3, db.getVersion());
             assertEquals(1, count(db, FTSQL.FT_TABLE_VIEW));
             assertEquals(1, count(db, FTSQL.FT_TABLE_ACTION));
-            assertTrue(hasColumn(db, FTSQL.FT_TABLE_VIEW, FTSQL.RUM_COLUMN_PROCESS_NAME));
-            assertTrue(hasColumn(db, FTSQL.FT_TABLE_VIEW, FTSQL.RUM_COLUMN_PROCESS_RUN_ID));
-            assertTrue(hasColumn(db, FTSQL.FT_TABLE_VIEW, FTSQL.RUM_COLUMN_PROCESS_START_MS));
-            assertTrue(hasColumn(db, FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME,
-                    FTSQL.RECORD_COLUMN_DEDUPE_KEY));
-            assertTrue(tableExists(db, FTSQL.FT_HISTORICAL_EXIT_CLAIM_TABLE));
-            assertTrue(hasColumn(db, FTSQL.FT_HISTORICAL_EXIT_CLAIM_TABLE,
-                    "view_error_counted"));
-            assertTrue(hasColumn(db, FTSQL.FT_HISTORICAL_EXIT_CLAIM_TABLE,
-                    "collect_type"));
+            assertHistoricalAnrSchemaIsAbsent(db);
             if (oldVersion < 3) {
                 assertEquals(1, count(db, FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME));
             } else {
@@ -63,31 +70,37 @@ public class DatabaseUpgradeV4Test {
             }
             helper.close();
         }
-        assertVersionFourCanBeOpenedByVersionThree();
     }
 
-    private void assertVersionFourCanBeOpenedByVersionThree() {
-        String name = "downgrade-" + System.nanoTime() + ".db";
+    @Test
+    public void versionFourPreviewDatabaseCanReturnToThreeWithoutDataLoss() {
+        String name = "downgrade-v4-" + System.nanoTime() + ".db";
         databaseNames.add(name);
         Context context = RuntimeEnvironment.getApplication();
         SQLiteDatabase db = context.openOrCreateDatabase(name, Context.MODE_PRIVATE, null);
         db.execSQL(FTSQL.FT_TABLE_SYNC_CREATE);
         db.execSQL(FTSQL.FT_TABLE_VIEW_CREATE);
         db.execSQL(FTSQL.FT_TABLE_ACTION_CREATE);
-        db.execSQL(FTSQL.FT_SYNC_DEDUPE_INDEX_CREATE);
-        db.execSQL(FTSQL.FT_HISTORICAL_EXIT_CLAIM_CREATE);
         db.execSQL("INSERT INTO " + FTSQL.FT_TABLE_VIEW
                 + " (" + FTSQL.RUM_COLUMN_ID + ") VALUES ('view')");
         db.setVersion(4);
         db.close();
 
-        DatabaseHelper v3 = new DatabaseHelper(context, name, 3);
-        SQLiteDatabase downgraded = v3.getWritableDatabase();
+        DatabaseHelper helper = new DatabaseHelper(context, name, 3);
+        SQLiteDatabase downgraded = helper.getWritableDatabase();
 
+        assertEquals(3, downgraded.getVersion());
         assertEquals(1, count(downgraded, FTSQL.FT_TABLE_VIEW));
-        assertTrue(hasColumn(downgraded, FTSQL.FT_TABLE_VIEW,
-                FTSQL.RUM_COLUMN_PROCESS_RUN_ID));
-        v3.close();
+        helper.close();
+    }
+
+    private void assertHistoricalAnrSchemaIsAbsent(SQLiteDatabase db) {
+        assertFalse(hasColumn(db, FTSQL.FT_TABLE_VIEW, FTSQL.RUM_COLUMN_PROCESS_NAME));
+        assertFalse(hasColumn(db, FTSQL.FT_TABLE_VIEW, FTSQL.RUM_COLUMN_PROCESS_RUN_ID));
+        assertFalse(hasColumn(db, FTSQL.FT_TABLE_VIEW, FTSQL.RUM_COLUMN_PROCESS_START_MS));
+        assertFalse(hasColumn(db, FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME,
+                FTSQL.RECORD_COLUMN_DEDUPE_KEY));
+        assertFalse(tableExists(db, "historical_exit_claim"));
     }
 
     private void createLegacyDatabase(String name, int version) {
@@ -143,7 +156,7 @@ public class DatabaseUpgradeV4Test {
     private int count(SQLiteDatabase db, String table) {
         Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + table, null);
         try {
-            cursor.moveToFirst();
+            assertTrue(cursor.moveToFirst());
             return cursor.getInt(0);
         } finally {
             cursor.close();

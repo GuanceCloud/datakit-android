@@ -1,5 +1,7 @@
 package com.ft.sdk.internal.anr.historical;
 
+import com.ft.sdk.garble.bean.CollectType;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -79,6 +81,103 @@ public class HistoricalAnrCoordinatorTest {
     }
 
     @Test
+    public void uploadIsTriggeredOnlyAfterTheClaimIsCommitted() {
+        AtomicInteger phase = new AtomicInteger();
+        RecordingLedger ledger = new RecordingLedger() {
+            @Override
+            public boolean markCommitted(String exitKey, String ownerRunId, long nowMs) {
+                assertEquals(1, phase.get());
+                phase.set(2);
+                return super.markCommitted(exitKey, ownerRunId, nowMs);
+            }
+        };
+        ProcessExitRecord exit = new ProcessExitRecord(
+                "com.example.app", 123, 20_000, ProcessExitRecord.REASON_ANR, 100,
+                () -> new ByteArrayInputStream(new byte[]{1}));
+        HistoricalRumContext oldView = new HistoricalRumContext(
+                "com.example.app", "old-run", 1_000,
+                "old-session", "old-view", "Home",
+                10_000_000_000L, 0, false);
+        HistoricalAnrReporter reporter = new HistoricalAnrReporter() {
+            @Override
+            public ReportResult report(ProcessExitRecord record,
+                                       HistoricalRumContext context,
+                                       String stack,
+                                       String dedupeKey) {
+                assertEquals(0, phase.get());
+                phase.set(1);
+                return ReportResult.INSERTED;
+            }
+
+            @Override
+            public void onCommitted(ReportResult result) {
+                assertEquals(ReportResult.INSERTED, result);
+                assertEquals(2, phase.get());
+                phase.set(3);
+            }
+        };
+        HistoricalAnrCoordinator coordinator = new HistoricalAnrCoordinator(
+                "com.example.app",
+                new ProcessRunIdentity("com.example.app", "current-run", 30_000),
+                () -> Collections.singletonList(exit),
+                processName -> Collections.singletonList(oldView),
+                ledger,
+                reporter,
+                Runnable::run,
+                () -> 40_000);
+
+        coordinator.consumePending();
+
+        assertEquals(3, phase.get());
+    }
+
+    @Test
+    public void failedClaimCommitDoesNotTriggerUpload() {
+        AtomicInteger uploads = new AtomicInteger();
+        RecordingLedger ledger = new RecordingLedger() {
+            @Override
+            public boolean markCommitted(String exitKey, String ownerRunId, long nowMs) {
+                return false;
+            }
+        };
+        ProcessExitRecord exit = new ProcessExitRecord(
+                "com.example.app", 123, 20_000, ProcessExitRecord.REASON_ANR, 100,
+                () -> new ByteArrayInputStream(new byte[]{1}));
+        HistoricalRumContext oldView = new HistoricalRumContext(
+                "com.example.app", "old-run", 1_000,
+                "old-session", "old-view", "Home",
+                10_000_000_000L, 0, false);
+        HistoricalAnrReporter reporter = new HistoricalAnrReporter() {
+            @Override
+            public ReportResult report(ProcessExitRecord record,
+                                       HistoricalRumContext context,
+                                       String stack,
+                                       String dedupeKey) {
+                return ReportResult.INSERTED;
+            }
+
+            @Override
+            public void onCommitted(ReportResult result) {
+                uploads.incrementAndGet();
+            }
+        };
+        HistoricalAnrCoordinator coordinator = new HistoricalAnrCoordinator(
+                "com.example.app",
+                new ProcessRunIdentity("com.example.app", "current-run", 30_000),
+                () -> Collections.singletonList(exit),
+                processName -> Collections.singletonList(oldView),
+                ledger,
+                reporter,
+                Runnable::run,
+                () -> 40_000);
+
+        coordinator.consumePending();
+
+        assertEquals(0, uploads.get());
+        assertEquals(1, ledger.retried);
+    }
+
+    @Test
     public void transientContextReadFailureIsRetriedInsteadOfDropped() {
         RecordingLedger ledger = new RecordingLedger();
         ProcessExitRecord exit = new ProcessExitRecord(
@@ -105,6 +204,141 @@ public class HistoricalAnrCoordinatorTest {
 
         assertEquals(1, ledger.retried);
         assertEquals(0, ledger.dropped);
+    }
+
+    @Test
+    public void migrationFailureDoesNotCreateOrOverwriteAClaim() {
+        RecordingLedger ledger = new RecordingLedger();
+        ProcessExitRecord exit = new ProcessExitRecord(
+                "com.example.app", 123, 20_000, ProcessExitRecord.REASON_ANR, 100,
+                () -> new ByteArrayInputStream(new byte[]{1}));
+        HistoricalAnrCoordinator coordinator = new HistoricalAnrCoordinator(
+                "com.example.app",
+                new ProcessRunIdentity("com.example.app", "current-run", 30_000),
+                () -> Collections.singletonList(exit),
+                processName -> {
+                    throw new HistoricalAnrMigrationException(
+                            new IOException("migration failed"));
+                },
+                ledger,
+                (record, context, stack, dedupeKey) ->
+                        HistoricalAnrReporter.ReportResult.INSERTED,
+                Runnable::run,
+                () -> 40_000);
+
+        coordinator.consumePending();
+
+        assertEquals(false, ledger.claimed);
+        assertEquals(0, ledger.retried);
+        assertEquals(0, ledger.dropped);
+    }
+
+    @Test
+    public void committedClaimPromotesPendingEventWithoutReadingTraceAgain() {
+        AtomicInteger traceOpens = new AtomicInteger();
+        AtomicInteger reports = new AtomicInteger();
+        AtomicInteger promotions = new AtomicInteger();
+        HistoricalRumContext snapshot = new HistoricalRumContext(
+                "com.example.app", null, 0,
+                "session", "view", "Home", 0, 0, true);
+        RecordingLedger ledger = new RecordingLedger() {
+            @Override
+            public Claim tryClaim(String exitKey, String ownerRunId, long nowMs,
+                                  long leaseUntilMs, ProcessExitRecord exit,
+                                  HistoricalRumContext context, String eventDedupeKey) {
+                return Claim.committed(snapshot);
+            }
+        };
+        ProcessExitRecord exit = new ProcessExitRecord(
+                "com.example.app", 123, 20_000, ProcessExitRecord.REASON_ANR, 100,
+                () -> {
+                    traceOpens.incrementAndGet();
+                    return new ByteArrayInputStream(new byte[]{1});
+                });
+        HistoricalAnrReporter reporter = new HistoricalAnrReporter() {
+            @Override
+            public ReportResult report(ProcessExitRecord record,
+                                       HistoricalRumContext context,
+                                       String stack,
+                                       String dedupeKey) {
+                reports.incrementAndGet();
+                return ReportResult.INSERTED;
+            }
+
+            @Override
+            public boolean onCommitted(ReportResult result,
+                                       String eventDedupeKey,
+                                       com.ft.sdk.garble.bean.CollectType collectType) {
+                promotions.incrementAndGet();
+                return true;
+            }
+        };
+        HistoricalAnrCoordinator coordinator = new HistoricalAnrCoordinator(
+                "com.example.app",
+                new ProcessRunIdentity("com.example.app", "current-run", 30_000),
+                () -> Collections.singletonList(exit),
+                processName -> Collections.emptyList(),
+                ledger,
+                reporter,
+                Runnable::run,
+                () -> 40_000);
+
+        coordinator.consumePending();
+
+        assertEquals(0, traceOpens.get());
+        assertEquals(0, reports.get());
+        assertEquals(1, promotions.get());
+    }
+
+    @Test
+    public void committedEventIsPromotedWhenSystemExitHistoryNoLongerContainsIt() {
+        AtomicInteger sourceQueries = new AtomicInteger();
+        AtomicInteger promotions = new AtomicInteger();
+        RecordingLedger ledger = new RecordingLedger() {
+            @Override
+            public List<PendingCommit> loadPendingCommits() {
+                return Collections.singletonList(new PendingCommit(
+                        "missing-exit",
+                        "historical-anr:v1:missing-exit",
+                        CollectType.COLLECT_BY_SAMPLE));
+            }
+        };
+        HistoricalAnrReporter reporter = new HistoricalAnrReporter() {
+            @Override
+            public ReportResult report(ProcessExitRecord record,
+                                       HistoricalRumContext context,
+                                       String stack,
+                                       String dedupeKey) {
+                throw new AssertionError("A committed event must not be reported again");
+            }
+
+            @Override
+            public boolean onCommitted(ReportResult result,
+                                       String eventDedupeKey,
+                                       CollectType collectType) {
+                promotions.incrementAndGet();
+                assertEquals("historical-anr:v1:missing-exit", eventDedupeKey);
+                return true;
+            }
+        };
+        HistoricalAnrCoordinator coordinator = new HistoricalAnrCoordinator(
+                "com.example.app",
+                new ProcessRunIdentity("com.example.app", "current-run", 30_000),
+                () -> {
+                    sourceQueries.incrementAndGet();
+                    return Collections.emptyList();
+                },
+                processName -> Collections.emptyList(),
+                ledger,
+                reporter,
+                Runnable::run,
+                () -> 40_000);
+
+        coordinator.consumePending();
+
+        assertEquals(1, sourceQueries.get());
+        assertEquals(1, promotions.get());
+        assertEquals(1, ledger.visible);
     }
 
     @Test
@@ -275,6 +509,7 @@ public class HistoricalAnrCoordinatorTest {
         private int committed;
         private int retried;
         private int dropped;
+        private int visible;
 
         @Override
         public Claim tryClaim(String exitKey, String ownerRunId, long nowMs,
@@ -288,8 +523,22 @@ public class HistoricalAnrCoordinatorTest {
         }
 
         @Override
-        public void markCommitted(String exitKey, String ownerRunId, long nowMs) {
+        public boolean markCommitted(String exitKey, String ownerRunId, long nowMs) {
             committed++;
+            return true;
+        }
+
+        @Override
+        public List<PendingCommit> loadPendingCommits() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public boolean markEventVisible(String exitKey,
+                                        String eventDedupeKey,
+                                        long nowMs) {
+            visible++;
+            return true;
         }
 
         @Override

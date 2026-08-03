@@ -23,9 +23,12 @@ import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.base.DBManager;
 import com.ft.sdk.garble.db.base.DatabaseHelper;
+import com.ft.sdk.garble.db.file.FTHistoricalFileStore;
+import com.ft.sdk.garble.db.file.FTFileStorePaths;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.anr.historical.HistoricalAnrDataId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +39,7 @@ import java.util.List;
  * Description: Database management class
  */
 @SuppressLint("Range")
-public class FTDBManager extends DBManager implements FTDataStore {
+public class FTDBManager extends DBManager implements FTDataStore, HistoricalRumDataStore {
     private static FTDBManager ftdbManager;
     public final static String TAG = Constants.LOG_TAG_PREFIX + "FTDBManager";
 
@@ -93,7 +96,7 @@ public class FTDBManager extends DBManager implements FTDataStore {
 
     }
 
-    private int deleteOldestSyncData(SQLiteDatabase db, String dataType, int limit) {
+    static int deleteOldestSyncData(SQLiteDatabase db, String dataType, int limit) {
         StringBuilder where = new StringBuilder();
         where.append(FTSQL.RECORD_COLUMN_ID)
                 .append(" in (SELECT ")
@@ -106,6 +109,10 @@ public class FTDBManager extends DBManager implements FTDataStore {
                     .append("='")
                     .append(dataType)
                     .append("'");
+        } else {
+            where.append(" where ")
+                    .append(FTSQL.RECORD_COLUMN_DATA_TYPE)
+                    .append(" NOT LIKE 'historical_pending_%'");
         }
         where.append(" ORDER by ")
                 .append(FTSQL.RECORD_COLUMN_TM)
@@ -151,9 +158,6 @@ public class FTDBManager extends DBManager implements FTDataStore {
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, data.getLoadTime());
             contentValues.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
             contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
-            contentValues.put(FTSQL.RUM_COLUMN_PROCESS_NAME, data.getProcessName());
-            contentValues.put(FTSQL.RUM_COLUMN_PROCESS_RUN_ID, data.getProcessRunId());
-            contentValues.put(FTSQL.RUM_COLUMN_PROCESS_START_MS, data.getProcessStartMs());
 
             Uri resultUri = contentProvider.insert(FTContentProvider.getUriViewData(), contentValues);
             if (resultUri == null) {
@@ -636,10 +640,6 @@ public class FTDBManager extends DBManager implements FTDataStore {
                     String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
                     String attr = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_EXTRA_ATTR));
                     long viewUpdateTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_VIEW_UPDATE_TIME));
-                    String processName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_PROCESS_NAME));
-                    String processRunId = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_PROCESS_RUN_ID));
-                    long processStartMs = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_PROCESS_START_MS));
-
                     ViewBean viewBean = new ViewBean();
                     viewBean.setClose(close == 1);
                     viewBean.setId(id);
@@ -655,10 +655,6 @@ public class FTDBManager extends DBManager implements FTDataStore {
                     viewBean.setViewReferrer(viewReferrer);
                     viewBean.setFromAttrJsonString(attr);
                     viewBean.setViewUpdateTime(viewUpdateTime);
-                    viewBean.setProcessName(processName);
-                    viewBean.setProcessRunId(processRunId);
-                    viewBean.setProcessStartMs(processStartMs);
-
                     list.add(viewBean);
                 }
                 cursor.close();
@@ -807,65 +803,67 @@ public class FTDBManager extends DBManager implements FTDataStore {
     }
 
     @Override
-    public InsertResult insertSyncDataIfAbsent(@NonNull String dedupeKey,
-                                               @NonNull SyncData data) {
-        if (dedupeKey.isEmpty()) {
+    public InsertResult prepareHistoricalRum(@NonNull String dedupeKey,
+                                             @NonNull String viewId,
+                                             @NonNull SyncData data) {
+        if (!HistoricalAnrDataId.canonicalize(dedupeKey, data)) {
             return InsertResult.FAILED;
         }
-        data.setDedupeKey(dedupeKey);
-        try {
-            ContentValues values = new ContentValues();
-            values.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
-            values.put(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
-            values.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
-            values.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
-            values.put(FTSQL.RECORD_COLUMN_DEDUPE_KEY, dedupeKey);
-            Uri uri = FTContentProvider.getUriSyncDataFlat();
-            Uri inserted = contentProvider.insert(uri, values);
-            if (inserted != null) {
-                return InsertResult.INSERTED;
-            }
-            Cursor cursor = contentProvider.query(
-                    uri,
-                    new String[]{FTSQL.RECORD_COLUMN_ID},
-                    FTSQL.RECORD_COLUMN_DEDUPE_KEY + "=?",
-                    new String[]{dedupeKey},
-                    null);
-            try {
-                return cursor != null && cursor.moveToFirst()
-                        ? InsertResult.ALREADY_EXISTS
-                        : InsertResult.FAILED;
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
-            }
-        } catch (Exception e) {
-            LogUtils.e(TAG, "insertSyncDataIfAbsent failed: " + e.getMessage());
+        String pendingType = HistoricalAnrDataId.pendingType(data.getDataType());
+        if (pendingType == null) {
             return InsertResult.FAILED;
         }
-    }
-
-    @Override
-    public InsertResult increaseViewErrorOnce(@NonNull String viewId,
-                                              @NonNull String dedupeKey) {
         try {
             Bundle extras = new Bundle();
-            extras.putString("view_id", viewId);
-            extras.putString("event_dedupe_key", dedupeKey);
+            extras.putLong(FTSQL.RECORD_COLUMN_TM, data.getTime());
+            extras.putString(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
+            extras.putString(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
+            extras.putString(FTSQL.RECORD_COLUMN_DATA_TYPE, pendingType);
+            extras.putString(FTSQL.RECORD_COLUMN_DEDUPE_KEY, dedupeKey);
+            extras.putString(FTSQL.RUM_COLUMN_VIEW_ID, viewId);
             Bundle result = contentProvider.call(
-                    FTContentProvider.getUriViewData(),
-                    FTContentProvider.METHOD_HISTORICAL_VIEW_ERROR_COUNT,
+                    FTContentProvider.getUriSyncDataFlat(),
+                    FTContentProvider.METHOD_HISTORICAL_RUM_PERSIST,
                     null,
                     extras);
             if (result == null || !result.getBoolean("success")) {
                 return InsertResult.FAILED;
             }
-            return result.getBoolean("applied")
+            return result.getBoolean("inserted")
                     ? InsertResult.INSERTED
                     : InsertResult.ALREADY_EXISTS;
         } catch (Exception e) {
-            LogUtils.e(TAG, "increaseViewErrorOnce failed: " + e.getMessage());
+            LogUtils.e(TAG, "prepareHistoricalRum failed: " + e.getMessage());
+            return InsertResult.FAILED;
+        }
+    }
+
+    @Override
+    public InsertResult commitHistoricalRum(@NonNull String dedupeKey,
+                                            @NonNull DataType committedType) {
+        String uuid = HistoricalAnrDataId.fromDedupeKey(dedupeKey);
+        String pendingType = HistoricalAnrDataId.pendingType(committedType);
+        if (uuid == null || pendingType == null) {
+            return InsertResult.FAILED;
+        }
+        try {
+            Bundle extras = new Bundle();
+            extras.putString(FTSQL.RECORD_COLUMN_DATA_UUID, uuid);
+            extras.putString("pending_type", pendingType);
+            extras.putString(FTSQL.RECORD_COLUMN_DATA_TYPE, committedType.getValue());
+            Bundle result = contentProvider.call(
+                    FTContentProvider.getUriSyncDataFlat(),
+                    FTContentProvider.METHOD_HISTORICAL_RUM_COMMIT,
+                    null,
+                    extras);
+            if (result == null || !result.getBoolean("success")) {
+                return InsertResult.FAILED;
+            }
+            return result.getBoolean("promoted")
+                    ? InsertResult.INSERTED
+                    : InsertResult.ALREADY_EXISTS;
+        } catch (Exception e) {
+            LogUtils.e(TAG, "commitHistoricalRum failed: " + e.getMessage());
             return InsertResult.FAILED;
         }
     }
@@ -897,7 +895,6 @@ public class FTDBManager extends DBManager implements FTDataStore {
                     contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
                 }
                 contentValues.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
-                contentValues.put(FTSQL.RECORD_COLUMN_DEDUPE_KEY, data.getDedupeKey());
 
                 contentValuesArray[i] = contentValues;
             }
@@ -1169,9 +1166,6 @@ public class FTDBManager extends DBManager implements FTDataStore {
                     String data = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA));
                     String type = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA_TYPE));
                     String uuid = oldCache ? "" : cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA_UUID));
-                    String dedupeKey = oldCache ? null
-                            : cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DEDUPE_KEY));
-
                     SyncData recordData = null;
 
                     for (DataType dataType : DataType.values()) {
@@ -1185,7 +1179,6 @@ public class FTDBManager extends DBManager implements FTDataStore {
                         recordData.setTime(time);
                         recordData.setUuid(uuid);
                         recordData.setDataString(data);
-                        recordData.setDedupeKey(dedupeKey);
                         recordList.add(recordData);
                     }
                 }
@@ -1264,14 +1257,8 @@ public class FTDBManager extends DBManager implements FTDataStore {
             int deletedSync = contentProvider.delete(syncUri, null, null);
             int deletedAction = contentProvider.delete(actionUri, null, null);
             int deletedView = contentProvider.delete(viewUri, null, null);
-            Bundle extras = new Bundle();
-            extras.putString("sql", "DELETE FROM " + FTSQL.FT_HISTORICAL_EXIT_CLAIM_TABLE);
-            contentProvider.call(
-                    viewUri,
-                    FTContentProvider.METHOD_EXEC_SQL,
-                    null,
-                    extras);
-
+            new FTHistoricalFileStore(new FTFileStorePaths(
+                    FTApplication.getApplication())).deleteAll();
             LogUtils.e(TAG, "DB table delete via ContentProvider - sync: " + deletedSync +
                     ", action: " + deletedAction + ", view: " + deletedView);
 
