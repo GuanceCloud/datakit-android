@@ -11,6 +11,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,10 +20,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EnrichedResource {
     private final byte[] resource;
     private final String filename;
+    private final Map<String, Object> globalContext;
 
     public EnrichedResource(byte[] resource, String filename) {
+        this(resource, filename, null);
+    }
+
+    public EnrichedResource(byte[] resource, String filename, Map<String, Object> globalContext) {
         this.resource = resource;
         this.filename = filename;
+        this.globalContext = globalContext == null
+                ? Collections.<String, Object>emptyMap()
+                : Collections.unmodifiableMap(new HashMap<>(globalContext));
     }
 
     public byte[] getResource() {
@@ -31,6 +41,10 @@ public class EnrichedResource {
 
     public String getFilename() {
         return filename;
+    }
+
+    public Map<String, Object> getGlobalContext() {
+        return globalContext;
     }
 
     @Override

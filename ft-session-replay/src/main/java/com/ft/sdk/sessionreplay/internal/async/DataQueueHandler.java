@@ -1,5 +1,6 @@
 package com.ft.sdk.sessionreplay.internal.async;
 
+import com.ft.sdk.sessionreplay.internal.processor.RecordedQueuedItemContext;
 import com.ft.sdk.sessionreplay.model.MobileRecord;
 import com.ft.sdk.sessionreplay.recorder.SystemInformation;
 
@@ -10,6 +11,14 @@ public interface DataQueueHandler {
         String identifier,
         byte[] resourceData
     );
+
+    default ResourceRecordedDataQueueItem addResourceItem(
+            String identifier,
+            byte[] resourceData,
+            RecordedQueuedItemContext recordedQueuedItemContext
+    ) {
+        return addResourceItem(identifier, resourceData);
+    }
 
     TouchEventRecordedDataQueueItem addTouchEventItem(
         List<MobileRecord> pointerInteractions

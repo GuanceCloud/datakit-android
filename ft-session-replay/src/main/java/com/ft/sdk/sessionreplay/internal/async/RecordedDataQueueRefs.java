@@ -1,5 +1,7 @@
 package com.ft.sdk.sessionreplay.internal.async;
 
+import com.ft.sdk.sessionreplay.internal.processor.RecordedQueuedItemContext;
+
 public class RecordedDataQueueRefs {
     private final RecordedDataQueueHandler recordedDataQueueHandler;
 
@@ -33,5 +35,11 @@ public class RecordedDataQueueRefs {
     public void tryToConsumeItem() {
 //        System.out.println("[FT-SDK] tryToConsumeItems from resource");
         recordedDataQueueHandler.tryToConsumeItems();
+    }
+
+    public RecordedQueuedItemContext getRecordedQueuedItemContext() {
+        return recordedDataQueueItem == null
+                ? null
+                : recordedDataQueueItem.getRecordedQueuedItemContext();
     }
 }

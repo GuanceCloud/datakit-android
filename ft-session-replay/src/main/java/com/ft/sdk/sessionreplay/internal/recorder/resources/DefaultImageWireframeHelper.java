@@ -17,6 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import com.ft.sdk.sessionreplay.ImagePrivacy;
+import com.ft.sdk.sessionreplay.internal.async.ResourceContextProvider;
+import com.ft.sdk.sessionreplay.internal.processor.RecordedQueuedItemContext;
 import com.ft.sdk.sessionreplay.internal.recorder.ViewUtilsInternal;
 import com.ft.sdk.sessionreplay.model.ImageWireframe;
 import com.ft.sdk.sessionreplay.model.PlaceholderWireframe;
@@ -129,6 +131,7 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
                 targetWidth,
                 targetHeight,
                 customResourceIdCacheKey,
+                resolveResourceContext(asyncJobStatusCallback),
                 new ResourceResolverCallback() {
                     @Override
                     public void onSuccess(String resourceId) {
@@ -191,6 +194,7 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
 
         resourceResolver.resolveResourceIdFromBitmap(
                 bitmap,
+                resolveResourceContext(asyncJobStatusCallback),
                 new ResourceResolverCallback() {
                     @Override
                     public void onSuccess(String resourceId) {
@@ -308,6 +312,7 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
                 width,
                 height,
                 customResourceIdCacheKey,
+                resolveResourceContext(asyncJobStatusCallback),
                 new ResourceResolverCallback() {
                     @Override
                     public void onSuccess(String resourceId) {
@@ -323,6 +328,14 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
         );
 
         return imageWireframe;
+    }
+
+    private RecordedQueuedItemContext resolveResourceContext(
+            AsyncJobStatusCallback asyncJobStatusCallback) {
+        if (asyncJobStatusCallback instanceof ResourceContextProvider) {
+            return ((ResourceContextProvider) asyncJobStatusCallback).getResourceContext();
+        }
+        return null;
     }
 
     @Override

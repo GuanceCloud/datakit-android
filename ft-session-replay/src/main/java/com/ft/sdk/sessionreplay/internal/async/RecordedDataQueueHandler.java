@@ -27,22 +27,39 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     private final InternalLogger internalLogger;
     private final ExecutorService executorService;
     private final Queue<RecordedDataQueueItem> recordedDataQueue;
+    private final ResourceItemQueueDeduplicator resourceItemQueueDeduplicator;
+    private boolean isStopped;
 
     public RecordedDataQueueHandler(RecordedDataProcessor processor,
                                     RumContextDataHandler rumContextDataHandler,
                                     InternalLogger internalLogger,
                                     ExecutorService executorService,
                                     Queue<RecordedDataQueueItem> recordedDataQueue) {
+        this(processor, rumContextDataHandler, internalLogger, executorService, recordedDataQueue,
+                new ResourceItemQueueDeduplicator());
+    }
+
+    RecordedDataQueueHandler(RecordedDataProcessor processor,
+                             RumContextDataHandler rumContextDataHandler,
+                             InternalLogger internalLogger,
+                             ExecutorService executorService,
+                             Queue<RecordedDataQueueItem> recordedDataQueue,
+                             ResourceItemQueueDeduplicator resourceItemQueueDeduplicator) {
         this.processor = processor;
         this.rumContextDataHandler = rumContextDataHandler;
         this.internalLogger = internalLogger;
         this.executorService = executorService;
         this.recordedDataQueue = recordedDataQueue;
+        this.resourceItemQueueDeduplicator = resourceItemQueueDeduplicator;
     }
 
     @Override
     @MainThread
     public synchronized void clearAndStopProcessingQueue() {
+        isStopped = true;
+        for (RecordedDataQueueItem item : recordedDataQueue) {
+            releaseResourceItem(item);
+        }
         recordedDataQueue.clear();
         executorService.shutdown();
     }
@@ -51,17 +68,55 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     @MainThread
     public ResourceRecordedDataQueueItem addResourceItem(String identifier, byte[] resourceData) {
         RecordedQueuedItemContext rumContextData = rumContextDataHandler.createRumContextData();
+        return addResourceItemWithContext(identifier, resourceData, rumContextData);
+    }
+
+    @Override
+    @MainThread
+    public ResourceRecordedDataQueueItem addResourceItem(String identifier,
+                                                         byte[] resourceData,
+                                                         RecordedQueuedItemContext rumContextData) {
         if (rumContextData == null) {
+            return addResourceItem(identifier, resourceData);
+        }
+        return addResourceItemWithContext(identifier, resourceData, rumContextData);
+    }
+
+    private synchronized ResourceRecordedDataQueueItem addResourceItemWithContext(
+            String identifier,
+            byte[] resourceData,
+            RecordedQueuedItemContext rumContextData) {
+        if (isStopped || rumContextData == null) {
+            return null;
+        }
+
+        if (resourceData == null || resourceData.length == 0
+                || !resourceItemQueueDeduplicator.shouldQueue(
+                identifier,
+                rumContextData.getNewRumContext())) {
             return null;
         }
 
         ResourceRecordedDataQueueItem item = new ResourceRecordedDataQueueItem(
                 rumContextData,
                 identifier,
-                resourceData
+                resourceData,
+                new ResourceRecordedDataQueueItem.WriteCompletionCallback() {
+                    @Override
+                    public void onComplete(boolean success) {
+                        resourceItemQueueDeduplicator.onWriteFinished(
+                                identifier,
+                                rumContextData.getNewRumContext(),
+                                success
+                        );
+                    }
+                }
         );
 
-        insertIntoRecordedDataQueue(item);
+        if (!insertIntoRecordedDataQueue(item)) {
+            item.onWriteFinished(false);
+            return null;
+        }
 
         return item;
     }
@@ -119,11 +174,11 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
                 long nextItemAgeInNs = System.nanoTime() - nextItem.getCreationTimeStampInNs();
                 if (!nextItem.isValid()) {
                     internalLogger.e(TAG, String.format(ITEM_DROPPED_INVALID_MESSAGE, nextItem.getClass().getSimpleName()));
-                    recordedDataQueue.poll();
+                    releaseResourceItem(recordedDataQueue.poll());
                 } else if (nextItemAgeInNs > MAX_DELAY_NS) {
 //                    internalLogger.e(TAG, "getCreationTimeStampInNs drop:"+nextItem.getCreationTimeStampInNs());
                     internalLogger.e(TAG, String.format(Locale.US, ITEM_DROPPED_EXPIRED_MESSAGE, nextItemAgeInNs));
-                    recordedDataQueue.poll();
+                    releaseResourceItem(recordedDataQueue.poll());
                 } else if (nextItem.isReady()) {
 //                    internalLogger.i(TAG, "getCreationTimeStampInNs finish:"+nextItem.getCreationTimeStampInNs()+","+nextItemAgeInNs);
                     processItem(recordedDataQueue.poll());
@@ -136,20 +191,32 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
 
     @WorkerThread
     private void processItem(RecordedDataQueueItem nextItem) {
-        if (nextItem instanceof SnapshotRecordedDataQueueItem) {
-            processor.processScreenSnapshots((SnapshotRecordedDataQueueItem) nextItem);
-        } else if (nextItem instanceof TouchEventRecordedDataQueueItem) {
-            processor.processTouchEventsRecords((TouchEventRecordedDataQueueItem) nextItem);
-        } else if (nextItem instanceof ResourceRecordedDataQueueItem) {
-            processor.processResources((ResourceRecordedDataQueueItem) nextItem);
+        try {
+            if (nextItem instanceof SnapshotRecordedDataQueueItem) {
+                processor.processScreenSnapshots((SnapshotRecordedDataQueueItem) nextItem);
+            } else if (nextItem instanceof TouchEventRecordedDataQueueItem) {
+                processor.processTouchEventsRecords((TouchEventRecordedDataQueueItem) nextItem);
+            } else if (nextItem instanceof ResourceRecordedDataQueueItem) {
+                processor.processResources((ResourceRecordedDataQueueItem) nextItem);
+            }
+        } catch (RuntimeException exception) {
+            releaseResourceItem(nextItem);
+            throw exception;
         }
     }
 
-    private void insertIntoRecordedDataQueue(RecordedDataQueueItem recordedDataQueueItem) {
+    private boolean insertIntoRecordedDataQueue(RecordedDataQueueItem recordedDataQueueItem) {
         try {
-            recordedDataQueue.offer(recordedDataQueueItem);
+            return recordedDataQueue.offer(recordedDataQueueItem);
         } catch (Exception e) {
             logAddToQueueException(e);
+            return false;
+        }
+    }
+
+    private void releaseResourceItem(RecordedDataQueueItem item) {
+        if (item instanceof ResourceRecordedDataQueueItem) {
+            ((ResourceRecordedDataQueueItem) item).onWriteFinished(false);
         }
     }
 

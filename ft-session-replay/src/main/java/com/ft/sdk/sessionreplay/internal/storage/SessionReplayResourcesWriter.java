@@ -8,9 +8,6 @@ import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.internal.processor.EnrichedResource;
 import com.ft.sdk.storage.EventBatchWriter;
 
-import java.util.Collections;
-import java.util.Map;
-
 public class SessionReplayResourcesWriter implements ResourcesWriter {
 
     private final FeatureSdkCore sdkCore;
@@ -21,35 +18,34 @@ public class SessionReplayResourcesWriter implements ResourcesWriter {
 
     @Override
     public void write(EnrichedResource enrichedResource) {
+        write(enrichedResource, null);
+    }
+
+    @Override
+    public void write(EnrichedResource enrichedResource, WriteCallback callback) {
         sdkCore.getFeature(Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME).withWriteContext(false,
                 new DataConsumerCallback() {
                     @Override
                     public void onConsume(SessionReplayContext context, EventBatchWriter eventBatchWriter) {
                         synchronized (this) {
-                            byte[] serializedMetadata = enrichedResource.asBinaryMetadata(
-                                    context.getAppId(),
-                                    getCurrentLinkContext()
-                            );
-                            eventBatchWriter.write(
-                                    new RawBatchEvent(enrichedResource.getResource(), serializedMetadata),
-                                    null,
-                                    EventType.DEFAULT
-                            );
+                            boolean written = false;
+                            try {
+                                byte[] serializedMetadata = enrichedResource.asBinaryMetadata(
+                                        context.getAppId(),
+                                        enrichedResource.getGlobalContext()
+                                );
+                                written = eventBatchWriter.write(
+                                        new RawBatchEvent(enrichedResource.getResource(), serializedMetadata),
+                                        null,
+                                        EventType.DEFAULT
+                                );
+                            } finally {
+                                if (callback != null) {
+                                    callback.onComplete(written);
+                                }
+                            }
                         }
                     }
                 });
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> getCurrentLinkContext() {
-        Map<String, Object> rumContext = sdkCore.getFeatureContext(Feature.RUM_FEATURE_NAME);
-        if (rumContext == null) {
-            return Collections.emptyMap();
-        }
-        Object context = rumContext.get("globalContext");
-        if (context instanceof Map) {
-            return (Map<String, Object>) context;
-        }
-        return Collections.emptyMap();
     }
 }

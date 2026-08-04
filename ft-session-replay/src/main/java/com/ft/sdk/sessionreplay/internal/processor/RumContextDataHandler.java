@@ -6,6 +6,8 @@ import com.ft.sdk.sessionreplay.utils.RumContextProvider;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 import com.ft.sdk.sessionreplay.utils.TimeProvider;
 
+import java.util.HashMap;
+
 public class RumContextDataHandler {
     private static final String TAG = "RumContextDataHandler";
     private final RumContextProvider rumContextProvider;
@@ -31,7 +33,13 @@ public class RumContextDataHandler {
             return null;
         }
 
-        return new RecordedQueuedItemContext(timestamp, newRumContext.clone());
+        SessionReplayRumContext snapshot = new SessionReplayRumContext(
+                newRumContext.getApplicationId(),
+                newRumContext.getSessionId(),
+                newRumContext.getViewId(),
+                new HashMap<>(newRumContext.getGlobalContext())
+        );
+        return new RecordedQueuedItemContext(timestamp, snapshot);
     }
 
     public static final String INVALID_RUM_CONTEXT_ERROR_MESSAGE_FORMAT = "SR RumContextDataHandler: Invalid RUM " +

@@ -17,6 +17,7 @@ import androidx.annotation.MainThread;
 import androidx.annotation.WorkerThread;
 
 import com.ft.sdk.sessionreplay.internal.async.DataQueueHandler;
+import com.ft.sdk.sessionreplay.internal.processor.RecordedQueuedItemContext;
 import com.ft.sdk.sessionreplay.internal.utils.ExecutorUtils;
 import com.ft.sdk.sessionreplay.resources.DrawableCopier;
 import com.ft.sdk.sessionreplay.utils.DrawableUtils;
@@ -88,6 +89,8 @@ public class ResourceResolver {
             resolveResourceCallback.onFailed();
             return;
         }
+
+        bitmapCachesManager.putResourceData(resourceId, compressedBitmapBytes);
 
         cacheIfNecessary(
                 shouldCacheBitmap,
@@ -251,30 +254,55 @@ public class ResourceResolver {
 
     @MainThread
     void resolveResourceIdFromBitmap(Bitmap bitmap, ResourceResolverCallback resourceResolverCallback) {
+        resolveResourceIdFromBitmap(bitmap, null, resourceResolverCallback);
+    }
+
+    @MainThread
+    void resolveResourceIdFromBitmap(Bitmap bitmap,
+                                     RecordedQueuedItemContext recordedQueuedItemContext,
+                                     ResourceResolverCallback resourceResolverCallback) {
         ExecutorUtils.executeSafe(threadPoolExecutor, RESOURCE_RESOLVER_ALIAS, logger,
-                () -> getResourceIdFromBitmap(bitmap, resourceResolverCallback));
+                () -> getResourceIdFromBitmap(
+                        bitmap,
+                        recordedQueuedItemContext,
+                        resourceResolverCallback
+                ));
 
     }
 
     @WorkerThread
-    private void getResourceIdFromBitmap(Bitmap bitmap, ResourceResolverCallback resourceResolverCallback) {
+    private void getResourceIdFromBitmap(Bitmap bitmap,
+                                         RecordedQueuedItemContext recordedQueuedItemContext,
+                                         ResourceResolverCallback resourceResolverCallback) {
         if (bitmap.getConfig() == Bitmap.Config.ALPHA_8) {
-            getResourceIdFromAlpha8Bitmap(bitmap, resourceResolverCallback);
+            getResourceIdFromAlpha8Bitmap(
+                    bitmap,
+                    recordedQueuedItemContext,
+                    resourceResolverCallback
+            );
         } else {
-            getResourceIdFromRegularBitmap(bitmap, resourceResolverCallback);
+            getResourceIdFromRegularBitmap(
+                    bitmap,
+                    recordedQueuedItemContext,
+                    resourceResolverCallback
+            );
         }
     }
 
     @WorkerThread
-    private void getResourceIdFromAlpha8Bitmap(Bitmap bitmap, ResourceResolverCallback resourceResolverCallback) {
+    private void getResourceIdFromAlpha8Bitmap(Bitmap bitmap,
+                                               RecordedQueuedItemContext recordedQueuedItemContext,
+                                               ResourceResolverCallback resourceResolverCallback) {
         // Generate cache key once and reuse for both lookup and storage
         Alpha8CacheKey cacheKey = alpha8ResourceCache.generateKey(bitmap);
 
         if (cacheKey != null) {
             String cachedResourceId = alpha8ResourceCache.get(cacheKey);
             if (cachedResourceId != null) {
-                resourceResolverCallback.onSuccess(cachedResourceId);
-                return;
+                if (queueCachedResource(cachedResourceId, recordedQueuedItemContext)) {
+                    resourceResolverCallback.onSuccess(cachedResourceId);
+                    return;
+                }
             }
         }
 
@@ -298,7 +326,11 @@ public class ResourceResolver {
                 if (cacheKey != null) {
                     alpha8ResourceCache.put(cacheKey, resourceId);
                 }
-                resourceItemCreationHandler.queueItem(resourceId, resourceData);
+                resourceItemCreationHandler.queueItem(
+                        resourceId,
+                        resourceData,
+                        recordedQueuedItemContext
+                );
                 resourceResolverCallback.onSuccess(resourceId);
             }
 
@@ -310,7 +342,9 @@ public class ResourceResolver {
     }
 
     @WorkerThread
-    private void getResourceIdFromRegularBitmap(Bitmap bitmap, ResourceResolverCallback resourceResolverCallback) {
+    private void getResourceIdFromRegularBitmap(Bitmap bitmap,
+                                                RecordedQueuedItemContext recordedQueuedItemContext,
+                                                ResourceResolverCallback resourceResolverCallback) {
         byte[] compressedBitmapBytes = webPImageCompression.compressBitmap(bitmap);
 
         if (compressedBitmapBytes.length == 0) {
@@ -321,7 +355,11 @@ public class ResourceResolver {
         resolveBitmapHash(compressedBitmapBytes, new ResolveResourceCallback() {
             @Override
             public void onResolved(String resourceId, byte[] resourceData) {
-                resourceItemCreationHandler.queueItem(resourceId, resourceData);
+                resourceItemCreationHandler.queueItem(
+                        resourceId,
+                        resourceData,
+                        recordedQueuedItemContext
+                );
                 resourceResolverCallback.onSuccess(resourceId);
             }
 
@@ -383,6 +421,8 @@ public class ResourceResolver {
             return;
         }
 
+        bitmapCachesManager.putResourceData(resourceId, compressedBitmapBytes);
+
         resolveResourceCallback.onResolved(resourceId, compressedBitmapBytes);
     }
 
@@ -398,15 +438,42 @@ public class ResourceResolver {
             String customResourceIdCacheKey,
             ResourceResolverCallback resourceResolverCallback
     ) {
+        resolveResourceIdFromDrawable(
+                resources,
+                applicationContext,
+                displayMetrics,
+                originalDrawable,
+                drawableCopier,
+                drawableWidth,
+                drawableHeight,
+                customResourceIdCacheKey,
+                null,
+                resourceResolverCallback
+        );
+    }
+
+    @MainThread
+    void resolveResourceIdFromDrawable(
+            Resources resources,
+            Context applicationContext,
+            DisplayMetrics displayMetrics,
+            Drawable originalDrawable,
+            DrawableCopier drawableCopier,
+            int drawableWidth,
+            int drawableHeight,
+            String customResourceIdCacheKey,
+            RecordedQueuedItemContext recordedQueuedItemContext,
+            ResourceResolverCallback resourceResolverCallback
+    ) {
         bitmapCachesManager.registerCallbacks(applicationContext);
 
         String resourceId = tryToGetResourceFromCache(originalDrawable, customResourceIdCacheKey);
 
         if (resourceId != null) {
-            // If we got here it means we saw the bitmap before,
-            // so we don't need to send the resource again
-            resourceResolverCallback.onSuccess(resourceId);
-            return;
+            if (queueCachedResource(resourceId, recordedQueuedItemContext)) {
+                resourceResolverCallback.onSuccess(resourceId);
+                return;
+            }
         }
 
 
@@ -439,7 +506,11 @@ public class ResourceResolver {
                         new ResolveResourceCallback() {
                             @Override
                             public void onResolved(String resourceId, byte[] resourceData) {
-                                resourceItemCreationHandler.queueItem(resourceId, resourceData);
+                                resourceItemCreationHandler.queueItem(
+                                        resourceId,
+                                        resourceData,
+                                        recordedQueuedItemContext
+                                );
                                 resourceResolverCallback.onSuccess(resourceId);
                             }
 
@@ -463,6 +534,29 @@ public class ResourceResolver {
             String customResourceIdCacheKey,
             ResourceResolverCallback resourceResolverCallback
     ) {
+        resolveResourceIdFromPath(
+                path,
+                strokeColor,
+                strokeWidth,
+                desiredWidth,
+                desiredHeight,
+                customResourceIdCacheKey,
+                null,
+                resourceResolverCallback
+        );
+    }
+
+    @MainThread
+    void resolveResourceIdFromPath(
+            Path path,
+            Integer strokeColor,
+            Integer strokeWidth,
+            Integer desiredWidth,
+            Integer desiredHeight,
+            String customResourceIdCacheKey,
+            RecordedQueuedItemContext recordedQueuedItemContext,
+            ResourceResolverCallback resourceResolverCallback
+    ) {
         ExecutorUtils.executeSafe(threadPoolExecutor, RESOURCE_RESOLVER_ALIAS, logger, new Runnable() {
             @Override
             public void run() {
@@ -473,9 +567,10 @@ public class ResourceResolver {
                 String resourceId = tryToGetResourceFromCache(null, key);
 
                 if (resourceId != null) {
-                    // If the resource ID can be obtained from the cache, return directly
-                    resourceResolverCallback.onSuccess(resourceId);
-                    return;
+                    if (queueCachedResource(resourceId, recordedQueuedItemContext)) {
+                        resourceResolverCallback.onSuccess(resourceId);
+                        return;
+                    }
                 }
 
                 Bitmap bitmap = pathUtils.convertPathToBitmap(
@@ -498,7 +593,11 @@ public class ResourceResolver {
                         new ResolveResourceCallback() {
                             @Override
                             public void onResolved(String resourceId, byte[] resourceData) {
-                                resourceItemCreationHandler.queueItem(resourceId, resourceData);
+                                resourceItemCreationHandler.queueItem(
+                                        resourceId,
+                                        resourceData,
+                                        recordedQueuedItemContext
+                                );
                                 resourceResolverCallback.onSuccess(resourceId);
                             }
 
@@ -510,6 +609,20 @@ public class ResourceResolver {
                 );
             }
         });
+    }
+
+    private boolean queueCachedResource(String resourceId,
+                                        RecordedQueuedItemContext recordedQueuedItemContext) {
+        byte[] resourceData = bitmapCachesManager.getResourceData(resourceId);
+        if (resourceData == null || resourceData.length == 0) {
+            return false;
+        }
+        resourceItemCreationHandler.queueItem(
+                resourceId,
+                resourceData,
+                recordedQueuedItemContext
+        );
+        return true;
     }
 
     public interface BitmapCreationCallback {

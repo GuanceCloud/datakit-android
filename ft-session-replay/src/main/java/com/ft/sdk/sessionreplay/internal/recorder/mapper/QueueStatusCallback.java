@@ -1,9 +1,11 @@
 package com.ft.sdk.sessionreplay.internal.recorder.mapper;
 
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueRefs;
+import com.ft.sdk.sessionreplay.internal.async.ResourceContextProvider;
+import com.ft.sdk.sessionreplay.internal.processor.RecordedQueuedItemContext;
 import com.ft.sdk.sessionreplay.utils.AsyncJobStatusCallback;
 
-public class QueueStatusCallback implements AsyncJobStatusCallback {
+public class QueueStatusCallback implements AsyncJobStatusCallback, ResourceContextProvider {
 
     private final RecordedDataQueueRefs recordedDataQueueRefs;
 
@@ -21,5 +23,10 @@ public class QueueStatusCallback implements AsyncJobStatusCallback {
         recordedDataQueueRefs.decrementPendingJobs();
         //System.out.println("[FT-SDK] tryToConsumeItems from QueStatus:");
         recordedDataQueueRefs.tryToConsumeItem();
+    }
+
+    @Override
+    public RecordedQueuedItemContext getResourceContext() {
+        return recordedDataQueueRefs.getRecordedQueuedItemContext();
     }
 }

@@ -15,13 +15,17 @@ import com.ft.sdk.storage.Serializer;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ResourceDataStoreManager {
+
+    private static final int MAX_KNOWN_RESOURCES = 10_000;
 
     private final FeatureSdkCore featureSdkCore;
     private final Serializer<ResourceHashesEntry> resourceHashesSerializer;
@@ -38,7 +42,7 @@ public class ResourceDataStoreManager {
         this.resourceHashesSerializer = resourceHashesSerializer;
         this.resourceHashesDeserializer = resourceHashesDeserializer;
 
-        knownResources = Collections.synchronizedSet(new HashSet<>());
+        knownResources = Collections.synchronizedSet(new LinkedHashSet<>());
         storedLastUpdateDateNs = new AtomicLong(System.nanoTime());
         isInitialized = new AtomicBoolean(false);
 
@@ -69,7 +73,9 @@ public class ResourceDataStoreManager {
                             });
                         } else {
                             ResourceDataStoreManager.this.storedLastUpdateDateNs.set(lastUpdateDateNs);
-                            knownResources.addAll(storedHashes);
+                            for (String storedHash : storedHashes) {
+                                addKnownResource(storedHash);
+                            }
                             finishedInitializingManager();
                         }
                     }
@@ -84,11 +90,23 @@ public class ResourceDataStoreManager {
     }
 
     public boolean isPreviouslySentResource(String resourceHash) {
-        return knownResources.contains(resourceHash);
+        return isPreviouslySentResource(resourceHash, Collections.<String, Object>emptyMap());
+    }
+
+    public boolean isPreviouslySentResource(String resourceHash, Map<String, Object> globalContext) {
+        return knownResources.contains(ResourceUploadKey.from(resourceHash, globalContext).toStorageKey());
     }
 
     public void cacheResourceHash(String resourceHash) {
-        knownResources.add(resourceHash);
+        cacheResourceHash(resourceHash, Collections.<String, Object>emptyMap());
+    }
+
+    public void cacheResourceHash(String resourceHash, Map<String, Object> globalContext) {
+        ResourceUploadKey uploadKey = ResourceUploadKey.from(resourceHash, globalContext);
+        addKnownResource(uploadKey.toStorageKey());
+        if (uploadKey.isRouted()) {
+            addKnownResource(ResourceUploadKey.main(resourceHash).toStorageKey());
+        }
         writeResourcesToStore();
     }
 
@@ -101,11 +119,29 @@ public class ResourceDataStoreManager {
     }
 
     private void writeResourcesToStore() {
-        ResourceHashesEntry data = new ResourceHashesEntry(storedLastUpdateDateNs.get(), new ArrayList<>(knownResources));
+        List<String> resourceKeys;
+        synchronized (knownResources) {
+            resourceKeys = new ArrayList<>(knownResources);
+        }
+        ResourceHashesEntry data = new ResourceHashesEntry(storedLastUpdateDateNs.get(), resourceKeys);
 
         DataStoreHandler dataStore = featureSdkCore.getFeature(SESSION_REPLAY_RESOURCES_FEATURE_NAME).getDataStore();
         if (dataStore != null) {
             dataStore.setValue(DATASTORE_HASHES_ENTRY_NAME, data, null, null, resourceHashesSerializer);
+        }
+    }
+
+    private void addKnownResource(String resourceKey) {
+        synchronized (knownResources) {
+            knownResources.add(resourceKey);
+            while (knownResources.size() > MAX_KNOWN_RESOURCES) {
+                Iterator<String> iterator = knownResources.iterator();
+                if (!iterator.hasNext()) {
+                    break;
+                }
+                iterator.next();
+                iterator.remove();
+            }
         }
     }
 

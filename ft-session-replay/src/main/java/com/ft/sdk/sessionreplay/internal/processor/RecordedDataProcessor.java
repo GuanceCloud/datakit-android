@@ -28,8 +28,10 @@ import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.SystemInformation;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class RecordedDataProcessor implements Processor {
@@ -71,18 +73,32 @@ public class RecordedDataProcessor implements Processor {
     @WorkerThread
     public void processResources(ResourceRecordedDataQueueItem item) {
         String resourceHash = item.getIdentifier();
-        boolean isKnownResource = resourceDataStoreManager.isPreviouslySentResource(resourceHash);
-        if (!isKnownResource) {
-            if (resourceDataStoreManager.isReady()) {
-                resourceDataStoreManager.cacheResourceHash(resourceHash);
-            }
-
-            EnrichedResource enrichedResource = new EnrichedResource(
-                    item.getResourceData(),
-                    resourceHash
-            );
-            resourcesWriter.write(enrichedResource);
+        Map<String, Object> globalContext = new HashMap<>(item.getRecordedQueuedItemContext()
+                .getNewRumContext()
+                .getGlobalContext());
+        boolean isKnownResource = resourceDataStoreManager.isPreviouslySentResource(
+                resourceHash,
+                globalContext
+        );
+        if (isKnownResource) {
+            item.onWriteFinished(true);
+            return;
         }
+
+        EnrichedResource enrichedResource = new EnrichedResource(
+                item.getResourceData(),
+                resourceHash,
+                globalContext
+        );
+        resourcesWriter.write(enrichedResource, new ResourcesWriter.WriteCallback() {
+            @Override
+            public void onComplete(boolean success) {
+                item.onWriteFinished(success);
+                if (success && resourceDataStoreManager.isReady()) {
+                    resourceDataStoreManager.cacheResourceHash(resourceHash, globalContext);
+                }
+            }
+        });
     }
 
     @Override

@@ -13,14 +13,24 @@ public class BitmapCachesManager {
 
     private static final String TAG = "BitmapCachesManager";
     private final Cache<String, byte[]> resourcesLRUCache;
+    private final Cache<String, byte[]> resourceDataLRUCache;
     private final BitmapPool bitmapPool;
     private final InternalLogger logger;
 
     private boolean isResourcesCacheRegisteredForCallbacks = false;
+    private boolean isResourceDataCacheRegisteredForCallbacks = false;
     private boolean isBitmapPoolRegisteredForCallbacks = false;
 
     public BitmapCachesManager(Cache<String, byte[]> resourcesLRUCache, BitmapPool bitmapPool, InternalLogger logger) {
+        this(resourcesLRUCache, new ResourcesLRUCache(), bitmapPool, logger);
+    }
+
+    BitmapCachesManager(Cache<String, byte[]> resourcesLRUCache,
+                        Cache<String, byte[]> resourceDataLRUCache,
+                        BitmapPool bitmapPool,
+                        InternalLogger logger) {
         this.resourcesLRUCache = resourcesLRUCache;
+        this.resourceDataLRUCache = resourceDataLRUCache;
         this.bitmapPool = bitmapPool;
         this.logger = logger;
     }
@@ -28,7 +38,22 @@ public class BitmapCachesManager {
     @MainThread
     public void registerCallbacks(Context applicationContext) {
         registerResourceLruCacheForCallbacks(applicationContext);
+        registerResourceDataLruCacheForCallbacks(applicationContext);
         registerBitmapPoolForCallbacks(applicationContext);
+    }
+
+    @MainThread
+    private void registerResourceDataLruCacheForCallbacks(Context applicationContext) {
+        if (isResourceDataCacheRegisteredForCallbacks) {
+            return;
+        }
+
+        if (resourceDataLRUCache instanceof ComponentCallbacks2) {
+            applicationContext.registerComponentCallbacks((ComponentCallbacks2) resourceDataLRUCache);
+            isResourceDataCacheRegisteredForCallbacks = true;
+        } else {
+            logger.e(TAG, Cache.DOES_NOT_IMPLEMENT_COMPONENTCALLBACKS);
+        }
     }
 
     @MainThread
@@ -62,6 +87,16 @@ public class BitmapCachesManager {
     public String getFromResourceCache(String key) {
         byte[] resourceId = resourcesLRUCache.get(key);
         return (resourceId != null) ? new String(resourceId, java.nio.charset.StandardCharsets.UTF_8) : null;
+    }
+
+    public void putResourceData(String resourceId, byte[] resourceData) {
+        if (resourceId != null && resourceData != null && resourceData.length > 0) {
+            resourceDataLRUCache.put(resourceId, resourceData);
+        }
+    }
+
+    public byte[] getResourceData(String resourceId) {
+        return resourceId == null ? null : resourceDataLRUCache.get(resourceId);
     }
 
     public String generateResourceKeyFromDrawable(Drawable drawable) {

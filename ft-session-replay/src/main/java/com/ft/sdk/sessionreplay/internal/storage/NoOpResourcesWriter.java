@@ -8,4 +8,11 @@ public class NoOpResourcesWriter implements ResourcesWriter {
     public void write(EnrichedResource enrichedResource) {
         // no-op
     }
+
+    @Override
+    public void write(EnrichedResource enrichedResource, WriteCallback callback) {
+        if (callback != null) {
+            callback.onComplete(false);
+        }
+    }
 }
