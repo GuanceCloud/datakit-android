@@ -42,6 +42,60 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:text="@string/websocket_test_title"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/websocket_test_description" />
+
+        <Button
+            android:id="@+id/btn_websocket_success"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/websocket_test_success" />
+
+        <Button
+            android:id="@+id/btn_websocket_reject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/websocket_test_reject" />
+
+        <Button
+            android:id="@+id/btn_websocket_invalid_upgrade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/websocket_test_invalid_upgrade" />
+
+        <Button
+            android:id="@+id/btn_websocket_tcp_failure"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/websocket_test_tcp_failure" />
+
+        <Button
+            android:id="@+id/btn_websocket_close"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/websocket_test_close" />
+
+        <TextView
+            android:id="@+id/tv_websocket_test_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="monospace"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:text="@string/resource_queue_repro_title"
             android:textSize="18sp"
             android:textStyle="bold" />

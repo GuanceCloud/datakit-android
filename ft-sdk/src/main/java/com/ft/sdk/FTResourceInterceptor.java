@@ -119,6 +119,9 @@ public class FTResourceInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
+        if (request.tag(FTWebSocketRequestTag.class) != null) {
+            return chain.proceed(request);
+        }
         Response response = null;
         IOException exception = null;
         String url = request.url().toString();

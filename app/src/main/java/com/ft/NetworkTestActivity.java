@@ -17,6 +17,7 @@ import com.ft.utils.RequestUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -24,6 +25,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okio.ByteString;
 
 /**
  * Network test activity
@@ -42,10 +46,17 @@ public class NetworkTestActivity extends NameTitleActivity {
             .connectTimeout(10, TimeUnit.SECONDS)
             .build();
 
+    private final OkHttpClient webSocketClient = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(0, TimeUnit.MILLISECONDS)
+            .build();
+
     private Button resourceQueueReproButton;
     private EditText resourceQueueHoldSeconds;
     private TextView resourceQueueResult;
     private ResourceQueueTimingRepro resourceQueueTimingRepro;
+    private TextView webSocketTestResult;
+    private final AtomicReference<WebSocket> activeWebSocket = new AtomicReference<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,129 @@ public class NetworkTestActivity extends NameTitleActivity {
         resourceQueueHoldSeconds = findViewById(R.id.et_resource_queue_hold_seconds);
         resourceQueueResult = findViewById(R.id.tv_resource_queue_result);
         resourceQueueReproButton.setOnClickListener(v -> testResourceQueueTiming());
+
+        webSocketTestResult = findViewById(R.id.tv_websocket_test_result);
+        bindWebSocketTestButton(
+                R.id.btn_websocket_success,
+                "success",
+                BuildConfig.WEBSOCKET_TEST_SUCCESS_URL
+        );
+        bindWebSocketTestButton(
+                R.id.btn_websocket_reject,
+                "reject",
+                BuildConfig.WEBSOCKET_TEST_REJECT_URL
+        );
+        bindWebSocketTestButton(
+                R.id.btn_websocket_invalid_upgrade,
+                "invalid-upgrade",
+                BuildConfig.WEBSOCKET_TEST_INVALID_UPGRADE_URL
+        );
+        bindWebSocketTestButton(
+                R.id.btn_websocket_tcp_failure,
+                "tcp-failure",
+                BuildConfig.WEBSOCKET_TEST_TCP_FAILURE_URL
+        );
+        findViewById(R.id.btn_websocket_close).setOnClickListener(v -> closeActiveWebSocket());
+        showWebSocketConfiguration();
+    }
+
+    private void bindWebSocketTestButton(int buttonId, String scenario, String url) {
+        Button button = findViewById(buttonId);
+        boolean configured = isWebSocketUrl(url);
+        button.setEnabled(configured);
+        button.setOnClickListener(v -> startWebSocketTest(scenario, url));
+    }
+
+    private boolean isWebSocketUrl(String url) {
+        return url != null && (url.startsWith("ws://") || url.startsWith("wss://"));
+    }
+
+    private void showWebSocketConfiguration() {
+        String configuration = "success=" + displayUrl(BuildConfig.WEBSOCKET_TEST_SUCCESS_URL)
+                + "\nreject=" + displayUrl(BuildConfig.WEBSOCKET_TEST_REJECT_URL)
+                + "\ninvalid-upgrade=" + displayUrl(BuildConfig.WEBSOCKET_TEST_INVALID_UPGRADE_URL)
+                + "\ntcp-failure=" + displayUrl(BuildConfig.WEBSOCKET_TEST_TCP_FAILURE_URL);
+        webSocketTestResult.setText(configuration);
+    }
+
+    private String displayUrl(String url) {
+        return isWebSocketUrl(url) ? url : "not configured";
+    }
+
+    private void startWebSocketTest(String scenario, String url) {
+        if (!isWebSocketUrl(url)) {
+            appendWebSocketResult(scenario + ": URL is not configured");
+            return;
+        }
+        closeActiveWebSocket();
+        appendWebSocketResult(scenario + ": connecting to " + url);
+        Request request = new Request.Builder().url(url).build();
+        WebSocket webSocket = webSocketClient.newWebSocket(request, new WebSocketListener() {
+            @Override
+            public void onOpen(WebSocket webSocket, Response response) {
+                appendWebSocketResult(scenario + ": onOpen status=" + response.code()
+                        + ", protocol=" + response.protocol());
+                webSocket.send("ft-sdk-websocket-handshake-test");
+            }
+
+            @Override
+            public void onMessage(WebSocket webSocket, String text) {
+                appendWebSocketResult(scenario + ": echo text=" + text);
+            }
+
+            @Override
+            public void onMessage(WebSocket webSocket, ByteString bytes) {
+                appendWebSocketResult(scenario + ": echo bytes=" + bytes.size());
+            }
+
+            @Override
+            public void onClosing(WebSocket webSocket, int code, String reason) {
+                appendWebSocketResult(scenario + ": onClosing code=" + code
+                        + ", reason=" + reason);
+                webSocket.close(code, reason);
+            }
+
+            @Override
+            public void onClosed(WebSocket webSocket, int code, String reason) {
+                appendWebSocketResult(scenario + ": onClosed code=" + code
+                        + ", reason=" + reason);
+                clearActiveWebSocket(webSocket);
+            }
+
+            @Override
+            public void onFailure(WebSocket webSocket, Throwable throwable, Response response) {
+                String status = response == null ? "none" : String.valueOf(response.code());
+                appendWebSocketResult(scenario + ": onFailure status=" + status
+                        + ", error=" + throwable.getClass().getSimpleName()
+                        + ": " + throwable.getMessage());
+                if (response != null) {
+                    response.close();
+                }
+                clearActiveWebSocket(webSocket);
+            }
+        });
+        activeWebSocket.set(webSocket);
+    }
+
+    private void appendWebSocketResult(String message) {
+        LogUtils.d(TAG, "WebSocket test: " + message);
+        runOnUiThread(() -> webSocketTestResult.append("\n" + message));
+    }
+
+    private void clearActiveWebSocket(WebSocket webSocket) {
+        activeWebSocket.compareAndSet(webSocket, null);
+    }
+
+    private void closeActiveWebSocket() {
+        WebSocket webSocket = activeWebSocket.get();
+        if (webSocket != null) {
+            boolean closing = webSocket.close(1000, "test complete");
+            appendWebSocketResult("close requested=" + closing);
+            if (!closing) {
+                webSocket.cancel();
+                activeWebSocket.compareAndSet(webSocket, null);
+            }
+        }
     }
 
     private void testResourceQueueTiming() {
@@ -240,6 +374,7 @@ public class NetworkTestActivity extends NameTitleActivity {
 
     @Override
     protected void onDestroy() {
+        closeActiveWebSocket();
         ResourceQueueTimingRepro repro = resourceQueueTimingRepro;
         if (repro != null) {
             repro.close();

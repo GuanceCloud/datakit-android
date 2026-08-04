@@ -27,6 +27,31 @@ public class ResourceParams {
     public String resourceProtocol = "";
 
     /**
+     * Resource type override. When empty, the SDK derives the type from Content-Type.
+     */
+    public String resourceType = "";
+
+    /**
+     * WebSocket collection boundary tag.
+     */
+    public String resourceWebSocketCollectionLevel = "";
+
+    /**
+     * WebSocket handshake state tag.
+     */
+    public String resourceWebSocketHandshakeState = "";
+
+    /**
+     * Whether the SDK should emit a response resource size.
+     */
+    public boolean enableResourceSize = true;
+
+    /**
+     * Whether a resource with a non-error HTTP status should also emit a network error.
+     */
+    public boolean forceNetworkError = false;
+
+    /**
      * HTTP request header
      */
     public HashMap<String, List<String>> requestHeaderMap;

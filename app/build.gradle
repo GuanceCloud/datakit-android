@@ -2,6 +2,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 //apply plugin: 'com.guardsquare.proguard'
 
+def buildConfigString = { String value ->
+    String escaped = (value ?: '').replace('\\', '\\\\').replace('"', '\\"')
+    return '"' + escaped + '"'
+}
+
 android {
     compileSdk 34
     namespace "com.ft"
@@ -13,6 +18,14 @@ android {
         versionCode 1
         versionName "1.4"
         testInstrumentationRunner "com.ft.application.MockTestRunner"
+        buildConfigField "String", "WEBSOCKET_TEST_SUCCESS_URL",
+                buildConfigString(System.getenv("FT_WEBSOCKET_TEST_SUCCESS_URL"))
+        buildConfigField "String", "WEBSOCKET_TEST_REJECT_URL",
+                buildConfigString(System.getenv("FT_WEBSOCKET_TEST_REJECT_URL"))
+        buildConfigField "String", "WEBSOCKET_TEST_INVALID_UPGRADE_URL",
+                buildConfigString(System.getenv("FT_WEBSOCKET_TEST_INVALID_UPGRADE_URL"))
+        buildConfigField "String", "WEBSOCKET_TEST_TCP_FAILURE_URL",
+                buildConfigString(System.getenv("FT_WEBSOCKET_TEST_TCP_FAILURE_URL"))
     }
 
     signingConfigs {

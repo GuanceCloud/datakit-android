@@ -452,6 +452,14 @@ public class Constants {
      */
     public static final String KEY_RUM_RESOURCE_TYPE = "resource_type";
     /**
+     * WebSocket resource collection boundary.
+     */
+    public static final String KEY_RUM_RESOURCE_WEBSOCKET_COLLECTION_LEVEL = "resource_websocket_collection_level";
+    /**
+     * WebSocket handshake result.
+     */
+    public static final String KEY_RUM_RESOURCE_WEBSOCKET_HANDSHAKE_STATE = "resource_websocket_handshake_state";
+    /**
      * Request return, http return header Connection
      */
     public static final String KEY_RUM_RESPONSE_CONNECTION = "response_connection";

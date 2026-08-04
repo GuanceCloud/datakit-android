@@ -37,6 +37,11 @@ public enum ResourceType {
     JS("js"),
 
     /**
+     * WebSocket handshake resource.
+     */
+    WEBSOCKET("websocket"),
+
+    /**
      * Native type resource (default for Android native network requests)
      */
     NATIVE("native");
@@ -111,4 +116,3 @@ public enum ResourceType {
         return value;
     }
 }
-

@@ -251,6 +251,18 @@ public class FTMethodAdapter extends AdviceAdapter {
             }
         }
 
+        if ("newWebSocket".equals(name)
+                && "(Lokhttp3/Request;Lokhttp3/WebSocketListener;)Lokhttp3/WebSocket;".equals(desc)
+                && (Constants.CLASS_NAME_OKHTTP_CLIENT.equals(owner)
+                || Constants.CLASS_NAME_OKHTTP_WEBSOCKET_FACTORY.equals(owner))) {
+            mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackOkHttpNewWebSocket",
+                    "(Lokhttp3/WebSocket$Factory;Lokhttp3/Request;Lokhttp3/WebSocketListener;)Lokhttp3/WebSocket;",
+                    false);
+            Logger.debug("HOOK_WEBSOCKET_CALL-> owner:" + owner + ", class:" + className
+                    + ", super:" + superName + ", method:" + name + desc + " | " + nameDesc);
+            return;
+        }
+
         switch (owner) {
             case Constants.CLASS_NAME_HTTP_CLIENT_BUILDER:
                 if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name + desc)) {
@@ -670,4 +682,3 @@ public class FTMethodAdapter extends AdviceAdapter {
         return super.visitAnnotation(descriptor, visible);
     }
 }
-
