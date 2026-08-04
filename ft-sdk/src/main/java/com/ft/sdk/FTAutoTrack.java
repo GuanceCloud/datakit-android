@@ -881,9 +881,7 @@ public class FTAutoTrack {
     public static WebSocket trackOkHttpNewWebSocket(WebSocket.Factory factory,
                                                     Request request,
                                                     WebSocketListener listener) {
-        Request webSocketRequest = request.newBuilder()
-                .tag(FTWebSocketRequestTag.class, FTWebSocketRequestTag.INSTANCE)
-                .build();
+        Request webSocketRequest = FTWebSocketRequestTag.prepare(request);
         if (!FTSdk.checkInstallState() || !FTRUMConfigManager.get().isRumEnable()) {
             return factory.newWebSocket(webSocketRequest, listener);
         }

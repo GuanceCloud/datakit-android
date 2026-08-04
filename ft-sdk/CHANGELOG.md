@@ -1,10 +1,11 @@
 # Unreleased
 1. Added OkHttp WebSocket handshake Resource collection with `success`, `rejected`, and `failed` states.
-2. Fixed cold-start `app_launch_type` classification when a background component starts the process long before the first Activity.
-3. Aligned cold-start duration calculation with the uptime clock so device deep sleep is not counted as launch work.
-4. Added `FTRUMConfig.setIssueDataProvider` to attach validated custom fields to automatically collected Java/native Crash and watchdog/native ANR RUM Errors, including historical native dump context.
-5. Fixed Java watchdog ANR detection so it rearms after the main thread recovers and exits promptly during SDK shutdown.
-6. Fixed WebView Session Replay slot callbacks retaining destroyed WebViews and Activities while preserving Native View rebind handling.
+2. Fixed concurrent WebSocket handshakes sharing a Resource ID and emitting duplicate Resources or invalid Download/Transfer timing phases.
+3. Fixed cold-start `app_launch_type` classification when a background component starts the process long before the first Activity.
+4. Aligned cold-start duration calculation with the uptime clock so device deep sleep is not counted as launch work.
+5. Added `FTRUMConfig.setIssueDataProvider` to attach validated custom fields to automatically collected Java/native Crash and watchdog/native ANR RUM Errors, including historical native dump context.
+6. Fixed Java watchdog ANR detection so it rearms after the main thread recovers and exits promptly during SDK shutdown.
+7. Fixed WebView Session Replay slot callbacks retaining destroyed WebViews and Activities while preserving Native View rebind handling.
 
 ---
 # agent 1.7.4

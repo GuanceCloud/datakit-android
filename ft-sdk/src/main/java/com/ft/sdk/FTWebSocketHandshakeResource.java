@@ -93,6 +93,8 @@ final class FTWebSocketHandshakeResource {
     NetStatusBean createNetStatus(long finishTimeNano) {
         NetStatusBean netStatus = new NetStatusBean();
         netStatus.callStartTime = startTimeNano;
+        netStatus.headerStartTime = finishTimeNano;
+        netStatus.bodyStartTime = finishTimeNano;
         netStatus.bodyEndTime = finishTimeNano;
         return netStatus;
     }
