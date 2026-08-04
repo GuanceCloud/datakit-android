@@ -83,6 +83,16 @@ public class Constants {
     public static final String CLASS_NAME_OKHTTP3_PATH = "okhttp3/";
 
     /**
+     * OkHttp WebSocket factory interface.
+     */
+    public static final String CLASS_NAME_OKHTTP_WEBSOCKET_FACTORY = "okhttp3/WebSocket$Factory";
+
+    /**
+     * OkHttp client implementation.
+     */
+    public static final String CLASS_NAME_OKHTTP_CLIENT = "okhttp3/OkHttpClient";
+
+    /**
      * OkHttpClient$Builder
      */
     public static final String CLASS_NAME_OKHTTP_BUILDER = "okhttp3/OkHttpClient$Builder";

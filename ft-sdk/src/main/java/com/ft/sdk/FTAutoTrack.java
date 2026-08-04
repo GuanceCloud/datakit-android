@@ -34,6 +34,8 @@ import okhttp3.EventListener;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 
 /**
  * BY huangDianHua
@@ -866,6 +868,40 @@ public class FTAutoTrack {
             }
         }
         return builder.build();
+    }
+
+    /**
+     * Plug-in method used to replace {@link OkHttpClient#newWebSocket(Request, WebSocketListener)}.
+     *
+     * @param factory WebSocket factory that starts the connection
+     * @param request WebSocket handshake request
+     * @param listener original application listener
+     * @return WebSocket returned by the original factory
+     */
+    public static WebSocket trackOkHttpNewWebSocket(WebSocket.Factory factory,
+                                                    Request request,
+                                                    WebSocketListener listener) {
+        Request webSocketRequest = request.newBuilder()
+                .tag(FTWebSocketRequestTag.class, FTWebSocketRequestTag.INSTANCE)
+                .build();
+        if (!FTSdk.checkInstallState() || !FTRUMConfigManager.get().isRumEnable()) {
+            return factory.newWebSocket(webSocketRequest, listener);
+        }
+
+        FTRUMConfig config = FTRUMConfigManager.get().getConfig();
+        if (config == null || !config.isEnableTraceUserResource()
+                || config.getResourceUrlHandler().isInTakeUrl(request.url().toString())) {
+            return factory.newWebSocket(webSocketRequest, listener);
+        }
+
+        FTWebSocketHandshakeResource resource = new FTWebSocketHandshakeResource(webSocketRequest);
+        try {
+            return factory.newWebSocket(webSocketRequest,
+                    new FTWebSocketHandshakeListener(listener, resource));
+        } catch (RuntimeException e) {
+            resource.onFailure(e, null);
+            throw e;
+        }
     }
 
     /**

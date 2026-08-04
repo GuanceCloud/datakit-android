@@ -6,6 +6,13 @@
     <string name="network_normal_request">Normal Network Request Test</string>
     <string name="network_stream_upload">Streaming Upload Test</string>
     <string name="network_stream_download">Streaming Download Test</string>
+    <string name="websocket_test_title">WebSocket Handshake Resource Test</string>
+    <string name="websocket_test_description">URLs are injected from FT_WEBSOCKET_TEST_* environment variables at build time. Disabled buttons are not configured.</string>
+    <string name="websocket_test_success">Connect: valid 101</string>
+    <string name="websocket_test_reject">Connect: rejected 403</string>
+    <string name="websocket_test_invalid_upgrade">Connect: invalid 101</string>
+    <string name="websocket_test_tcp_failure">Connect: TCP failure</string>
+    <string name="websocket_test_close">Close active WebSocket</string>
     <string name="resource_queue_repro_title">Resource Queue Timing Reproduction</string>
     <string name="resource_queue_repro_description">The first response holds the only OkHttp Dispatcher slot. Use 5 seconds for a quick check or 600 seconds to reproduce a 10-minute Unknown duration.</string>
     <string name="resource_queue_hold_hint">Queue hold time in seconds</string>

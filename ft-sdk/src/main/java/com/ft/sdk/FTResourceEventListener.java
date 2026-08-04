@@ -335,6 +335,9 @@ public class FTResourceEventListener extends EventListener {
             if (originFactory != null) {
                 originEventLister = originFactory.create(call);
             }
+            if (call.request().tag(FTWebSocketRequestTag.class) != null) {
+                return originEventLister;
+            }
             String url = call.request().url().toString();
             if (handler != null && handler.isInTakeUrl(url)) {
                 return originEventLister;

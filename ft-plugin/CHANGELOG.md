@@ -1,3 +1,7 @@
+# Unreleased
+1. Added OkHttp `newWebSocket()` instrumentation for WebSocket handshake Resource collection.
+
+---
 # plugin 1.3.7
 1. Added wildcard support for `ignorePackages`.
 2. Fix an issue where native `.so` symbol files cannot be detected when `autoUploadNativeDebugSymbol` is enabled and the default `nativeLibPath` auto-detection is used with AGP native library intermediate directories.

@@ -1225,6 +1225,14 @@ public class FTRUMInnerManager {
             tags.put(Constants.KEY_RUM_RESOURCE_URL_HOST, bean.urlHost);
 
             tags.put(Constants.KEY_RUM_RESOURCE_TYPE, bean.resourceType);
+            if (!Utils.isNullOrEmpty(bean.resourceWebSocketCollectionLevel)) {
+                tags.put(Constants.KEY_RUM_RESOURCE_WEBSOCKET_COLLECTION_LEVEL,
+                        bean.resourceWebSocketCollectionLevel);
+            }
+            if (!Utils.isNullOrEmpty(bean.resourceWebSocketHandshakeState)) {
+                tags.put(Constants.KEY_RUM_RESOURCE_WEBSOCKET_HANDSHAKE_STATE,
+                        bean.resourceWebSocketHandshakeState);
+            }
             tags.put(Constants.KEY_RUM_RESPONSE_CONNECTION, bean.responseConnection);
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_TYPE, bean.responseContentType);
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
@@ -1246,7 +1254,7 @@ public class FTRUMInnerManager {
 
             long resourceSize = bean.resourceResponseBodySize + (bean.responseHeader == null ?
                     0 : bean.responseHeader.length());
-            if (resourceSize > 0) {
+            if (bean.enableResourceSize && resourceSize > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_SIZE, resourceSize);
             }
 
@@ -1346,7 +1354,8 @@ public class FTRUMInnerManager {
             long time = Utils.getCurrentNanoTime();
 
             if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST
-                    || (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(bean.errorStack))) {
+                    || ((bean.resourceStatus == 0 || bean.forceNetworkError)
+                    && !Utils.isNullOrEmpty(bean.errorStack))) {
                 SyncTaskManager.get().setErrorTimeLine(time, activeView);
 
                 HashMap<String, Object> errorTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
@@ -1369,6 +1378,15 @@ public class FTRUMInnerManager {
                 errorTags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
                 errorTags.put(Constants.KEY_RUM_RESOURCE_URL_HOST, bean.urlHost);
                 errorTags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
+                if (!Utils.isNullOrEmpty(bean.resourceWebSocketCollectionLevel)) {
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_TYPE, bean.resourceType);
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_WEBSOCKET_COLLECTION_LEVEL,
+                            bean.resourceWebSocketCollectionLevel);
+                }
+                if (!Utils.isNullOrEmpty(bean.resourceWebSocketHandshakeState)) {
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_WEBSOCKET_HANDSHAKE_STATE,
+                            bean.resourceWebSocketHandshakeState);
+                }
 
                 if (!urlPath.isEmpty()) {
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, urlPath);
@@ -1466,11 +1484,18 @@ public class FTRUMInnerManager {
         bean.resourceMethod = params.resourceMethod;
         bean.resourceProtocol = params.resourceProtocol;
         bean.responseContentEncoding = params.responseContentEncoding;
-        bean.resourceType = ResourceType.fromMimeType(params.responseContentType).getValue();
+        bean.resourceType = Utils.isNullOrEmpty(params.resourceType)
+                ? ResourceType.fromMimeType(params.responseContentType).getValue()
+                : params.resourceType;
+        bean.resourceWebSocketCollectionLevel = params.resourceWebSocketCollectionLevel;
+        bean.resourceWebSocketHandshakeState = params.resourceWebSocketHandshakeState;
+        bean.enableResourceSize = params.enableResourceSize;
+        bean.forceNetworkError = params.forceNetworkError;
         bean.resourceStatus = params.resourceStatus;
         if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
             bean.errorStack = params.responseBody == null ? "" : params.responseBody;
-        } else if (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(params.requestErrorStack)) {
+        } else if ((bean.resourceStatus == 0 || bean.forceNetworkError)
+                && !Utils.isNullOrEmpty(params.requestErrorStack)) {
             bean.errorStack = params.requestErrorStack;
             bean.errorMsg = params.requestErrorMsg;
         }

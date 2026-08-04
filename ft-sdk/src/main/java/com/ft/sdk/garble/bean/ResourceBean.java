@@ -38,6 +38,22 @@ public class ResourceBean {
      */
     public String resourceType = "";
     /**
+     * WebSocket collection boundary tag.
+     */
+    public String resourceWebSocketCollectionLevel = "";
+    /**
+     * WebSocket handshake state tag.
+     */
+    public String resourceWebSocketHandshakeState = "";
+    /**
+     * Whether a response resource size should be emitted.
+     */
+    public boolean enableResourceSize = true;
+    /**
+     * Whether this resource should also generate a network error.
+     */
+    public boolean forceNetworkError = false;
+    /**
      * Request HTTP header
      */
     public String requestHeader = "";
