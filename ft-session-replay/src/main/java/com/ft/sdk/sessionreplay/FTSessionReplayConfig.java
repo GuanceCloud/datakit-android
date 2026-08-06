@@ -161,9 +161,22 @@ public class FTSessionReplayConfig {
     }
 
     /**
-     * Enables linking Session Replay records to additional RUM keys.
+     * Enables linking Session Replay records and resources to selected RUM context values.
      *
-     * @param rumLinkKeys RUM keys that should be attached to replay records
+     * <p>Each configured value is matched as a key fragment: a non-null RUM context or View property
+     * whose key contains the configured fragment is attached to the replay context. Selected values
+     * are serialized with replay records and may be sent with resource existence checks and uploads.
+     * Do not select secrets or other values that must not leave the application.</p>
+     *
+     * <p>The exact linked key {@code wgt_id} has additional routing semantics. Session Replay uses its
+     * value to separate resource caching, deduplication, existence checks and uploads for different
+     * WGT applications. To enable that routing, include {@code "wgt_id"} here and provide the same
+     * property in the corresponding RUM context.</p>
+     *
+     * <p>Passing {@code null} or an empty array disables additional RUM key linking. The configuration
+     * retains the supplied array; do not mutate it after this call.</p>
+     *
+     * @param rumLinkKeys RUM key fragments whose matching values should be linked
      * @return the current configuration instance
      */
     public FTSessionReplayConfig enableLinkRUMKeys(String[] rumLinkKeys) {

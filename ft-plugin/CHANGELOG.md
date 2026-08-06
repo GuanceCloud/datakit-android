@@ -1,5 +1,5 @@
-# Unreleased
-1. Added OkHttp `newWebSocket()` instrumentation for WebSocket handshake Resource collection.
+# plugin 1.3.8-alpha01
+1. Added automatic OkHttp `newWebSocket()` instrumentation for WebSocket handshake RUM Resource collection; requires `ft-sdk >= 1.7.5-alpha01`.
 
 ---
 # plugin 1.3.7

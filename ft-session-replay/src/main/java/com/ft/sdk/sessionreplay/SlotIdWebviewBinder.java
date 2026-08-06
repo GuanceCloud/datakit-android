@@ -9,6 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Manages the mapping relationship between slotId and viewId
  * Used to establish associations between WebView and Native View
  *
+ * <p>This is a Session Replay lifecycle component exposed for SDK module interoperability.
+ * Applications normally should not create or operate the binder directly.</p>
+ *
  * @author Brandon
  */
 public class SlotIdWebviewBinder {
@@ -234,9 +237,12 @@ public class SlotIdWebviewBinder {
     }
 
     /**
-     * Remove the binding for a WebView slot.
+     * Removes the binding and callback references for a WebView slot.
      *
-     * @param slotId WebView's slotId
+     * <p>This method does not notify either binding callback. Passing {@code null}, a non-existent
+     * slot, or calling this method more than once for the same slot is a no-op.</p>
+     *
+     * @param slotId the recorder-assigned WebView slot id
      */
     public void unbind(String slotId) {
         if (slotId == null) {
@@ -257,9 +263,12 @@ public class SlotIdWebviewBinder {
     }
 
     /**
-     * Remove the binding for a WebView slot.
+     * Removes the binding and callback references for a WebView slot.
      *
-     * @param slotId WebView's slotId
+     * <p>This method does not notify either binding callback. Passing a non-existent slot or calling
+     * this method more than once for the same slot is a no-op.</p>
+     *
+     * @param slotId the WebView slot id, normally derived from {@link System#identityHashCode(Object)}
      */
     public void unbind(long slotId) {
         unbind(String.valueOf(slotId));
