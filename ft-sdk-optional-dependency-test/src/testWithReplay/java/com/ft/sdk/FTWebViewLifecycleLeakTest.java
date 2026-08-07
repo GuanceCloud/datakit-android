@@ -153,6 +153,15 @@ public class FTWebViewLifecycleLeakTest {
         assertNull(manager.getSlotIdWebviewBinder());
     }
 
+    @Test
+    public void lazyBridgeExposesRecordsAfterReplayStarts() {
+        WebAppInterface bridge = new WebAppInterface(null, new NoOpReceiver(),
+                null, null, null, true);
+
+        assertEquals("[\"records\"]", bridge.getCapabilities());
+        assertNotNull(bridge.getPrivacyLevel());
+    }
+
     private ActivityScenarioReferences createAndDestroyWebViewActivity() throws Exception {
         ActivityController<WebViewHostActivity> controller =
                 Robolectric.buildActivity(WebViewHostActivity.class).setup();
@@ -217,6 +226,20 @@ public class FTWebViewLifecycleLeakTest {
         Field field = target.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(target, value);
+    }
+
+    private static final class NoOpReceiver implements WebAppInterface.JsReceiver {
+        @Override
+        public void sendEvent(String s) {
+        }
+
+        @Override
+        public void sendEvent(String s, String callbackMethod) {
+        }
+
+        @Override
+        public void addEventListener(String s, String callBackMethod) {
+        }
     }
 
     private static <T> void awaitCollection(WeakReference<T> reference,

@@ -92,6 +92,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     private Object dataBatcher;
     private View mWebView;
     private boolean isDCWebView = false;
+    private boolean isLazyUniAppBridge = false;
 
     private final ConcurrentHashMap<String, Map<String, Object>> webViewLinkMap = new ConcurrentHashMap<>();
 
@@ -134,6 +135,25 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
             } else {
                 setWebView(webview, config.getAllowWebViewHost());
             }
+        }
+    }
+
+    /**
+     * Installs the DCloud bridge before the first document load without
+     * requiring RUM or Session Replay configuration to exist yet. The bridge
+     * resolves its configuration lazily and does not accept events before RUM
+     * WebView tracing becomes ready.
+     */
+    void setUniAppFirstViewWebView(View webview) {
+        mWebView = webview;
+        isDCWebView = true;
+        isLazyUniAppBridge = true;
+        if (webview instanceof WebView) {
+            ((WebView) webview).getSettings().setJavaScriptEnabled(true);
+            ((WebView) webview).addJavascriptInterface(new WebAppInterface(webview.getContext(), this,
+                            null, null, null, true),
+                    FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
+            webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
         }
     }
 
@@ -186,6 +206,31 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         if (nativeViewId == null) {
             nativeViewId = viewId;
         }
+    }
+
+    private boolean prepareLazyUniAppBridgeForEvent() {
+        if (!isLazyUniAppBridge) {
+            return true;
+        }
+        if (!WebAppInterface.isRumWebViewBridgeReady()) {
+            return false;
+        }
+        if (nativeViewName == null && mWebView != null) {
+            Activity activity = AopUtils.getActivityFromContext(mWebView.getContext());
+            nativeViewName = AopUtils.getClassName(activity);
+            getRelativeNativeViewId();
+        }
+        if (WebAppInterface.isSessionReplayBridgeReady()) {
+            if (slotID == 0 && mWebView != null) {
+                slotID = System.identityHashCode(mWebView);
+                inactiveTimestamp = 0;
+            }
+            if (dataBatcher == null) {
+                dataBatcher = SessionReplayBridge.newWebViewDataBatcher(isDCWebView);
+                checkAndStartSnapshotTimer();
+            }
+        }
+        return true;
     }
 
     static String resolveContainerViewId(String nativeViewId, String boundViewId) {
@@ -305,6 +350,9 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     public void sendEvent(String s, String callbackMethod) {
         try {
             LogUtils.d(LOG_TAG, "sendEvent：" + s);
+            if (!prepareLazyUniAppBridgeForEvent()) {
+                return;
+            }
             JSONObject json = new JSONObject(s);
             String name = json.optString(WEB_JS_NAME);
             JSONObject data = json.optJSONObject(WEB_JS_DATA);

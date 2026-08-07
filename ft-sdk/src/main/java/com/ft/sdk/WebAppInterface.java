@@ -26,17 +26,24 @@ public class WebAppInterface {
     private final String[] mAllowWebViewHost;
     private final String[] capabilities;
     private final String privacyLevel;
+    private final boolean resolveSessionReplayMetadataLazily;
 
     Context mContext;
 
     public WebAppInterface(Context c, JsReceiver receiver,
                            String[] allowWebViewHost, String privacyLevel, String[] capabilities) {
+        this(c, receiver, allowWebViewHost, privacyLevel, capabilities, false);
+    }
+
+    WebAppInterface(Context c, JsReceiver receiver,
+                    String[] allowWebViewHost, String privacyLevel, String[] capabilities,
+                    boolean resolveSessionReplayMetadataLazily) {
         mJsReceiver = receiver;
         mContext = c;
         mAllowWebViewHost = allowWebViewHost;
-        //fixme read from config
         this.capabilities = capabilities;
         this.privacyLevel = privacyLevel;
+        this.resolveSessionReplayMetadataLazily = resolveSessionReplayMetadataLazily;
     }
 
     /**
@@ -62,20 +69,35 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public String getAllowedWebViewHosts() {
-        if (mAllowWebViewHost == null) {
+        String[] allowWebViewHost = mAllowWebViewHost;
+        if (resolveSessionReplayMetadataLazily) {
+            if (!isRumWebViewBridgeReady()) {
+                return null;
+            }
+            allowWebViewHost = FTRUMConfigManager.get().getConfig().getAllowWebViewHost();
+        }
+        if (allowWebViewHost == null) {
             return null;
         }
-        return Utils.setToJsonString(Arrays.asList(mAllowWebViewHost));
+        return Utils.setToJsonString(Arrays.asList(allowWebViewHost));
     }
 
 
     @JavascriptInterface
     public String getPrivacyLevel() {
+        if (resolveSessionReplayMetadataLazily) {
+            return isSessionReplayBridgeReady() ? SessionReplayBridge.getPrivacyLevel() : null;
+        }
         return privacyLevel;
     }
 
     @JavascriptInterface
     public String getCapabilities() {
+        if (resolveSessionReplayMetadataLazily) {
+            return isSessionReplayBridgeReady()
+                    ? Utils.setToJsonString(Arrays.asList("records"))
+                    : null;
+        }
         if (capabilities == null) {
             return null;
         }
@@ -92,6 +114,15 @@ public class WebAppInterface {
     @JavascriptInterface
     public void addEventListener(String string, String callbackMethod) {
         mJsReceiver.addEventListener(string, callbackMethod);
+    }
+
+    static boolean isRumWebViewBridgeReady() {
+        FTRUMConfig config = FTRUMConfigManager.get().getConfig();
+        return config.isRumEnable() && config.isEnableTraceWebView();
+    }
+
+    static boolean isSessionReplayBridgeReady() {
+        return isRumWebViewBridgeReady() && FTSdk.isSessionReplaySupport();
     }
 
 

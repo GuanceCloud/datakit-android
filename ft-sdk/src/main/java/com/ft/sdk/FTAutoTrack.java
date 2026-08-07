@@ -20,6 +20,7 @@ import android.widget.RadioGroup;
 import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.DCSWebViewUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.TBSWebViewUtils;
@@ -44,6 +45,47 @@ import okhttp3.WebSocketListener;
  */
 public class FTAutoTrack {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "AutoTrack";
+
+    /**
+     * Enabled by the optional UniApp Session Replay module from the Android
+     * Application hook. It is process-wide because it must be set before
+     * DCloud creates its first render WebView, and is consumed by the first
+     * eligible WebView so later WebViews keep the original setup path.
+     */
+    private static volatile boolean uniAppFirstViewWebViewBridgeEnabled = false;
+
+    /**
+     * Enables a DCloud-only lazy JavaScript bridge when a UniApp document
+     * begins loading before Session Replay is ready. This method does not
+     * initialize RUM or Session Replay and does not affect non-DCloud WebViews.
+     */
+    static void enableUniAppFirstViewWebViewBridge() {
+        uniAppFirstViewWebViewBridgeEnabled = true;
+    }
+
+    /**
+     * Stops selecting the lazy bridge for subsequently created DCloud
+     * WebViews. Existing first-document handlers keep their lazy state so
+     * they can resolve RUM and Session Replay configuration on their first
+     * Browser SDK event.
+     */
+    static void disableUniAppFirstViewWebViewBridge() {
+        uniAppFirstViewWebViewBridgeEnabled = false;
+    }
+
+    static boolean consumeUniAppFirstViewWebViewBridge(boolean isDCWebView,
+                                                       boolean isSessionReplayBridgeReady) {
+        if (!isDCWebView || isSessionReplayBridgeReady) {
+            return false;
+        }
+        synchronized (FTAutoTrack.class) {
+            if (!uniAppFirstViewWebViewBridgeEnabled) {
+                return false;
+            }
+            uniAppFirstViewWebViewBridgeEnabled = false;
+            return true;
+        }
+    }
 
 
     /**
@@ -767,7 +809,15 @@ public class FTAutoTrack {
         if (webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
             // Check if it's a supported WebView type
             if (webView instanceof WebView || TBSWebViewUtils.isTBSWebViewInstance(webView)) {
-                new FTWebViewHandler().setWebView(webView);
+                FTWebViewHandler handler = new FTWebViewHandler();
+                if (uniAppFirstViewWebViewBridgeEnabled
+                        && consumeUniAppFirstViewWebViewBridge(
+                                DCSWebViewUtils.isDCWebViewInstance(webView),
+                                WebAppInterface.isSessionReplayBridgeReady())) {
+                    handler.setUniAppFirstViewWebView(webView);
+                } else {
+                    handler.setWebView(webView);
+                }
             }
         }
     }
