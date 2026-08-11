@@ -3,7 +3,7 @@ jdk:
 
 install:
   - |
-    set -eu
+    set -e
 
     unsupported_version() {
       echo "Unsupported JitPack version: ${VERSION:-<empty>}" >&2
