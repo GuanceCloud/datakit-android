@@ -5,6 +5,11 @@ install:
   - |
     set -eu
 
+    unsupported_version() {
+      echo "Unsupported JitPack version: ${VERSION:-<empty>}" >&2
+      exit 1
+    }
+
     case "${VERSION:-}" in
       agent_*)
         publish_task=:ft-sdk:publishToMavenLocal
@@ -15,18 +20,14 @@ install:
       plugin_*)
         publish_task=:ft-plugin:publishToMavenLocal
         ;;
-      replay_material_*)
-        publish_task=:ft-session-replay-material:publishToMavenLocal
-        ;;
-      replay_compose_*)
-        publish_task=:ft-session-replay-compose:publishToMavenLocal
+      replay_material_*|replay_compose_*)
+        unsupported_version
         ;;
       replay_*)
         publish_task=:ft-session-replay:publishToMavenLocal
         ;;
       *)
-        echo "Unsupported JitPack version: ${VERSION:-<empty>}" >&2
-        exit 1
+        unsupported_version
         ;;
     esac
 
