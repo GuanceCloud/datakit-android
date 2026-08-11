@@ -6,13 +6,13 @@ install:
     set -eu
 
     case "${VERSION:-}" in
-      agent_*|tw_agent_*)
+      agent_*)
         publish_task=:ft-sdk:publishToMavenLocal
         ;;
-      native_*|tw_native_*)
+      native_*)
         publish_task=:ft-native:publishToMavenLocal
         ;;
-      plugin_*|tw_plugin_*)
+      plugin_*)
         publish_task=:ft-plugin:publishToMavenLocal
         ;;
       replay_material_*)
@@ -21,7 +21,7 @@ install:
       replay_compose_*)
         publish_task=:ft-session-replay-compose:publishToMavenLocal
         ;;
-      replay_*|tw_replay_*)
+      replay_*)
         publish_task=:ft-session-replay:publishToMavenLocal
         ;;
       *)
