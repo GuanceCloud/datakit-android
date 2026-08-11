@@ -1,0 +1,5 @@
+jdk:
+  - openjdk11
+
+install:
+  - ./scripts/jitpack_publish.sh
