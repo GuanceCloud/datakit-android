@@ -289,6 +289,8 @@ public class SyncDataHelper {
 
     public String getBodyContent(String measurement, HashMap<String, Object> tags,
                                  HashMap<String, Object> fields, long timeStamp, DataType dataType, String uuid) {
+        boolean webViewLog = dataType == DataType.LOG && tags != null
+                && Boolean.TRUE.equals(tags.get(Constants.KEY_RUM_VIEW_IS_WEB_VIEW));
         if (fields != null && isRUMDataType(dataType)) {
             RUMHeatMapPropertyBuilder.appendDisplay(fields);
         }
@@ -304,9 +306,12 @@ public class SyncDataHelper {
             // log data
             mergeTags.putAll(dynamicBaseTags);
             mergeTags.putAll(dynamicLogTags);
-            mergeTags.putAll(logTags);
-            if (logConfig != null) {
-                if (logConfig.isEnableLinkRumData()) {
+            if (webViewLog) {
+                mergeWebViewLogTags(mergeTags);
+                mergeTags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
+            } else {
+                mergeTags.putAll(logTags);
+                if (logConfig != null && logConfig.isEnableLinkRumData()) {
                     mergeTags.putAll(rumTags);
                 }
             }
@@ -352,6 +357,35 @@ public class SyncDataHelper {
         }
         return bodyContent;
 
+    }
+
+    /**
+     * Applies the same collision rules used by WebView RUM: keep the Browser service,
+     * use native SDK identity, and retain the Browser SDK version in sdk_pkg_info.web.
+     */
+    private void mergeWebViewLogTags(HashMap<String, Object> mergeTags) {
+        Object webSDKVersion = mergeTags.get(Constants.KEY_SDK_VERSION);
+        Iterator<String> keys = logTags.keySet().iterator();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            if (Constants.KEY_SERVICE.equals(key)) {
+                continue;
+            }
+            if (Constants.KEY_SDK_PACKAGE_INFO.equals(key)) {
+                Object pkgInfo = logTags.get(Constants.KEY_SDK_PACKAGE_INFO);
+                if (pkgInfo != null && webSDKVersion != null) {
+                    String replacePkgInfo = PackageUtils.appendPackageVersion(
+                            pkgInfo.toString(), Constants.KEY_RUM_SDK_PACKAGE_WEB,
+                            webSDKVersion.toString());
+                    mergeTags.put(Constants.KEY_SDK_PACKAGE_INFO,
+                            applyModifier(Constants.KEY_SDK_PACKAGE_INFO, replacePkgInfo));
+                } else if (pkgInfo != null) {
+                    mergeTags.put(key, pkgInfo);
+                }
+            } else {
+                mergeTags.put(key, logTags.get(key));
+            }
+        }
     }
 
     private boolean isRUMDataType(DataType dataType) {

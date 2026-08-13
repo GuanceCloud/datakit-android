@@ -100,12 +100,16 @@ public class TrackLogManager {
             return false;
         }
 
+        if (!isLogEnabledForSource(config, logBean)) {
+            return false;
+        }
+
         if (!Utils.enableTraceSamplingRate(config.getSamplingRate())) {
             LogUtils.w(TAG, "Log discarded by sampling rate: " + logBean.getContent());
             return false;
         }
 
-        if (config.isEnableLinkRumData()) {
+        if (shouldAttachNativeRumData(config, logBean)) {
             HashMap<String, Object> rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             HashMap<String, Object> fields = new HashMap<>();
             FTRUMInnerManager.get().attachRUMRelative(rumTags, fields, false);
@@ -114,6 +118,20 @@ public class TrackLogManager {
         }
 
         return true;
+    }
+
+    static boolean isLogEnabledForSource(FTLoggerConfig config, LogBean logBean) {
+        return !isWebViewLog(logBean)
+                || (config.isEnableWebViewLog() && config.checkLogLevel(logBean.getStatus()));
+    }
+
+    static boolean shouldAttachNativeRumData(FTLoggerConfig config, LogBean logBean) {
+        return config.isEnableLinkRumData() && !isWebViewLog(logBean);
+    }
+
+    private static boolean isWebViewLog(LogBean logBean) {
+        return Boolean.TRUE.equals(
+                logBean.getTags().get(Constants.KEY_RUM_VIEW_IS_WEB_VIEW));
     }
 
     private void triggerProcessing(boolean isSilence) {

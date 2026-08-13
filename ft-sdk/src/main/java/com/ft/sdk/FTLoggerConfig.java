@@ -36,6 +36,11 @@ public class FTLoggerConfig {
     private boolean enableCustomLog = false;
 
     /**
+     * Whether Browser SDK logs received through the WebView bridge are collected.
+     */
+    private boolean enableWebViewLog = false;
+
+    /**
      * Service name {@link Constants#KEY_SERVICE }, default is {@link Constants#DEFAULT_SERVICE_NAME}
      */
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
@@ -153,6 +158,26 @@ public class FTLoggerConfig {
      */
     public FTLoggerConfig setEnableCustomLog(boolean enableCustomLog) {
         this.enableCustomLog = enableCustomLog;
+        return this;
+    }
+
+    /**
+     * Returns whether Browser SDK logs received through
+     * {@code FTWebViewJavascriptBridge} are collected.
+     */
+    public boolean isEnableWebViewLog() {
+        return enableWebViewLog;
+    }
+
+    /**
+     * Enable Browser SDK Log collection through {@code FTWebViewJavascriptBridge}.
+     * This setting is independent of native custom and console log collection.
+     *
+     * @param enableWebViewLog true to collect Browser SDK logs from WebViews
+     * @return this config for chaining
+     */
+    public FTLoggerConfig setEnableWebViewLog(boolean enableWebViewLog) {
+        this.enableWebViewLog = enableWebViewLog;
         return this;
     }
 
@@ -329,6 +354,7 @@ public class FTLoggerConfig {
                 ", enableLinkRumData=" + enableLinkRumData +
                 ", enableConsoleLog=" + enableConsoleLog +
                 ", enableCustomLog=" + enableCustomLog +
+                ", enableWebViewLog=" + enableWebViewLog +
                 ", serviceName='" + serviceName + '\'' +
                 ", logPrefix='" + logPrefix + '\'' +
                 ", logCacheLimitCount=" + logCacheLimitCount +

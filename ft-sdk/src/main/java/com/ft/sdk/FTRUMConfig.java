@@ -163,7 +163,10 @@ public class FTRUMConfig {
      *
      * @param allowWebViewHost allowed WebView host list, or null to allow all hosts
      * @return this config for chaining
+     * @deprecated Configure the shared RUM and Log WebView host list with
+     * {@link FTSDKConfig#setAllowWebViewHost(String[])}.
      */
+    @Deprecated
     public FTRUMConfig setAllowWebViewHost(String[] allowWebViewHost) {
         this.allowWebViewHost = allowWebViewHost;
         return this;

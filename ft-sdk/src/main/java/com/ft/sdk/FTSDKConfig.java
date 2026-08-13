@@ -6,6 +6,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.net.Proxy;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -140,6 +141,22 @@ public class FTSDKConfig {
     private boolean enableDataFilter = true;
 
     /**
+     * Hosts for which the Browser SDK may use the native WebView bridge.
+     * A null value allows every host, while an empty array disables bridge use.
+     */
+    private String[] allowWebViewHost;
+
+    /**
+     * Distinguishes an explicit null value from an unset base configuration.
+     */
+    private boolean allowWebViewHostConfigured;
+
+    /**
+     * Compatibility value supplied by the historical rumAllowWebViewHost remote key.
+     */
+    private String[] remoteAllowWebViewHost;
+
+    /**
      * Local DataKit-compatible filter rules. Local filters are applied together with remote filters.
      */
     private final HashMap<String, String[]> dataFilters = new HashMap<>();
@@ -185,6 +202,42 @@ public class FTSDKConfig {
      */
     public boolean isLimitWithCacheSize() {
         return limitWithCacheSize;
+    }
+
+    /**
+     * Configure the hosts for which the Browser SDK may use
+     * {@code FTWebViewJavascriptBridge}.
+     * <p>
+     * A null value allows every host, an empty array disables automatic bridge use,
+     * and each configured host also matches its subdomains. This only controls the
+     * Browser SDK bridge selection and is not a native origin security boundary.
+     *
+     * @param allowWebViewHost allowed WebView hosts, null to allow every host
+     * @return this config for chaining
+     */
+    public FTSDKConfig setAllowWebViewHost(String[] allowWebViewHost) {
+        this.allowWebViewHost = allowWebViewHost;
+        this.allowWebViewHostConfigured = true;
+        return this;
+    }
+
+    /**
+     * Returns the base allowed WebView host list, or null when every host is allowed.
+     */
+    public String[] getAllowWebViewHost() {
+        return allowWebViewHost;
+    }
+
+    boolean isAllowWebViewHostConfigured() {
+        return allowWebViewHostConfigured;
+    }
+
+    String[] getRemoteAllowWebViewHost() {
+        return remoteAllowWebViewHost;
+    }
+
+    void setRemoteAllowWebViewHost(String[] remoteAllowWebViewHost) {
+        this.remoteAllowWebViewHost = remoteAllowWebViewHost;
     }
 
     /**
@@ -974,6 +1027,7 @@ public class FTSDKConfig {
                 ", useFileDataStore=" + useFileDataStore +
                 ", fileDataStoreShadow=" + fileDataStoreShadow +
                 ", enableDataFilter=" + enableDataFilter +
+                ", allowWebViewHost=" + Arrays.toString(allowWebViewHost) +
                 ", dataFilters=" + dataFilters.keySet() +
                 ", globalContext=" + globalContext +
                 ", proxy=" + proxy +

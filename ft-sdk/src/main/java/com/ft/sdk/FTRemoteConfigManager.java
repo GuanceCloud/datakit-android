@@ -102,6 +102,10 @@ public class FTRemoteConfigManager {
             if (mRemoteConfig.getSyncSleepTime() != null) {
                 config.setSyncSleepTime(mRemoteConfig.getSyncSleepTime());
             }
+
+            if (mRemoteConfig.getRumAllowWebViewHost() != null) {
+                config.setRemoteAllowWebViewHost(mRemoteConfig.getRumAllowWebViewHost());
+            }
         }
     }
 
@@ -169,6 +173,10 @@ public class FTRemoteConfigManager {
 
             if (mRemoteConfig.getLogEnableCustomLog() != null) {
                 config.setEnableCustomLog(mRemoteConfig.getLogEnableCustomLog());
+            }
+
+            if (mRemoteConfig.getLogEnableWebViewLog() != null) {
+                config.setEnableWebViewLog(mRemoteConfig.getLogEnableWebViewLog());
             }
         }
     }
@@ -376,6 +384,14 @@ public class FTRemoteConfigManager {
             if (bean.getLogSampleRate() != null) {
                 loggerConfig.setSamplingRate(bean.getLogSampleRate());
             }
+            if (bean.getLogEnableWebViewLog() != null) {
+                loggerConfig.setEnableWebViewLog(bean.getLogEnableWebViewLog());
+            }
+        }
+
+        if (bean.getRumAllowWebViewHost() != null && FTSdk.checkInstallState()) {
+            FTSdk.get().getBaseConfig().setRemoteAllowWebViewHost(
+                    bean.getRumAllowWebViewHost());
         }
 
         FTTraceConfig traceConfig = FTTraceConfigManager.get().getConfig();
@@ -387,6 +403,12 @@ public class FTRemoteConfigManager {
 
         FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
         if (rumConfig.isRumEnable()) {
+            if (bean.getRumEnableTraceWebView() != null) {
+                rumConfig.setEnableTraceWebView(bean.getRumEnableTraceWebView());
+            }
+            if (bean.getRumAllowWebViewHost() != null) {
+                rumConfig.setAllowWebViewHost(bean.getRumAllowWebViewHost());
+            }
             if (bean.getRumSampleRate() != null) {
                 rumConfig.setSamplingRate(bean.getRumSampleRate());
             }

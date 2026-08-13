@@ -31,6 +31,7 @@ public class RemoteConfigBean {
     public static final String KEY_LOG_LEVEL_FILTERS = "logLevelFilters";
     public static final String KEY_LOG_ENABLE_CUSTOM_LOG = "logEnableCustomLog";
     public static final String KEY_LOG_ENABLE_CONSOLE_LOG = "logEnableConsoleLog";
+    public static final String KEY_LOG_ENABLE_WEB_VIEW_LOG = "logEnableWebViewLog";
     public static final String KEY_TRACE_SAMPLE_RATE = "traceSampleRate";
     public static final String KEY_TRACE_ENABLE_AUTO_TRACE = "traceEnableAutoTrace";
     public static final String KEY_TRACE_TYPE = "traceType";
@@ -63,6 +64,7 @@ public class RemoteConfigBean {
     private String[] logLevelFilters;
     private Boolean logEnableCustomLog;
     private Boolean logEnableConsoleLog;
+    private Boolean logEnableWebViewLog;
 
     private Float traceSampleRate;
     private Boolean traceEnableAutoTrace;
@@ -188,6 +190,7 @@ public class RemoteConfigBean {
 
             if (isBoolean(content, KEY_LOG_ENABLE_CUSTOM_LOG)) logEnableCustomLog = content.optBoolean(KEY_LOG_ENABLE_CUSTOM_LOG);
             if (isBoolean(content, KEY_LOG_ENABLE_CONSOLE_LOG)) logEnableConsoleLog = content.optBoolean(KEY_LOG_ENABLE_CONSOLE_LOG);
+            if (isBoolean(content, KEY_LOG_ENABLE_WEB_VIEW_LOG)) logEnableWebViewLog = content.optBoolean(KEY_LOG_ENABLE_WEB_VIEW_LOG);
             if (isNumber(content, KEY_TRACE_SAMPLE_RATE)) traceSampleRate = (float) content.optDouble(KEY_TRACE_SAMPLE_RATE);
             if (isBoolean(content, KEY_TRACE_ENABLE_AUTO_TRACE)) traceEnableAutoTrace = content.optBoolean(KEY_TRACE_ENABLE_AUTO_TRACE);
             if (isString(content, KEY_TRACE_TYPE)) traceType = content.optString(KEY_TRACE_TYPE);
@@ -276,6 +279,10 @@ public class RemoteConfigBean {
         return logEnableCustomLog;
     }
 
+    public Boolean getLogEnableWebViewLog() {
+        return logEnableWebViewLog;
+    }
+
     public Float getTraceSampleRate() {
         return traceSampleRate;
     }
@@ -326,6 +333,10 @@ public class RemoteConfigBean {
 
     public void setLogEnableCustomLog(Boolean logEnableCustomLog) {
         this.logEnableCustomLog = logEnableCustomLog;
+    }
+
+    public void setLogEnableWebViewLog(Boolean logEnableWebViewLog) {
+        this.logEnableWebViewLog = logEnableWebViewLog;
     }
 
     public void setLogLevelFilters(String[] logLevelFilters) {
@@ -436,6 +447,8 @@ public class RemoteConfigBean {
             sb.append("logLevelFilters='").append(Arrays.toString(logLevelFilters)).append("', ");
         if (logEnableCustomLog != null)
             sb.append("logEnableCustomLog='").append(logEnableCustomLog).append("', ");
+        if (logEnableWebViewLog != null)
+            sb.append("logEnableWebViewLog='").append(logEnableWebViewLog).append("', ");
         if (traceSampleRate != null)
             sb.append("traceSampleRate='").append(traceSampleRate).append("', ");
         if (traceEnableAutoTrace != null)
@@ -577,6 +590,9 @@ public class RemoteConfigBean {
             }
             if (logEnableConsoleLog != null) {
                 content.put(KEY_LOG_ENABLE_CONSOLE_LOG, logEnableConsoleLog);
+            }
+            if (logEnableWebViewLog != null) {
+                content.put(KEY_LOG_ENABLE_WEB_VIEW_LOG, logEnableWebViewLog);
             }
             if (traceSampleRate != null) {
                 content.put(KEY_TRACE_SAMPLE_RATE, traceSampleRate);

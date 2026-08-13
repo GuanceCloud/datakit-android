@@ -7,6 +7,7 @@
 6. Added API 30+ fatal ANR recovery through `ApplicationExitInfo`, with persisted historical RUM View association and multi-process effectively-once deduplication across DB, File, and Shadow storage modes.
 7. Fixed Java watchdog ANR detection so it rearms after the main thread recovers and exits promptly during SDK shutdown.
 8. Fixed WebView Session Replay slot callbacks retaining destroyed WebViews and Activities while preserving Native View rebind handling.
+9. Added opt-in Browser Logs SDK collection through `FTWebViewJavascriptBridge` with `FTLoggerConfig.setEnableWebViewLog`, native Log sampling/filtering/cache/upload handling, shared WebView host configuration through `FTSDKConfig.setAllowWebViewHost`, and remote `logEnableWebViewLog` support.
 
 ---
 # agent 1.7.4

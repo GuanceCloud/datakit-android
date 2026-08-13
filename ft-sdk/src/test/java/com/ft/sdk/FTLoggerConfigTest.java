@@ -8,6 +8,15 @@ import org.junit.Test;
 public class FTLoggerConfigTest {
 
     @Test
+    public void webViewLogIsOptIn() {
+        FTLoggerConfig config = new FTLoggerConfig();
+
+        Assert.assertFalse(config.isEnableWebViewLog());
+        Assert.assertSame(config, config.setEnableWebViewLog(true));
+        Assert.assertTrue(config.isEnableWebViewLog());
+    }
+
+    @Test
     public void checkLogLevel_remoteWarnFilterMatchesWarningStatus() {
         FTLoggerConfig config = new FTLoggerConfig()
                 .setLogLevelFilters(new String[]{"warn"});

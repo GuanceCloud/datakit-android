@@ -230,10 +230,11 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
+                .setEnableWebViewLog(true)
                 .setLogCacheLimitCount(20000)
                 .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD)
                 .setPrintCustomLogToConsole(true)
-                .setLogLevelFilters(new Status[]{Status.ERROR, Status.DEBUG})
+                .setLogLevelFilters(new Status[]{Status.ERROR, Status.DEBUG, Status.INFO})
                 .setEnableLinkRumData(true)
         );
 
