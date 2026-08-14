@@ -104,6 +104,18 @@ public class TrackLogManager {
             return false;
         }
 
+        String nativeApplicationId = null;
+        String nativeSessionId = null;
+        if (isWebViewLog(logBean)
+                && config.isEnableLinkRumData()
+                && FTWebViewHandler.isRumWebViewEnabled(
+                FTRUMConfigManager.get().getConfig())) {
+            nativeApplicationId = FTRUMInnerManager.get().getApplicationID();
+            nativeSessionId = FTRUMInnerManager.get().getSessionId();
+        }
+        applyWebViewRumLinkConfiguration(
+                config, logBean, nativeApplicationId, nativeSessionId);
+
         if (!Utils.enableTraceSamplingRate(config.getSamplingRate())) {
             LogUtils.w(TAG, "Log discarded by sampling rate: " + logBean.getContent());
             return false;
@@ -127,6 +139,20 @@ public class TrackLogManager {
 
     static boolean shouldAttachNativeRumData(FTLoggerConfig config, LogBean logBean) {
         return config.isEnableLinkRumData() && !isWebViewLog(logBean);
+    }
+
+    static void applyWebViewRumLinkConfiguration(FTLoggerConfig config, LogBean logBean,
+                                                 String nativeApplicationId,
+                                                 String nativeSessionId) {
+        if (!isWebViewLog(logBean)) {
+            return;
+        }
+        if (!config.isEnableLinkRumData()) {
+            WebViewLogEventMapper.removeRumLinkData(logBean);
+        } else {
+            WebViewLogEventMapper.replaceRumLinkData(
+                    logBean, nativeApplicationId, nativeSessionId);
+        }
     }
 
     private static boolean isWebViewLog(LogBean logBean) {

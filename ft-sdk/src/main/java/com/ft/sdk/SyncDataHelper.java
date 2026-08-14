@@ -329,24 +329,7 @@ public class SyncDataHelper {
                 mergeTags.putAll(rumTags);
                 fields.putAll(rumStaticFields);
             } else {
-                Object webSDKVersion = mergeTags.get(Constants.KEY_SDK_VERSION);
-                Iterator<String> keys = rumTags.keySet().iterator();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    if (!key.equals(Constants.KEY_SERVICE)) {
-                        if (key.equals(Constants.KEY_SDK_PACKAGE_INFO)) {
-                            Object pkgInfo = rumTags.get(Constants.KEY_SDK_PACKAGE_INFO);
-                            if (pkgInfo != null) {
-                                String replacePkgInfo = PackageUtils.appendPackageVersion(pkgInfo.toString(),
-                                        Constants.KEY_RUM_SDK_PACKAGE_WEB, webSDKVersion + "");
-                                mergeTags.put(Constants.KEY_SDK_PACKAGE_INFO,
-                                        applyModifier(Constants.KEY_SDK_PACKAGE_INFO, replacePkgInfo));
-                            }
-                        } else {
-                            mergeTags.put(key, rumTags.get(key));
-                        }
-                    }
-                }
+                mergeWebViewNativeTags(mergeTags, rumTags);
             }
             if (appLineModifier(dataType, measurement, uuid, mergeTags, fields)) {
                 return "";
@@ -359,20 +342,30 @@ public class SyncDataHelper {
 
     }
 
-    /**
-     * Applies the same collision rules used by WebView RUM: keep the Browser service,
-     * use native SDK identity, and retain the Browser SDK version in sdk_pkg_info.web.
-     */
     private void mergeWebViewLogTags(HashMap<String, Object> mergeTags) {
+        HashMap<String, Object> nativeTags = new LinkedHashMap<>();
+        nativeTags.putAll(logTags);
+        if (logConfig != null && logConfig.isEnableLinkRumData()) {
+            nativeTags.putAll(rumTags);
+        }
+        mergeWebViewNativeTags(mergeTags, nativeTags);
+    }
+
+    /**
+     * Applies the WebView RUM collision rules: keep the Browser service, use native SDK
+     * identity and configuration tags, and retain the Browser SDK version in sdk_pkg_info.web.
+     */
+    private void mergeWebViewNativeTags(HashMap<String, Object> mergeTags,
+                                        HashMap<String, Object> nativeTags) {
         Object webSDKVersion = mergeTags.get(Constants.KEY_SDK_VERSION);
-        Iterator<String> keys = logTags.keySet().iterator();
+        Iterator<String> keys = nativeTags.keySet().iterator();
         while (keys.hasNext()) {
             String key = keys.next();
             if (Constants.KEY_SERVICE.equals(key)) {
                 continue;
             }
             if (Constants.KEY_SDK_PACKAGE_INFO.equals(key)) {
-                Object pkgInfo = logTags.get(Constants.KEY_SDK_PACKAGE_INFO);
+                Object pkgInfo = nativeTags.get(Constants.KEY_SDK_PACKAGE_INFO);
                 if (pkgInfo != null && webSDKVersion != null) {
                     String replacePkgInfo = PackageUtils.appendPackageVersion(
                             pkgInfo.toString(), Constants.KEY_RUM_SDK_PACKAGE_WEB,
@@ -383,7 +376,7 @@ public class SyncDataHelper {
                     mergeTags.put(key, pkgInfo);
                 }
             } else {
-                mergeTags.put(key, logTags.get(key));
+                mergeTags.put(key, nativeTags.get(key));
             }
         }
     }

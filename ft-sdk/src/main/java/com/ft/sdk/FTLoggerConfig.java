@@ -91,7 +91,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * Whether to associate with RUM data
+     * Whether to associate Native and WebView logs with RUM data.
      *
      * @return true when logs should include RUM linkage data
      */
@@ -100,7 +100,9 @@ public class FTLoggerConfig {
     }
 
     /**
-     * Set whether to associate with RUM data
+     * Set whether to associate Native and WebView logs with RUM data. When disabled,
+     * Browser RUM application/session/view/action linkage is removed before a WebView
+     * log is stored by the native SDK.
      *
      * @param enableLinkRumData true to attach RUM linkage data to logs
      * @return this config for chaining

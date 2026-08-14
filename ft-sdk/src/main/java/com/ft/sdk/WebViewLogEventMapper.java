@@ -21,6 +21,34 @@ final class WebViewLogEventMapper {
 
     private static final long NANOSECONDS_PER_MILLISECOND = 1_000_000L;
     private static final long MAX_MILLISECONDS = Long.MAX_VALUE / NANOSECONDS_PER_MILLISECOND;
+    private static final String[] RUM_LINK_TAG_KEYS = {
+            Constants.KEY_RUM_APP_ID,
+            Constants.KEY_RUM_SESSION_ID,
+            Constants.KEY_RUM_SESSION_TYPE,
+            "session_is_forced",
+            "session_sampling",
+            Constants.KEY_RUM_VIEW_ID,
+            Constants.KEY_RUM_VIEW_REFERRER,
+            "view_url",
+            "view_host",
+            "view_path",
+            Constants.KEY_RUM_VIEW_NAME,
+            "view_path_group",
+            "view_path_name",
+            Constants.KEY_RUM_ACTION_ID
+    };
+    private static final String[] RUM_LINK_FIELD_KEYS = {
+            "application",
+            "session",
+            "view",
+            "action",
+            "user_action",
+            "view_url_query",
+            Constants.KEY_RUM_ACTION_ID,
+            "action_ids",
+            "view_in_foreground",
+            "session_has_replay"
+    };
 
     private WebViewLogEventMapper() {
     }
@@ -57,6 +85,48 @@ final class WebViewLogEventMapper {
         logBean.appendFields(fields);
         logBean.appendTags(singletonTag(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true));
         return logBean;
+    }
+
+    static void removeRumLinkData(LogBean logBean) {
+        if (logBean == null) {
+            return;
+        }
+        removeKeys(logBean.getTags(), RUM_LINK_TAG_KEYS);
+        removeKeys(logBean.getFields(), RUM_LINK_FIELD_KEYS);
+    }
+
+    static void replaceRumLinkData(LogBean logBean, String applicationId, String sessionId) {
+        if (logBean == null) {
+            return;
+        }
+        replaceRumLinkId(logBean, Constants.KEY_RUM_APP_ID, "application", applicationId);
+        replaceRumLinkId(logBean, Constants.KEY_RUM_SESSION_ID, "session", sessionId);
+    }
+
+    private static void replaceRumLinkId(LogBean logBean, String tagKey,
+                                         String fieldKey, String id) {
+        if (Utils.isNullOrEmpty(id)) {
+            return;
+        }
+        logBean.getTags().put(tagKey, id);
+        Object value = logBean.getFields().get(fieldKey);
+        if (value == null) {
+            return;
+        }
+        try {
+            JSONObject object = value instanceof JSONObject
+                    ? (JSONObject) value : new JSONObject(String.valueOf(value));
+            object.put("id", id);
+            logBean.getFields().put(fieldKey, object.toString());
+        } catch (Exception ignored) {
+            // Keep non-standard custom values while the flattened native tag remains authoritative.
+        }
+    }
+
+    private static void removeKeys(HashMap<String, Object> values, String[] keys) {
+        for (String key : keys) {
+            values.remove(key);
+        }
     }
 
     private static void mapCommonTags(JSONObject event, HashMap<String, Object> tags,
