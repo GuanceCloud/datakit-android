@@ -2,7 +2,9 @@ package com.ft.sdk.tests;
 
 import static org.junit.Assert.assertEquals;
 
+import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.InnerConfigSet;
+import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -43,6 +45,7 @@ public class HttpTest {
     public void setUp() {
         mMockWebServer = new MockWebServer();
         InnerConfigSet.enableNetwork();
+        FTHttpConfigManager.get().initParams(FTSDKConfig.builder());
     }
 
     @After
