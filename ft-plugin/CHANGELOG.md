@@ -1,3 +1,7 @@
+# plugin 1.3.8-beta01
+1. Same as version 1.3.8-alpha01.
+
+---
 # plugin 1.3.8-alpha01
 1. Added automatic OkHttp `newWebSocket()` instrumentation for WebSocket handshake RUM Resource collection; requires `ft-sdk >= 1.7.5-alpha01`.
 

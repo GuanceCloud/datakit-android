@@ -1,7 +1,11 @@
+# replay 0.1.8-beta01
+1. Same as version 0.1.8-alpha01.
+
+---
 # replay 0.1.8-alpha01
 1. Added RUM link `globalContext` propagation for Session Replay resources and routed resource caching, deduplication, existence checks, and uploads by `wgt_id`, preventing resources from different WGT applications from sharing an upload route.
 2. Changed `SessionReplayResourceUploadCallback.onCheckFilesExist(String, List<String>, Map<String, Object>)` and `SessionReplayResourceUploadCallback.onUploadFiles(String, List<RawBatchEvent>, Map<String, Object>)` to expose the resource RUM link context; custom implementations must accept the new parameter.
-3. Added `SlotIdWebviewBinder.unbind(String)` and `SlotIdWebviewBinder.unbind(long)`, and fixed WebView slot cleanup so stopped Session Replay instances no longer retain stale bindings.
+3. Added `SlotIdWebviewBinder.unbind(String)` and `SlotIdWebviewBinder.unbind(long)`, and fixed a WebView memory leak caused by stale slot bindings retained after Session Replay stopped.
 
 ---
 # replay 0.1.7

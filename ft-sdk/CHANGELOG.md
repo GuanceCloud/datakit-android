@@ -1,3 +1,7 @@
+# agent 1.7.5-beta01
+1. Added opt-in Browser Logs SDK collection through `FTWebViewJavascriptBridge` with `FTLoggerConfig.setEnableWebViewLog`, native Log sampling/filtering/cache/upload handling, WebView RUM-aligned native tags and `setEnableLinkRumData` control, shared WebView host configuration through `FTSDKConfig.setAllowWebViewHost`, and remote `logEnableWebViewLog` support.
+
+---
 # agent 1.7.5-alpha01
 1. Added automatic OkHttp WebSocket handshake RUM Resource collection through `ft-plugin` `newWebSocket()` instrumentation, emitting `resource_type=websocket`, `resource_websocket_collection_level=handshake`, and `resource_websocket_handshake_state` with `success`, `rejected`, or `failed`; requires `ft-plugin >= 1.3.8-alpha01`.
 2. Fixed concurrent WebSocket handshakes sharing a Resource ID and emitting duplicate Resources or invalid Download/Transfer timing phases.
