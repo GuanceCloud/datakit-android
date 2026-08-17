@@ -498,7 +498,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * Returns whether automatic OkHttp resource tracking is enabled.
+     * Returns whether supported OkHttp Resource tracking is enabled.
      */
     public boolean isEnableTraceUserResource() {
         return enableTraceUserResource;
@@ -508,17 +508,18 @@ public class FTRUMConfig {
      * Enables automatic OkHttp Resource collection. The default is {@code false}.
      *
      * <p>With a compatible {@code ft-plugin} version, this also instruments OkHttp
-     * {@code newWebSocket()} calls and records one Resource for each WebSocket handshake. The
-     * Resource ends when the handshake succeeds, is rejected, or fails; it does not measure the
-     * connection lifetime or collect messages. The Agent and Gradle plugin versions must support
-     * the same WebSocket instrumentation hook.</p>
+     * {@code newWebSocket()} calls and records one Resource for each WebSocket handshake. Without
+     * plug-in instrumentation, use the explicit {@link FTWebSocket} entry points for the same
+     * collection behavior. The Resource ends when the handshake succeeds, is rejected, or fails;
+     * it does not measure the connection lifetime or collect messages.</p>
      *
      * <p>Existing Resource URL filtering and RUM sampling rules also apply to WebSocket handshake
-     * Resources. Third-party WebSocket implementations that do not use OkHttp
-     * {@code newWebSocket()} are not supported.</p>
+     * Resources. A third-party library that hides both its OkHttp {@code newWebSocket()} call site
+     * and its {@link okhttp3.WebSocket.Factory} requires plug-in instrumentation. WebSocket
+     * implementations that do not use OkHttp are not supported.</p>
      *
      * @param enableTraceUserResource {@code true} to collect supported OkHttp HTTP requests and
-     *                                WebSocket handshakes automatically
+     *                                WebSocket handshakes automatically or explicitly
      * @return this config for chaining
      */
     public FTRUMConfig setEnableTraceUserResource(boolean enableTraceUserResource) {

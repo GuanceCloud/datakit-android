@@ -890,25 +890,7 @@ public class FTAutoTrack {
     public static WebSocket trackOkHttpNewWebSocket(WebSocket.Factory factory,
                                                     Request request,
                                                     WebSocketListener listener) {
-        Request webSocketRequest = FTWebSocketRequestTag.prepare(request);
-        if (!FTSdk.checkInstallState() || !FTRUMConfigManager.get().isRumEnable()) {
-            return factory.newWebSocket(webSocketRequest, listener);
-        }
-
-        FTRUMConfig config = FTRUMConfigManager.get().getConfig();
-        if (config == null || !config.isEnableTraceUserResource()
-                || config.getResourceUrlHandler().isInTakeUrl(request.url().toString())) {
-            return factory.newWebSocket(webSocketRequest, listener);
-        }
-
-        FTWebSocketHandshakeResource resource = new FTWebSocketHandshakeResource(webSocketRequest);
-        try {
-            return factory.newWebSocket(webSocketRequest,
-                    new FTWebSocketHandshakeListener(listener, resource));
-        } catch (RuntimeException e) {
-            resource.onFailure(e, null);
-            throw e;
-        }
+        return FTWebSocketInstrumentation.newWebSocket(factory, request, listener);
     }
 
     /**

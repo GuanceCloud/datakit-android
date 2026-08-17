@@ -1,5 +1,6 @@
 # agent 1.7.5-beta01
 1. Added opt-in Browser Logs SDK collection through `FTWebViewJavascriptBridge` with `FTLoggerConfig.setEnableWebViewLog`, native Log sampling/filtering/cache/upload handling, WebView RUM-aligned native tags and `setEnableLinkRumData` control, shared WebView host configuration through `FTSDKConfig.setAllowWebViewHost`, and remote `logEnableWebViewLog` support.
+2. Added `FTWebSocket.newWebSocket()` and idempotent `FTWebSocket.wrap()` APIs for explicit OkHttp WebSocket handshake Resource collection without Plugin instrumentation, sharing the same collection core and duplicate protection as the Plugin path.
 
 ---
 # agent 1.7.5-alpha01

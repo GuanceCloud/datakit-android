@@ -14,6 +14,10 @@ final class FTWebSocketRequestTag {
     private FTWebSocketRequestTag() {
     }
 
+    static boolean isTracked(Request request) {
+        return request.tag(FTWebSocketRequestTag.class) != null;
+    }
+
     static Request prepare(Request request) {
         Request.Builder builder = request.newBuilder()
                 .tag(FTWebSocketRequestTag.class, INSTANCE);
