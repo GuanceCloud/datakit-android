@@ -10,6 +10,7 @@ import com.ft.BuildConfig;
 import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTTraceInterceptor;
+import com.ft.sdk.FTWebSocket;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.utils.RequestUtils;
@@ -84,32 +85,44 @@ public class NetworkTestActivity extends NameTitleActivity {
         bindWebSocketTestButton(
                 R.id.btn_websocket_success,
                 "success",
-                BuildConfig.WEBSOCKET_TEST_SUCCESS_URL
+                BuildConfig.WEBSOCKET_TEST_SUCCESS_URL,
+                false
+        );
+        bindWebSocketTestButton(
+                R.id.btn_websocket_manual_success,
+                "manual-success",
+                BuildConfig.WEBSOCKET_TEST_SUCCESS_URL,
+                true
         );
         bindWebSocketTestButton(
                 R.id.btn_websocket_reject,
                 "reject",
-                BuildConfig.WEBSOCKET_TEST_REJECT_URL
+                BuildConfig.WEBSOCKET_TEST_REJECT_URL,
+                false
         );
         bindWebSocketTestButton(
                 R.id.btn_websocket_invalid_upgrade,
                 "invalid-upgrade",
-                BuildConfig.WEBSOCKET_TEST_INVALID_UPGRADE_URL
+                BuildConfig.WEBSOCKET_TEST_INVALID_UPGRADE_URL,
+                false
         );
         bindWebSocketTestButton(
                 R.id.btn_websocket_tcp_failure,
                 "tcp-failure",
-                BuildConfig.WEBSOCKET_TEST_TCP_FAILURE_URL
+                BuildConfig.WEBSOCKET_TEST_TCP_FAILURE_URL,
+                false
         );
         findViewById(R.id.btn_websocket_close).setOnClickListener(v -> closeActiveWebSocket());
         showWebSocketConfiguration();
     }
 
-    private void bindWebSocketTestButton(int buttonId, String scenario, String url) {
+    private void bindWebSocketTestButton(int buttonId, String scenario, String url,
+                                         boolean explicitIntegration) {
         Button button = findViewById(buttonId);
         boolean configured = isWebSocketUrl(url);
         button.setEnabled(configured);
-        button.setOnClickListener(v -> startWebSocketTest(scenario, url));
+        button.setOnClickListener(v -> startWebSocketTest(
+                scenario, url, explicitIntegration));
     }
 
     private boolean isWebSocketUrl(String url) {
@@ -128,15 +141,16 @@ public class NetworkTestActivity extends NameTitleActivity {
         return isWebSocketUrl(url) ? url : "not configured";
     }
 
-    private void startWebSocketTest(String scenario, String url) {
+    private void startWebSocketTest(String scenario, String url, boolean explicitIntegration) {
         if (!isWebSocketUrl(url)) {
             appendWebSocketResult(scenario + ": URL is not configured");
             return;
         }
         closeActiveWebSocket();
-        appendWebSocketResult(scenario + ": connecting to " + url);
+        String integration = explicitIntegration ? "explicit" : "plugin";
+        appendWebSocketResult(scenario + ": connecting via " + integration + " to " + url);
         Request request = new Request.Builder().url(url).build();
-        WebSocket webSocket = webSocketClient.newWebSocket(request, new WebSocketListener() {
+        WebSocketListener listener = new WebSocketListener() {
             @Override
             public void onOpen(WebSocket webSocket, Response response) {
                 appendWebSocketResult(scenario + ": onOpen status=" + response.code()
@@ -179,7 +193,14 @@ public class NetworkTestActivity extends NameTitleActivity {
                 }
                 clearActiveWebSocket(webSocket);
             }
-        });
+        };
+        WebSocket webSocket;
+        if (explicitIntegration) {
+            // Explicit Resource collection for apps that do not use ft-plugin instrumentation.
+            webSocket = FTWebSocket.newWebSocket(webSocketClient, request, listener);
+        } else {
+            webSocket = webSocketClient.newWebSocket(request, listener);
+        }
         activeWebSocket.set(webSocket);
     }
 

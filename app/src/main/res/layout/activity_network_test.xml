@@ -60,6 +60,12 @@
             android:text="@string/websocket_test_success" />
 
         <Button
+            android:id="@+id/btn_websocket_manual_success"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/websocket_test_manual_success" />
+
+        <Button
             android:id="@+id/btn_websocket_reject"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
