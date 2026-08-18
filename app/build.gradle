@@ -19,13 +19,13 @@ android {
         versionName "1.4"
         testInstrumentationRunner "com.ft.application.MockTestRunner"
         buildConfigField "String", "WEBSOCKET_TEST_SUCCESS_URL",
-                buildConfigString(System.getenv("FT_WEBSOCKET_TEST_SUCCESS_URL"))
+                buildConfigString(ft_env.webSocketTestSuccessUrl)
         buildConfigField "String", "WEBSOCKET_TEST_REJECT_URL",
-                buildConfigString(System.getenv("FT_WEBSOCKET_TEST_REJECT_URL"))
+                buildConfigString(ft_env.webSocketTestRejectUrl)
         buildConfigField "String", "WEBSOCKET_TEST_INVALID_UPGRADE_URL",
-                buildConfigString(System.getenv("FT_WEBSOCKET_TEST_INVALID_UPGRADE_URL"))
+                buildConfigString(ft_env.webSocketTestInvalidUpgradeUrl)
         buildConfigField "String", "WEBSOCKET_TEST_TCP_FAILURE_URL",
-                buildConfigString(System.getenv("FT_WEBSOCKET_TEST_TCP_FAILURE_URL"))
+                buildConfigString(ft_env.webSocketTestTcpFailureUrl)
     }
 
     signingConfigs {

@@ -22,14 +22,23 @@ buildscript {
         properties.load(project.rootProject.file(localPropertiesPath).newDataInputStream())
     }
 
-    def appIdString = properties.getProperty("RUM_APP_ID")
-    def datakitRUMUrl = properties.getProperty("DATAKIT_URL")
-    def datawayRUMUrl = properties.getProperty("DATAWAY_URL")
-    def clientToken = properties.getProperty("CLIENT_TOKEN")
-    def datawayToken = properties.getProperty("DATAWAY_TOKEN")
-    def trackId = properties.getProperty("TRACK_ID")
-    def traceUrl = properties.getProperty("TRACE_URL")
-    def proxyAddress = properties.getProperty("PROXY_ADDRESS")
+    def getEnvironmentOrLocalProperty = { String name ->
+        def environmentValue = System.getenv(name)
+        return environmentValue != null ? environmentValue : properties.getProperty(name)
+    }
+
+    def appIdString = getEnvironmentOrLocalProperty("RUM_APP_ID")
+    def datakitRUMUrl = getEnvironmentOrLocalProperty("DATAKIT_URL")
+    def datawayRUMUrl = getEnvironmentOrLocalProperty("DATAWAY_URL")
+    def clientToken = getEnvironmentOrLocalProperty("CLIENT_TOKEN")
+    def datawayToken = getEnvironmentOrLocalProperty("DATAWAY_TOKEN")
+    def trackId = getEnvironmentOrLocalProperty("TRACK_ID")
+    def traceUrl = getEnvironmentOrLocalProperty("TRACE_URL")
+    def proxyAddress = getEnvironmentOrLocalProperty("PROXY_ADDRESS")
+    def webSocketTestSuccessUrl = getEnvironmentOrLocalProperty("FT_WEBSOCKET_TEST_SUCCESS_URL")
+    def webSocketTestRejectUrl = getEnvironmentOrLocalProperty("FT_WEBSOCKET_TEST_REJECT_URL")
+    def webSocketTestInvalidUpgradeUrl = getEnvironmentOrLocalProperty("FT_WEBSOCKET_TEST_INVALID_UPGRADE_URL")
+    def webSocketTestTcpFailureUrl = getEnvironmentOrLocalProperty("FT_WEBSOCKET_TEST_TCP_FAILURE_URL")
 
     ext.ft_env = [
             'rumAppid'      : appIdString,
@@ -40,6 +49,10 @@ buildscript {
             'trackId'       : trackId,
             'traceUrl'      : traceUrl,
             'proxyAddress'  : proxyAddress,
+            'webSocketTestSuccessUrl': webSocketTestSuccessUrl,
+            'webSocketTestRejectUrl': webSocketTestRejectUrl,
+            'webSocketTestInvalidUpgradeUrl': webSocketTestInvalidUpgradeUrl,
+            'webSocketTestTcpFailureUrl': webSocketTestTcpFailureUrl,
             'prodTestEnv'   : 'gray',
             'prodPublishEnv': 'prod'
     ]
@@ -59,7 +72,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
-        if (Boolean.parseBoolean(System.getenv('FT_USE_LOCAL_PLUGIN'))) {
+        if (Boolean.parseBoolean(getEnvironmentOrLocalProperty('FT_USE_LOCAL_PLUGIN'))) {
             classpath files("ft-plugin/build/libs/ft-plugin-${sdkVersions.ftPlugin}.jar")
         } else {
             classpath "com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:${sdkVersions.ftPluginBuildscript}"

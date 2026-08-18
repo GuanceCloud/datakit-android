@@ -7,7 +7,7 @@
     <string name="network_stream_upload">Streaming Upload Test</string>
     <string name="network_stream_download">Streaming Download Test</string>
     <string name="websocket_test_title">WebSocket Handshake Resource Test</string>
-    <string name="websocket_test_description">URLs are injected from FT_WEBSOCKET_TEST_* environment variables at build time. Disabled buttons are not configured. Compare Plugin automatic and explicit FTWebSocket collection with the success URL.</string>
+    <string name="websocket_test_description">URLs are injected from local.properties or FT_WEBSOCKET_TEST_* environment variables at build time. Disabled buttons are not configured. Compare Plugin automatic and explicit FTWebSocket collection with the success URL.</string>
     <string name="websocket_test_success">Plugin automatic: valid 101</string>
     <string name="websocket_test_manual_success">Explicit FTWebSocket: valid 101</string>
     <string name="websocket_test_reject">Connect: rejected 403</string>
