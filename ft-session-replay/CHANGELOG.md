@@ -1,6 +1,7 @@
 # replay 0.1.8
-1. Added the RUM `globalContext` values selected by `FTSessionReplayConfig.enableLinkRUMKeys(...)` to Session Replay resource existence checks and uploads, preserving the linked RUM context in resource requests.
-2. Fixed a memory leak where Session Replay retained WebViews and Activities after replay stopped.
+1. Added the RUM `globalContext` values selected by `FTSessionReplayConfig.enableLinkRUMKeys(...)` to Session Replay resource existence checks and uploads, and scoped resource caching, deduplication, existence checks, and uploads by `wgt_id` to preserve routing between WGT applications.
+2. Changed `SessionReplayResourceUploadCallback.onCheckFilesExist(...)` and `onUploadFiles(...)` to include a `Map<String, Object> globalContext` parameter. Custom implementations must update both callback methods and forward the context as request tags.
+3. Fixed a memory leak where Session Replay retained WebViews and Activities after replay stopped.
 
 ---
 # replay 0.1.8-beta01
