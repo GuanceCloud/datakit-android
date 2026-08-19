@@ -1,17 +1,21 @@
+# replay 0.1.8
+1. Added the RUM `globalContext` values selected by `FTSessionReplayConfig.enableLinkRUMKeys(...)` to Session Replay resource existence checks and uploads, preserving the linked RUM context in resource requests.
+2. Fixed a memory leak where Session Replay retained WebViews and Activities after replay stopped.
+
+---
 # replay 0.1.8-beta01
 1. Same as version 0.1.8-alpha01.
 
 ---
 # replay 0.1.8-alpha01
-1. Added RUM link `globalContext` propagation for Session Replay resources and routed resource caching, deduplication, existence checks, and uploads by `wgt_id`, preventing resources from different WGT applications from sharing an upload route.
-2. Changed `SessionReplayResourceUploadCallback.onCheckFilesExist(String, List<String>, Map<String, Object>)` and `SessionReplayResourceUploadCallback.onUploadFiles(String, List<RawBatchEvent>, Map<String, Object>)` to expose the resource RUM link context; custom implementations must accept the new parameter.
-3. Added `SlotIdWebviewBinder.unbind(String)` and `SlotIdWebviewBinder.unbind(long)`, and fixed a WebView memory leak caused by stale slot bindings retained after Session Replay stopped.
+1. Added the RUM `globalContext` values selected by `FTSessionReplayConfig.enableLinkRUMKeys(...)` to Session Replay resource existence checks and uploads, preserving the linked RUM context in resource requests.
+2. Added `SlotIdWebviewBinder.unbind(String)` and `SlotIdWebviewBinder.unbind(long)`, and fixed a WebView memory leak caused by stale slot bindings retained after Session Replay stopped.
 
 ---
 # replay 0.1.7
-1. Added `Wireframe.getPermanentId()` and `Wireframe.setPermanentId(String)` for experimental Android Heatmap element association; requires `ft-sdk >= 1.7.4`.
+1. Added Session Replay element association for the experimental Android Heatmap; requires `ft-sdk >= 1.7.4`.
 2. Fixed pointer IDs and coordinates for multi-touch and cancelled gestures.
-3. Fixed locale-sensitive `TouchPrivacy` parsing.
+3. Fixed touch privacy overrides set through `PrivacyOverrideExtensions.setSessionReplayTouchPrivacy(View, TouchPrivacy)` not taking effect under locale-sensitive case conversion, such as Turkish.
 
 ---
 # replay 0.1.7-beta01

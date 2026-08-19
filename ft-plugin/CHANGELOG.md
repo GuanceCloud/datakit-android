@@ -1,3 +1,7 @@
+# plugin 1.3.8
+1. Added automatic OkHttp `newWebSocket()` instrumentation for WebSocket handshake RUM Resource collection when `FTRUMConfig.setEnableTraceUserResource(true)` is enabled; requires `ft-sdk >= 1.7.5`.
+
+---
 # plugin 1.3.8-beta01
 1. Same as version 1.3.8-alpha01.
 
