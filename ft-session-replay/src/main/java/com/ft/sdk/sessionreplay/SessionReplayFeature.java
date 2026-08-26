@@ -26,10 +26,12 @@ import com.ft.sdk.sessionreplay.internal.storage.SessionReplayRecordWriter;
 import com.ft.sdk.sessionreplay.recorder.OptionSelectorDetector;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -85,6 +87,8 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     private final RecorderProvider recorderProvider;
     private final String[] linkRumKeys;
     private final boolean enableNativeRecorder;
+    private static final String DEFAULT_EXTERNAL_RECORDER_OWNER = "external";
+    private final Set<String> activeExternalRecorderOwners = new HashSet<>();
 
     private final AtomicReference<String> currentRumSessionId = new AtomicReference<>();
 
@@ -306,6 +310,9 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         dataWriter = new NoOpRecordWriter();
         sessionReplayRecorder = new NoOpRecorder();
         initialized.set(false);
+        synchronized (activeExternalRecorderOwners) {
+            activeExternalRecorderOwners.clear();
+        }
     }
 
     public void forceFullSnapShotForLinkView() {
@@ -399,7 +406,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                     context.put(SESSION_REPLAY_ENABLED_ON_ERROR_KEY, isErrorSampled);
                 }
             });
-            if (enableNativeRecorder) {
+            if (enableNativeRecorder && !isExternalRecorderActive()) {
                 sessionReplayRecorder.resumeRecorders();
             }
         }
@@ -431,6 +438,55 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             if (enableNativeRecorder) {
                 sessionReplayRecorder.stopRecorders();
             }
+        }
+    }
+
+    /**
+     * Pauses or resumes native view recording for the default external recorder owner.
+     */
+    public void setExternalRecorderActive(boolean active) {
+        setExternalRecorderActive(DEFAULT_EXTERNAL_RECORDER_OWNER, active);
+    }
+
+    /**
+     * Updates ownership of native view recording for a framework recorder.
+     * Native recording resumes only after every active owner has released ownership.
+     *
+     * @param owner stable framework or engine instance identifier
+     * @param active whether this owner currently records the visible surface
+     */
+    public void setExternalRecorderActive(String owner, boolean active) {
+        String normalizedOwner = owner == null ? "" : owner.trim();
+        if (normalizedOwner.isEmpty()) {
+            throw new IllegalArgumentException("External recorder owner must not be empty.");
+        }
+
+        boolean wasActive;
+        boolean isActive;
+        synchronized (activeExternalRecorderOwners) {
+            wasActive = !activeExternalRecorderOwners.isEmpty();
+            if (active) {
+                activeExternalRecorderOwners.add(normalizedOwner);
+            } else {
+                activeExternalRecorderOwners.remove(normalizedOwner);
+            }
+            isActive = !activeExternalRecorderOwners.isEmpty();
+        }
+
+        if (wasActive == isActive || !enableNativeRecorder || !isRecording.get()) {
+            return;
+        }
+        if (isActive) {
+            sessionReplayRecorder.stopRecorders();
+        } else {
+            sessionReplayRecorder.forceFullSnapshot();
+            sessionReplayRecorder.resumeRecorders();
+        }
+    }
+
+    private boolean isExternalRecorderActive() {
+        synchronized (activeExternalRecorderOwners) {
+            return !activeExternalRecorderOwners.isEmpty();
         }
     }
 

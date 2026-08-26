@@ -224,6 +224,10 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
         processor.forceNewNextViewForLinkView();
     }
 
+    public void forceFullSnapshot() {
+        processor.forceFullSnapshot();
+    }
+
     private void logAddToQueueException(Exception e) {
         internalLogger.e(TAG, FAILED_TO_ADD_RECORDS_TO_QUEUE_ERROR_MESSAGE + "," + Log.getStackTraceString(e));
     }

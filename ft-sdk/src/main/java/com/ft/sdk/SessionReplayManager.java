@@ -72,8 +72,8 @@ public class SessionReplayManager implements FeatureSdkCore {
     private SessionReplayFeature sessionReplayFeature;
     private String privacyLevel = "mask";
     private String[] rumLinkKeys = new String[]{};
-    private String flutterViewId = "";
-    private final Map<String, Boolean> flutterResourceIds = new ConcurrentHashMap<>();
+    private String externalViewId = "";
+    private final Map<String, Boolean> externalResourceIds = new ConcurrentHashMap<>();
 
     public void init(Context context) {
         this.context = context;
@@ -167,19 +167,31 @@ public class SessionReplayManager implements FeatureSdkCore {
                 : new NoOpRecordWriter();
     }
 
-    public Map<String, Object> getCurrentFlutterRumContext() {
+    /**
+     * Returns the current Session Replay and linked RUM context for a framework recorder.
+     */
+    public Map<String, Object> getCurrentExternalRumContext() {
         return getFeatureContext(SESSION_REPLAY_FEATURE_NAME);
     }
 
-    public void setFlutterHasReplay(String viewId, boolean hasReplay) {
-        updateFlutterViewMetadata(viewId, hasReplay, null);
+    /**
+     * Updates the replay availability metadata for an externally recorded RUM view.
+     */
+    public void setExternalHasReplay(String viewId, boolean hasReplay) {
+        updateExternalViewMetadata(viewId, hasReplay, null);
     }
 
-    public void setFlutterRecordCount(String viewId, long recordsCount) {
-        updateFlutterViewMetadata(viewId, null, recordsCount);
+    /**
+     * Updates the accumulated record count for an externally recorded RUM view.
+     */
+    public void setExternalRecordCount(String viewId, long recordsCount) {
+        updateExternalViewMetadata(viewId, null, recordsCount);
     }
 
-    public void writeFlutterSegment(String segment, String viewId) {
+    /**
+     * Writes a framework-generated Session Replay segment using the native storage pipeline.
+     */
+    public void writeExternalSegment(String segment, String viewId) {
         if (Utils.isNullOrEmpty(segment) || Utils.isNullOrEmpty(viewId)) {
             return;
         }
@@ -189,10 +201,10 @@ public class SessionReplayManager implements FeatureSdkCore {
             return;
         }
 
-        boolean forceNew = !viewId.equals(flutterViewId);
+        boolean forceNew = !viewId.equals(externalViewId);
         if (forceNew) {
-            flutterViewId = viewId;
-            getInternalLogger().i(TAG, "Flutter SR forceNew:viewId:" + flutterViewId);
+            externalViewId = viewId;
+            getInternalLogger().i(TAG, "External SR forceNew:viewId:" + externalViewId);
         }
 
         scope.withWriteContext(forceNew, new DataConsumerCallback(false) {
@@ -203,14 +215,17 @@ public class SessionReplayManager implements FeatureSdkCore {
                 RawBatchEvent rawBatchEvent = new RawBatchEvent(serializedRecord, null);
                 synchronized (this) {
                     if (writer.write(rawBatchEvent, null, EventType.DEFAULT)) {
-                        updateFlutterViewMetadata(viewId, true, null);
+                        updateExternalViewMetadata(viewId, true, null);
                     }
                 }
             }
         });
     }
 
-    public String saveFlutterImageResource(byte[] rgbaBytes, int width, int height) {
+    /**
+     * Stores an RGBA image supplied by a framework recorder and returns its content identifier.
+     */
+    public String saveExternalImageResource(byte[] rgbaBytes, int width, int height) {
         if (rgbaBytes == null || rgbaBytes.length == 0 || width <= 0 || height <= 0) {
             return null;
         }
@@ -233,12 +248,12 @@ public class SessionReplayManager implements FeatureSdkCore {
                 return null;
             }
 
-            if (flutterResourceIds.put(resourceId, Boolean.TRUE) == null) {
-                writeFlutterResource(compressedBytes, resourceId);
+            if (externalResourceIds.put(resourceId, Boolean.TRUE) == null) {
+                writeExternalResource(compressedBytes, resourceId);
             }
             return resourceId;
         } catch (Throwable e) {
-            getInternalLogger().e(TAG, "Unable to save Flutter Session Replay image resource.", e);
+            getInternalLogger().e(TAG, "Unable to save external Session Replay image resource.", e);
             return null;
         } finally {
             if (bitmap != null && !bitmap.isRecycled()) {
@@ -247,7 +262,7 @@ public class SessionReplayManager implements FeatureSdkCore {
         }
     }
 
-    private void writeFlutterResource(byte[] resourceData, String resourceId) {
+    private void writeExternalResource(byte[] resourceData, String resourceId) {
         FeatureScope scope = getFeature(SESSION_REPLAY_RESOURCES_FEATURE_NAME);
         if (scope == null) {
             getInternalLogger().w(TAG, String.format(MISSING_FEATURE_FOR_EVENT_RECEIVER, SESSION_REPLAY_RESOURCES_FEATURE_NAME));
@@ -270,7 +285,7 @@ public class SessionReplayManager implements FeatureSdkCore {
         });
     }
 
-    private void updateFlutterViewMetadata(String viewId, Boolean hasReplay, Long recordsCount) {
+    private void updateExternalViewMetadata(String viewId, Boolean hasReplay, Long recordsCount) {
         if (Utils.isNullOrEmpty(viewId)) return;
         updateFeatureContext(SESSION_REPLAY_FEATURE_NAME, new SessionReplayRecordCallback.UpdateCallBack() {
             @Override
@@ -290,6 +305,55 @@ public class SessionReplayManager implements FeatureSdkCore {
                 context.put(viewId, viewMetadata);
             }
         });
+    }
+
+    /**
+     * Pauses or resumes native view recording for the default external recorder owner.
+     */
+    public void setExternalRecorderActive(boolean active) {
+        if (sessionReplayFeature != null) {
+            sessionReplayFeature.setExternalRecorderActive(active);
+        }
+    }
+
+    /**
+     * Pauses or resumes native view recording for a framework or engine instance.
+     * Native recording resumes only after every active owner has released ownership.
+     */
+    public void setExternalRecorderActive(String owner, boolean active) {
+        if (sessionReplayFeature != null) {
+            sessionReplayFeature.setExternalRecorderActive(owner, active);
+        }
+    }
+
+    /** @deprecated Use {@link #getCurrentExternalRumContext()} instead. */
+    @Deprecated
+    public Map<String, Object> getCurrentFlutterRumContext() {
+        return getCurrentExternalRumContext();
+    }
+
+    /** @deprecated Use {@link #setExternalHasReplay(String, boolean)} instead. */
+    @Deprecated
+    public void setFlutterHasReplay(String viewId, boolean hasReplay) {
+        setExternalHasReplay(viewId, hasReplay);
+    }
+
+    /** @deprecated Use {@link #setExternalRecordCount(String, long)} instead. */
+    @Deprecated
+    public void setFlutterRecordCount(String viewId, long recordsCount) {
+        setExternalRecordCount(viewId, recordsCount);
+    }
+
+    /** @deprecated Use {@link #writeExternalSegment(String, String)} instead. */
+    @Deprecated
+    public void writeFlutterSegment(String segment, String viewId) {
+        writeExternalSegment(segment, viewId);
+    }
+
+    /** @deprecated Use {@link #saveExternalImageResource(byte[], int, int)} instead. */
+    @Deprecated
+    public String saveFlutterImageResource(byte[] rgbaBytes, int width, int height) {
+        return saveExternalImageResource(rgbaBytes, width, height);
     }
 
     public com.ft.sdk.sessionreplay.SlotIdWebviewBinder getSlotIdWebviewBinder() {
@@ -517,6 +581,8 @@ public class SessionReplayManager implements FeatureSdkCore {
         }
         features.clear();
         sessionReplayFeature = null;
+        externalViewId = "";
+        externalResourceIds.clear();
     }
 
     @Override

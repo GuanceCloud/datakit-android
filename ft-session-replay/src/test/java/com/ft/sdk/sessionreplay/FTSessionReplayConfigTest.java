@@ -15,6 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class FTSessionReplayConfigTest {
 
@@ -81,6 +82,17 @@ public class FTSessionReplayConfigTest {
 
         assertSame(rumKeys, config.getRumLinkKeys());
         assertTrue(config.toString().contains("sampleRate="));
+    }
+
+    @Test
+    public void externalRecorderMode_shouldBePublicAndDisabledByDefault() {
+        FTSessionReplayConfig config = new FTSessionReplayConfig();
+
+        assertFalse(config.isExternalRecorderMode());
+
+        config.setExternalRecorderMode(true);
+
+        assertTrue(config.isExternalRecorderMode());
     }
 
     // Minimal extension implementation used to verify list append behavior without depending on

@@ -279,11 +279,24 @@ public class FTSessionReplayConfig {
         return sessionReplayOnErrorSampleRate;
     }
 
-    void setExternalRecorderMode(boolean externalRecorderMode) {
+    /**
+     * Enables external-only recorder mode.
+     *
+     * <p>The SDK keeps Session Replay sampling, storage, resource upload and RUM linkage active,
+     * but does not create the native view recorder. Framework SDKs that need to switch between
+     * native and framework recording at runtime should initialize Session Replay normally and use
+     * {@code SessionReplayManager.setExternalRecorderActive(...)} instead.</p>
+     *
+     * @param externalRecorderMode whether an external recorder owns the complete replay lifecycle
+     */
+    public void setExternalRecorderMode(boolean externalRecorderMode) {
         this.externalRecorderMode = externalRecorderMode;
     }
 
-    boolean isExternalRecorderMode() {
+    /**
+     * Returns whether external-only recorder mode is enabled.
+     */
+    public boolean isExternalRecorderMode() {
         return externalRecorderMode;
     }
 
