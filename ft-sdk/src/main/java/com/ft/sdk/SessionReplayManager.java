@@ -262,6 +262,59 @@ public class SessionReplayManager implements FeatureSdkCore {
         }
     }
 
+    /**
+     * Stores a budgeted WebP image supplied by a framework recorder.
+     *
+     * <p>The existing three-argument API intentionally keeps its original fixed-quality behavior.
+     * This V2 entry point reports the actual encoded size and rejects oversized images before
+     * writing them to the resource store.</p>
+     */
+    public Map<String, Object> saveExternalImageResourceV2(
+            byte[] rgbaBytes,
+            int width,
+            int height,
+            float quality,
+            int maxFrameBytes
+    ) {
+        Map<String, Object> rejected = new HashMap<>();
+        rejected.put("accepted", false);
+        if (rgbaBytes == null || rgbaBytes.length == 0 || width <= 0 || height <= 0
+                || maxFrameBytes <= 0 || getFeature(SESSION_REPLAY_RESOURCES_FEATURE_NAME) == null) {
+            return rejected;
+        }
+
+        Bitmap source = null;
+        try {
+            source = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            source.copyPixelsFromBuffer(ByteBuffer.wrap(rgbaBytes));
+            WebPImageCompression compression = new WebPImageCompression(getInternalLogger());
+            WebPImageCompression.BudgetedResult compressed =
+                    compression.compressBitmapWithBudget(source, quality, maxFrameBytes);
+            byte[] compressedBytes = compressed.getBytes();
+            if (compressedBytes.length == 0) return rejected;
+            width = compressed.getWidth();
+            height = compressed.getHeight();
+
+            String resourceId = new MD5HashGenerator(getInternalLogger()).generate(compressedBytes);
+            if (Utils.isNullOrEmpty(resourceId)) return rejected;
+            if (externalResourceIds.put(resourceId, Boolean.TRUE) == null) {
+                writeExternalResource(compressedBytes, resourceId);
+            }
+            Map<String, Object> result = new HashMap<>();
+            result.put("accepted", true);
+            result.put("resourceId", resourceId);
+            result.put("byteSize", compressedBytes.length);
+            result.put("width", width);
+            result.put("height", height);
+            return result;
+        } catch (Throwable error) {
+            getInternalLogger().e(TAG, "Unable to save budgeted external Session Replay image resource.", error);
+            return rejected;
+        } finally {
+            if (source != null && !source.isRecycled()) source.recycle();
+        }
+    }
+
     private void writeExternalResource(byte[] resourceData, String resourceId) {
         FeatureScope scope = getFeature(SESSION_REPLAY_RESOURCES_FEATURE_NAME);
         if (scope == null) {
