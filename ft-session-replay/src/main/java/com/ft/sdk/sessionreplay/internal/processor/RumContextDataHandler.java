@@ -37,9 +37,18 @@ public class RumContextDataHandler {
                 newRumContext.getApplicationId(),
                 newRumContext.getSessionId(),
                 newRumContext.getViewId(),
-                new HashMap<>(newRumContext.getGlobalContext())
+                new HashMap<>(newRumContext.getGlobalContext()),
+                newRumContext.isViewActive()
         );
         return new RecordedQueuedItemContext(timestamp, snapshot);
+    }
+
+    public RecordedQueuedItemContext createActiveRumContextData() {
+        RecordedQueuedItemContext context = createRumContextData();
+        if (context == null || !context.getNewRumContext().isViewActive()) {
+            return null;
+        }
+        return context;
     }
 
     public static final String INVALID_RUM_CONTEXT_ERROR_MESSAGE_FORMAT = "SR RumContextDataHandler: Invalid RUM " +

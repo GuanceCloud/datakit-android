@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionReplayRumContextProvider implements RumContextProvider {
 
+    private static final String RUM_VIEW_IS_ACTIVE_KEY = "is_active";
     private final FeatureSdkCore sdkCore;
 
     public SessionReplayRumContextProvider(FeatureSdkCore sdkCore) {
@@ -22,11 +23,14 @@ public class SessionReplayRumContextProvider implements RumContextProvider {
     @Override
     public SessionReplayRumContext getRumContext() {
         Map<String, Object> rumContext = sdkCore.getFeatureContext(Feature.RUM_FEATURE_NAME);
+        Object viewActiveValue = rumContext.get(RUM_VIEW_IS_ACTIVE_KEY);
+        boolean viewActive = !(viewActiveValue instanceof Boolean) || (Boolean) viewActiveValue;
         return new SessionReplayRumContext(
                 rumContext.containsKey("application_id") ? (String) rumContext.get("application_id") : NULL_UUID,
                 rumContext.containsKey("session_id") ? (String) rumContext.get("session_id") : NULL_UUID,
                 rumContext.containsKey("view_id") ? (String) rumContext.get("view_id") : NULL_UUID,
-                rumContext.containsKey("globalContext") ? (ConcurrentHashMap<String, Object>) rumContext.get("globalContext") : new ConcurrentHashMap<>()
+                rumContext.containsKey("globalContext") ? (ConcurrentHashMap<String, Object>) rumContext.get("globalContext") : new ConcurrentHashMap<>(),
+                viewActive
         );
     }
 

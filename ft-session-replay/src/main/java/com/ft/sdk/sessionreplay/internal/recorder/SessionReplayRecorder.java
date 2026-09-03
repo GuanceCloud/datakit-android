@@ -257,6 +257,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
 
     @Override
     public void resumeRecorders() {
+        recordedDataQueueHandler.resumeRecording();
         uiHandler.post(() -> {
             shouldRecord = true;
             List<Window> windows = sessionReplayLifecycleCallback.getCurrentWindows();
@@ -276,11 +277,24 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
 
     @Override
     public void stopRecorders() {
+        recordedDataQueueHandler.pauseRecording();
         uiHandler.post(() -> {
-            viewOnDrawInterceptor.stopIntercepting();
-            windowCallbackInterceptor.stopIntercepting();
-            shouldRecord = false;
+            stopNativeRecorders();
         });
+    }
+
+    @Override
+    public void stopRecordersAndCloseCurrentView() {
+        recordedDataQueueHandler.pauseRecordingAndCloseCurrentView(timeProvider.getDeviceTimestamp());
+        uiHandler.post(() -> {
+            stopNativeRecorders();
+        });
+    }
+
+    private void stopNativeRecorders() {
+        viewOnDrawInterceptor.stopIntercepting();
+        windowCallbackInterceptor.stopIntercepting();
+        shouldRecord = false;
     }
 
     @MainThread

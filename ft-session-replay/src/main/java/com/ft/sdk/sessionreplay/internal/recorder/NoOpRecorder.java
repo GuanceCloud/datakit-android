@@ -28,6 +28,11 @@ public class NoOpRecorder implements Recorder {
     }
 
     @Override
+    public void stopRecordersAndCloseCurrentView() {
+        // No-op
+    }
+
+    @Override
     public void forceFullSnapshot() {
         // No-op
     }

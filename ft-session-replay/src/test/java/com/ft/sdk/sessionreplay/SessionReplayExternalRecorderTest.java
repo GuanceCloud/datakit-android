@@ -11,6 +11,7 @@ import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.internal.RecorderProvider;
 import com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback;
+import com.ft.sdk.sessionreplay.internal.SessionReplayRumContextProvider;
 import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
@@ -27,6 +28,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class SessionReplayExternalRecorderTest {
 
@@ -39,13 +42,17 @@ public class SessionReplayExternalRecorderTest {
         assertEquals(1, recorder.resumeCount);
 
         feature.setExternalRecorderActive("flutter-engine", true);
+        feature.setExternalRecorderActive("flutter-engine", true);
+        assertEquals(1, recorder.closeCurrentViewCount);
         assertEquals(1, recorder.stopCount);
 
         feature.setExternalRecorderActive("unity-player", true);
         feature.setExternalRecorderActive("flutter-engine", false);
+        assertEquals(1, recorder.closeCurrentViewCount);
         assertEquals(1, recorder.stopCount);
         assertEquals(1, recorder.resumeCount);
 
+        feature.setExternalRecorderActive("unity-player", false);
         feature.setExternalRecorderActive("unity-player", false);
         assertEquals(1, recorder.forceFullSnapshotCount);
         assertEquals(2, recorder.resumeCount);
@@ -63,6 +70,24 @@ public class SessionReplayExternalRecorderTest {
         feature.setExternalRecorderActive(false);
         assertEquals(1, recorder.forceFullSnapshotCount);
         assertEquals(1, recorder.resumeCount);
+    }
+
+    @Test
+    public void rumContextProvider_preservesClosedViewStateDuringRecorderHandoff() {
+        TestFeatureSdkCore sdkCore = new TestFeatureSdkCore();
+        sdkCore.context.put("application_id", "app-id");
+        sdkCore.context.put("session_id", "session-id");
+        sdkCore.context.put("view_id", "cocos-view-id");
+        sdkCore.context.put("is_active", false);
+
+        assertFalse(new SessionReplayRumContextProvider(sdkCore)
+                .getRumContext()
+                .isViewActive());
+
+        sdkCore.context.remove("is_active");
+        assertTrue(new SessionReplayRumContextProvider(sdkCore)
+                .getRumContext()
+                .isViewActive());
     }
 
     private SessionReplayFeature newFeature(TestRecorder recorder) {
@@ -106,6 +131,7 @@ public class SessionReplayExternalRecorderTest {
         private int resumeCount;
         private int stopCount;
         private int forceFullSnapshotCount;
+        private int closeCurrentViewCount;
 
         @Override
         public void registerCallbacks() {
@@ -126,6 +152,12 @@ public class SessionReplayExternalRecorderTest {
 
         @Override
         public void stopRecorders() {
+            stopCount += 1;
+        }
+
+        @Override
+        public void stopRecordersAndCloseCurrentView() {
+            closeCurrentViewCount += 1;
             stopCount += 1;
         }
 

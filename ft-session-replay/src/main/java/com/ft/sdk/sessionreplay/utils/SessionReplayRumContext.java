@@ -15,12 +15,14 @@ public class SessionReplayRumContext {
     private String applicationId;
     private String sessionId;
     private String viewId;
+    private final boolean viewActive;
     private final Map<String, Object> globalContext;
 
     public SessionReplayRumContext() {
         this.applicationId = NULL_UUID;
         this.sessionId = NULL_UUID;
         this.viewId = NULL_UUID;
+        this.viewActive = false;
         this.globalContext = new ConcurrentHashMap<>();
     }
 
@@ -28,14 +30,21 @@ public class SessionReplayRumContext {
         this.applicationId = applicationId != null ? applicationId : NULL_UUID;
         this.sessionId = sessionId != null ? sessionId : NULL_UUID;
         this.viewId = viewId != null ? viewId : NULL_UUID;
+        this.viewActive = true;
         this.globalContext = new ConcurrentHashMap<>();
     }
 
     public SessionReplayRumContext(String applicationId, String sessionId, String viewId,
                                    Map<String, Object> globalContext) {
+        this(applicationId, sessionId, viewId, globalContext, true);
+    }
+
+    public SessionReplayRumContext(String applicationId, String sessionId, String viewId,
+                                   Map<String, Object> globalContext, boolean viewActive) {
         this.applicationId = applicationId != null ? applicationId : NULL_UUID;
         this.sessionId = sessionId != null ? sessionId : NULL_UUID;
         this.viewId = viewId != null ? viewId : NULL_UUID;
+        this.viewActive = viewActive;
         this.globalContext = globalContext != null ? globalContext : new ConcurrentHashMap<>();
     }
 
@@ -63,6 +72,13 @@ public class SessionReplayRumContext {
         return viewId;
     }
 
+    /**
+     * Returns whether the linked RUM View is still active and can accept screen snapshots.
+     */
+    public boolean isViewActive() {
+        return viewActive;
+    }
+
     public void setViewId(String viewId) {
         this.viewId = viewId != null ? viewId : NULL_UUID;
     }
@@ -76,7 +92,7 @@ public class SessionReplayRumContext {
     }
 
     public SessionReplayRumContext clone() {
-        return new SessionReplayRumContext(applicationId, sessionId, viewId, globalContext);
+        return new SessionReplayRumContext(applicationId, sessionId, viewId, globalContext, viewActive);
     }
 
     @Override
@@ -98,6 +114,7 @@ public class SessionReplayRumContext {
                 "applicationId='" + applicationId + '\'' +
                 ", sessionId='" + sessionId + '\'' +
                 ", viewId='" + viewId + '\'' +
+                ", viewActive=" + viewActive +
                 '}';
     }
 }

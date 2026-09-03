@@ -1,9 +1,11 @@
 package com.ft.sdk;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Process;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +15,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.FpsUtils;
 
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -193,7 +196,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
         activityCount--;
-        if (activityCount == 0) {
+        if (activityCount == 0 && !hasForegroundSiblingProcess(activity)) {
             mAppRestartCallback.onEnterBackground();
             FTActivityManager.get().appBackGround();
             if (FTRUMConfigManager.get().isRumEnable()) {
@@ -242,6 +245,40 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     public static boolean isAppInForeground() {
-        return activityCount > 0;
+        if (activityCount > 0) return true;
+        Application application = FTApplication.getApplication();
+        return application != null && hasForegroundSiblingProcess(application);
+    }
+
+    /**
+     * Returns whether another process owned by this application currently presents UI.
+     * Framework runtimes such as Cocos Creator 2 may host their Activity in a dedicated
+     * process while the SDK stays in the main process.
+     */
+    private static boolean hasForegroundSiblingProcess(Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (manager == null) return false;
+        try {
+            return hasForegroundSiblingProcess(
+                    manager.getRunningAppProcesses(), Process.myUid(), Process.myPid());
+        } catch (SecurityException ignored) {
+            return false;
+        }
+    }
+
+    static boolean hasForegroundSiblingProcess(
+            List<ActivityManager.RunningAppProcessInfo> processes,
+            int applicationUid,
+            int currentProcessId) {
+        if (processes == null) return false;
+        for (ActivityManager.RunningAppProcessInfo process : processes) {
+            if (process != null
+                    && process.uid == applicationUid
+                    && process.pid != currentProcessId
+                    && process.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                return true;
+            }
+        }
+        return false;
     }
 }

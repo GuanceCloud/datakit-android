@@ -63,7 +63,7 @@ public class ViewBean {
     /**
      * Whether it is active, {@link  Constants#KEY_RUM_VIEW_IS_ACTIVE}
      */
-    boolean isClose = false;
+    volatile boolean isClose = false;
     /**
      * View Start time, unit: nanoseconds
      */

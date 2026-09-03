@@ -106,7 +106,7 @@ public class FTRUMInnerManager {
     /**
      * Current active View
      */
-    private ActiveViewBean activeView;
+    private volatile ActiveViewBean activeView;
 
     /**
      * Synthetic View contexts used when RUM data is produced without a foreground View.
@@ -289,15 +289,18 @@ public class FTRUMInnerManager {
     Map<String, Object> getCurrentViewSession() {
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put(Constants.KEY_RUM_SESSION_ID, sessionId);
-        String viewId = getViewId();
+        ActiveViewBean currentView = activeView;
+        String viewId = currentView == null ? null : currentView.getId();
         hashMap.put(Constants.KEY_RUM_VIEW_ID, viewId == null ? SessionReplayBridge.NULL_UUID : viewId);
+        hashMap.put(Constants.KEY_RUM_VIEW_IS_ACTIVE,
+                currentView != null && !currentView.isClose());
         hashMap.put("application_id", getApplicationID());
         Map<String, Object> map = SessionReplayBridge.getTagLinkMap();
-        if (activeView != null) {
+        if (currentView != null) {
             Map<String, Object> viewMeta = new HashMap<>();
-            viewMeta.put(SessionReplayBridge.VIEW_RECORDS_COUNT_KEY, activeView.getRecordsCount());
+            viewMeta.put(SessionReplayBridge.VIEW_RECORDS_COUNT_KEY, currentView.getRecordsCount());
             hashMap.put(viewId, viewMeta);
-            Map<String, Object> filedMap = SessionReplayBridge.getFieldLinkMap().get(activeView.getId());
+            Map<String, Object> filedMap = SessionReplayBridge.getFieldLinkMap().get(currentView.getId());
             if (filedMap != null) {
                 map.putAll(filedMap);
             }

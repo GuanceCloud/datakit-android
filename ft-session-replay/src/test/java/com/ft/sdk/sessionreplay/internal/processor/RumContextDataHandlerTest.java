@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class RumContextDataHandlerTest {
 
@@ -47,5 +49,41 @@ public class RumContextDataHandlerTest {
                 "widget-1",
                 captured.getNewRumContext().getGlobalContext().get("wgt_id")
         );
+    }
+
+    @Test
+    public void snapshotContextShouldWaitUntilRumViewIsActive() {
+        SessionReplayRumContext closedSource = new SessionReplayRumContext(
+                "app-id",
+                "session-id",
+                "closed-view-id",
+                new HashMap<>(),
+                false
+        );
+        RumContextDataHandler handler = new RumContextDataHandler(
+                () -> closedSource,
+                () -> 42L,
+                null
+        );
+
+        assertNotNull(handler.createRumContextData());
+        assertNull(handler.createActiveRumContextData());
+
+        SessionReplayRumContext activeSource = new SessionReplayRumContext(
+                "app-id",
+                "session-id",
+                "native-view-id",
+                new HashMap<>(),
+                true
+        );
+        handler = new RumContextDataHandler(
+                () -> activeSource,
+                () -> 43L,
+                null
+        );
+
+        RecordedQueuedItemContext captured = handler.createActiveRumContextData();
+        assertNotNull(captured);
+        assertEquals("native-view-id", captured.getNewRumContext().getViewId());
     }
 }

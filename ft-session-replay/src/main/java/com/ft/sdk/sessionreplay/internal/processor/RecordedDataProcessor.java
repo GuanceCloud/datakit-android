@@ -9,6 +9,7 @@ import com.ft.sdk.sessionreplay.SlotIdWebviewBinder;
 import com.ft.sdk.sessionreplay.internal.async.ResourceRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.async.SnapshotRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.async.TouchEventRecordedDataQueueItem;
+import com.ft.sdk.sessionreplay.internal.async.ViewEndRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.recorder.Node;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
@@ -123,6 +124,18 @@ public class RecordedDataProcessor implements Processor {
                 item.getRecordedQueuedItemContext().getNewRumContext(),
                 item.getTouchData()
         );
+    }
+
+    @WorkerThread
+    public void processViewEnd(ViewEndRecordedDataQueueItem item) {
+        handleViewEndRecord(item.getTimestamp());
+        prevRumContext = new SessionReplayRumContext();
+        prevSnapshot = new LinkedList<>();
+        previousOrientation = Configuration.ORIENTATION_UNDEFINED;
+        forceNewNextViewForLinkView = false;
+        if (slotIdWebviewBinder != null) {
+            slotIdWebviewBinder.setAllInactive();
+        }
     }
 
     // Internal methods

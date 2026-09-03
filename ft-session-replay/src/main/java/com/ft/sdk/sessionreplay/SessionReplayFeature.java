@@ -461,26 +461,24 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             throw new IllegalArgumentException("External recorder owner must not be empty.");
         }
 
-        boolean wasActive;
-        boolean isActive;
         synchronized (activeExternalRecorderOwners) {
-            wasActive = !activeExternalRecorderOwners.isEmpty();
+            boolean wasActive = !activeExternalRecorderOwners.isEmpty();
             if (active) {
                 activeExternalRecorderOwners.add(normalizedOwner);
             } else {
                 activeExternalRecorderOwners.remove(normalizedOwner);
             }
-            isActive = !activeExternalRecorderOwners.isEmpty();
-        }
+            boolean isActive = !activeExternalRecorderOwners.isEmpty();
 
-        if (wasActive == isActive || !enableNativeRecorder || !isRecording.get()) {
-            return;
-        }
-        if (isActive) {
-            sessionReplayRecorder.stopRecorders();
-        } else {
-            sessionReplayRecorder.forceFullSnapshot();
-            sessionReplayRecorder.resumeRecorders();
+            if (wasActive == isActive || !enableNativeRecorder || !isRecording.get()) {
+                return;
+            }
+            if (isActive) {
+                sessionReplayRecorder.stopRecordersAndCloseCurrentView();
+            } else {
+                sessionReplayRecorder.forceFullSnapshot();
+                sessionReplayRecorder.resumeRecorders();
+            }
         }
     }
 

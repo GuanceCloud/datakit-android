@@ -29,6 +29,7 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     private final Queue<RecordedDataQueueItem> recordedDataQueue;
     private final ResourceItemQueueDeduplicator resourceItemQueueDeduplicator;
     private boolean isStopped;
+    private boolean isAcceptingRecordedData = true;
 
     public RecordedDataQueueHandler(RecordedDataProcessor processor,
                                     RumContextDataHandler rumContextDataHandler,
@@ -57,6 +58,7 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     @MainThread
     public synchronized void clearAndStopProcessingQueue() {
         isStopped = true;
+        isAcceptingRecordedData = false;
         for (RecordedDataQueueItem item : recordedDataQueue) {
             releaseResourceItem(item);
         }
@@ -67,8 +69,8 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     @Override
     @MainThread
     public ResourceRecordedDataQueueItem addResourceItem(String identifier, byte[] resourceData) {
-        RecordedQueuedItemContext rumContextData = rumContextDataHandler.createRumContextData();
-        return addResourceItemWithContext(identifier, resourceData, rumContextData);
+        RecordedQueuedItemContext rumContextData = rumContextDataHandler.createActiveRumContextData();
+        return addResourceItemWithContext(identifier, resourceData, rumContextData, false);
     }
 
     @Override
@@ -79,14 +81,16 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
         if (rumContextData == null) {
             return addResourceItem(identifier, resourceData);
         }
-        return addResourceItemWithContext(identifier, resourceData, rumContextData);
+        return addResourceItemWithContext(identifier, resourceData, rumContextData, true);
     }
 
     private synchronized ResourceRecordedDataQueueItem addResourceItemWithContext(
             String identifier,
             byte[] resourceData,
-            RecordedQueuedItemContext rumContextData) {
-        if (isStopped || rumContextData == null) {
+            RecordedQueuedItemContext rumContextData,
+            boolean belongsToAcceptedSnapshot) {
+        if (isStopped || (!isAcceptingRecordedData && !belongsToAcceptedSnapshot)
+                || rumContextData == null) {
             return null;
         }
 
@@ -123,8 +127,11 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
 
     @Override
     @MainThread
-    public TouchEventRecordedDataQueueItem addTouchEventItem(List<MobileRecord> pointerInteractions) {
-        RecordedQueuedItemContext rumContextData = rumContextDataHandler.createRumContextData();
+    public synchronized TouchEventRecordedDataQueueItem addTouchEventItem(List<MobileRecord> pointerInteractions) {
+        if (isStopped || !isAcceptingRecordedData) {
+            return null;
+        }
+        RecordedQueuedItemContext rumContextData = rumContextDataHandler.createActiveRumContextData();
         if (rumContextData == null) {
             return null;
         }
@@ -141,8 +148,11 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
 
     @Override
     @MainThread
-    public SnapshotRecordedDataQueueItem addSnapshotItem(SystemInformation systemInformation) {
-        RecordedQueuedItemContext rumContextData = rumContextDataHandler.createRumContextData();
+    public synchronized SnapshotRecordedDataQueueItem addSnapshotItem(SystemInformation systemInformation) {
+        if (isStopped || !isAcceptingRecordedData) {
+            return null;
+        }
+        RecordedQueuedItemContext rumContextData = rumContextDataHandler.createActiveRumContextData();
         if (rumContextData == null) {
             return null;
         }
@@ -175,6 +185,8 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
                 if (!nextItem.isValid()) {
                     internalLogger.e(TAG, String.format(ITEM_DROPPED_INVALID_MESSAGE, nextItem.getClass().getSimpleName()));
                     releaseResourceItem(recordedDataQueue.poll());
+                } else if (nextItem instanceof ViewEndRecordedDataQueueItem) {
+                    processItem(recordedDataQueue.poll());
                 } else if (nextItemAgeInNs > MAX_DELAY_NS) {
 //                    internalLogger.e(TAG, "getCreationTimeStampInNs drop:"+nextItem.getCreationTimeStampInNs());
                     internalLogger.e(TAG, String.format(Locale.US, ITEM_DROPPED_EXPIRED_MESSAGE, nextItemAgeInNs));
@@ -198,6 +210,8 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
                 processor.processTouchEventsRecords((TouchEventRecordedDataQueueItem) nextItem);
             } else if (nextItem instanceof ResourceRecordedDataQueueItem) {
                 processor.processResources((ResourceRecordedDataQueueItem) nextItem);
+            } else if (nextItem instanceof ViewEndRecordedDataQueueItem) {
+                processor.processViewEnd((ViewEndRecordedDataQueueItem) nextItem);
             }
         } catch (RuntimeException exception) {
             releaseResourceItem(nextItem);
@@ -226,6 +240,31 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
 
     public void forceFullSnapshot() {
         processor.forceFullSnapshot();
+    }
+
+    /** Stops accepting data from native recorder callbacks that have not started yet. */
+    public synchronized void pauseRecording() {
+        isAcceptingRecordedData = false;
+    }
+
+    /**
+     * Atomically stops accepting native records and puts the View boundary behind records that
+     * were already accepted. This prevents a queued draw callback from being attributed to the
+     * external recorder's RUM View while the main-thread interceptors are being removed.
+     */
+    public synchronized void pauseRecordingAndCloseCurrentView(long timestamp) {
+        if (isStopped || !isAcceptingRecordedData) {
+            return;
+        }
+        isAcceptingRecordedData = false;
+        insertIntoRecordedDataQueue(new ViewEndRecordedDataQueueItem(timestamp));
+        tryToConsumeItems();
+    }
+
+    public synchronized void resumeRecording() {
+        if (!isStopped) {
+            isAcceptingRecordedData = true;
+        }
     }
 
     private void logAddToQueueException(Exception e) {
