@@ -1,3 +1,8 @@
+# replay 0.1.9-alpha02
+1. Fixed native and external recorder handoffs so queued records remain linked to their original active RUM View, closed Views stop accepting new records, and native recording resumes across a clean View boundary.
+2. Added budgeted WebP encoding for external recorder images, progressively reducing quality and dimensions before rejecting frames that exceed the configured byte limit.
+
+---
 # replay 0.1.9-alpha01
 1. Added reusable external recorder ownership control so multiple framework or engine recorders can pause native recording while active, resume it only after the final owner releases control, and force a full snapshot when native recording resumes.
 2. Made external-only recorder mode publicly configurable for framework SDK integrations.

@@ -1,3 +1,8 @@
+# agent 1.7.6-alpha02
+1. Added `SessionReplayManager.saveExternalImageResourceV2(...)` for framework and engine recorders to encode WebP images within a maximum frame byte budget and report acceptance, resource identifier, encoded size, and dimensions; requires `ft-session-replay >= 0.1.9-alpha02`.
+2. Fixed RUM lifecycle handling when UI is hosted by another foreground process in the same application, preventing the SDK main process from entering the background prematurely.
+
+---
 # agent 1.7.6-alpha01
 1. Added generic external Session Replay integration APIs for framework and engine recorders to reuse RUM context, segment storage, image resources, and replay metadata while dynamically coordinating native recorder ownership; the Flutter-specific APIs remain available as deprecated compatibility aliases. Requires `ft-session-replay >= 0.1.9-alpha01` for dynamic recorder ownership.
 
