@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckedTextView;
 
+import com.ft.replay.LabeledReplayImageView;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTRUMGlobalManager;
 
@@ -58,6 +59,14 @@ public class SRActivity extends NameTitleActivity {
         replayEditText = findViewById(R.id.session_replay_edittext_et);
         remoteImageView = findViewById(R.id.remote_image_view);
         replayList = findViewById(R.id.session_replay_list);
+
+        findViewById(R.id.session_replay_invalid_id_btn).setOnClickListener(v ->
+                startActivity(new Intent(SRActivity.this, ReplayInvalidIdActivity.class)));
+
+        // The app shows the icons; Session Replay records only these business labels.
+        ((LabeledReplayImageView) findViewById(R.id.replay_image_a)).setReplayPlaceholderLabel("A");
+        ((LabeledReplayImageView) findViewById(R.id.replay_image_b)).setReplayPlaceholderLabel("B");
+        ((LabeledReplayImageView) findViewById(R.id.replay_image_c)).setReplayPlaceholderLabel("C");
 
         // Set dialog button click event
         findViewById(R.id.session_replay_dialog).setOnClickListener(new View.OnClickListener() {
