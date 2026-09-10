@@ -58,7 +58,27 @@ policy. Shutdown discards outstanding tracking without closing business connecti
 A Resource starts on the first request-triggering operation and finishes once at response EOF,
 input close, disconnect, confirmed HEAD/204/304 response, or I/O failure. Closing an output stream
 only ends the upload. HTTP 4xx/5xx error streams remain readable and are measured until completion.
-No full body is recorded, and this feature does not inject Trace headers.
+No full body is recorded. To propagate Trace headers and link the same IDs to RUM Resources:
+
+```java
+FTSdk.initTraceWithConfig(new FTTraceConfig()
+        .setEnableAutoTrace(true)
+        .setEnableLinkRUMData(true)
+        .setTraceType(TraceType.DDTRACE)
+        .setSamplingRate(1f));
+```
+
+With URLConnection Resource collection enabled, Trace headers are injected before the first
+request-triggering operation. The default SDK generator supports Datadog, W3C Trace Context,
+Zipkin multi/single header, Jaeger and SkyWalking. The configured format replaces existing
+same-name headers, matching the default OkHttp interceptor. The OkHttp-specific custom header
+handler does not apply to URLConnection. Disabling automatic Trace preserves application headers;
+disabling RUM linking still propagates headers but omits `trace_id` / `span_id` from the Resource.
+Sampling controls the propagated sampling decision; it does not suppress Trace IDs.
+Header injection failures never replace the business call or produce a fabricated RUM link.
+One context is retained for the connection lifecycle, including redirects and transport retries;
+URL filters and SDK-intake exclusions apply before propagation. The connection layer does not
+create or upload an independent APM span; the backend tracer must consume the selected format.
 
 `resource_collection_source=http_url_connection`, `resource_completion` and
 `resource_body_complete` describe the observation. `resource_request_bytes_observed` and
@@ -105,7 +125,10 @@ root address must support those routes. Requests run on a background thread with
 15-second connect/read timeouts and standard TLS verification. The page displays status,
 elapsed time, bytes read, and up to 512 bytes of response preview; the response body is
 not recorded by the SDK. It also reports whether the automatic collection wrapper is active.
-The Sample enables both Resource switches in `DemoApplication`; configure its usual RUM
+The Sample enables both Resource switches and automatic Trace/RUM linking in `DemoApplication`.
+GET/POST responses from the default echo service also display the server-observed Datadog
+`trace_id` and `span_id`; the page buffers at most 16 KiB to parse the echo and displays a
+512-byte preview. Configure its usual RUM
 application ID and intake endpoint to view uploaded Resources. Filter by
 `resource_collection_source=http_url_connection`. A successful build with the default
 published Plugin `1.3.8` does not instrument these calls; use the local Plugin command above.

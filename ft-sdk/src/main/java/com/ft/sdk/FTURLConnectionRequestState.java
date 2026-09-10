@@ -30,6 +30,8 @@ final class FTURLConnectionRequestState {
     long responseBytes;
     long requestBytes;
     boolean sizeKnown = true;
+    String traceId;
+    String spanId;
 
     FTURLConnectionRequestState(String url, long generation) {
         this(url, generation, FTURLConnectionResourceReporter.REPORTER);
@@ -116,6 +118,8 @@ final class FTURLConnectionRequestState {
             try {
                 reporter.discard(this);
                 started = false;
+                traceId = null;
+                spanId = null;
                 id = UUID.randomUUID().toString();
             } catch (Throwable ignored) {
                 terminal = true;
@@ -126,6 +130,8 @@ final class FTURLConnectionRequestState {
     void discard() {
         synchronized (FTURLConnectionResourceReporter.LOCK) {
             terminal = true;
+            traceId = null;
+            spanId = null;
             try { reporter.discard(this); } catch (Throwable ignored) { }
         }
     }

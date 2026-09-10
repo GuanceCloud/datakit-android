@@ -56,6 +56,10 @@ final class FTURLConnectionResourceReporter {
                     try {
                         // View/Action creation and pending increments precede this task on the same queue.
                         FTRUMInnerManager manager = FTRUMInnerManager.get();
+                        if (state.traceId != null && state.spanId != null) {
+                            FTTraceManager.get().putTraceHandler(state.id,
+                                    new TraceContext.Simple(null, state.traceId, state.spanId));
+                        }
                         manager.stopURLConnectionResource(state.id);
                         manager.addResource(state.id, params, timing);
                     } catch (Throwable ignored) {

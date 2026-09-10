@@ -44,7 +44,35 @@ final class FTURLConnectionDelegate {
     }
 
     private void begin(StartSnapshot start) {
-        if (start != null) state.begin(start.method, start.headers, start.nanoTime, start.wallTime);
+        synchronized (FTURLConnectionResourceReporter.LOCK) {
+            if (start == null || state.started || state.terminal) return;
+            state.begin(start.method, start.headers, start.nanoTime, start.wallTime);
+            if (!state.started || state.terminal) return;
+            injectTraceHeaders();
+            try { state.params.requestHeaderMap = snapshot(connection.getRequestProperties()); }
+            catch (Exception ignored) { }
+        }
+    }
+
+    /** Runs once per accepted request, before the original connection can send its headers. */
+    private void injectTraceHeaders() {
+        if (!FTTraceConfigManager.get().isEnableAutoTrace()) return;
+        try {
+            FTTraceHandler handler = new FTTraceHandler();
+            HashMap<String, String> headers = handler.getTraceHeader(connection.getURL());
+            if (headers.isEmpty()) return;
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                // Match the default OkHttp interceptor: replace this format's existing headers.
+                connection.setRequestProperty(header.getKey(), header.getValue());
+            }
+            // Retain only IDs, not a handler that also holds the application Trace configuration.
+            // Publish the context at completion so long requests cannot outlive the Trace map TTL.
+            state.traceId = handler.getTraceID();
+            state.spanId = handler.getSpanID();
+        } catch (Throwable ignored) {
+            // Already-connected/custom connections can reject headers. Preserve business I/O
+            // and do not claim a RUM link when propagation did not complete successfully.
+        }
     }
 
     private static final class StartSnapshot {

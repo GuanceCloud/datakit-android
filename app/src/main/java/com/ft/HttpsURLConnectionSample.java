@@ -6,11 +6,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -81,15 +84,18 @@ final class HttpsURLConnectionSample {
                         int count;
                         while ((count = input.read(buffer)) != -1) {
                             bytes += count;
-                            int retained = Math.min(count, 512 - preview.size());
+                            int retained = Math.min(count, 16384 - preview.size());
                             if (retained > 0) {
                                 preview.write(buffer, 0, retained);
                             }
                         }
                     }
                 }
+                byte[] body = preview.toByteArray();
                 message = "HTTP " + status + "\nResponse body: " + bytes + " bytes"
-                        + "\n" + new String(preview.toByteArray(), StandardCharsets.UTF_8);
+                        + (bytes <= body.length ? echoedTraceIds(body) : "")
+                        + "\nResponse preview (up to 512 bytes):\n"
+                        + new String(body, 0, Math.min(body.length, 512), StandardCharsets.UTF_8);
             } catch (Exception e) {
                 message = "Request failed: " + e.getClass().getSimpleName() + "\n" + e.getMessage();
             } finally {
@@ -112,4 +118,27 @@ final class HttpsURLConnectionSample {
             });
         }, "sample-https-urlconnection").start();
     }
+    /** httpbin echoes the request headers; these are the server-observed default Datadog IDs. */
+    private static String echoedTraceIds(byte[] response) {
+        try {
+            JSONObject headers = new JSONObject(new String(response, StandardCharsets.UTF_8))
+                    .optJSONObject("headers");
+            if (headers == null) return "";
+            String traceId = "";
+            String spanId = "";
+            Iterator<String> keys = headers.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if ("x-datadog-trace-id".equalsIgnoreCase(key)) traceId = headers.optString(key);
+                if ("x-datadog-parent-id".equalsIgnoreCase(key)) spanId = headers.optString(key);
+            }
+            if (!traceId.isEmpty() && !spanId.isEmpty()) {
+                return "\nServer-echoed trace_id: " + traceId + "\nServer-echoed span_id: " + spanId;
+            }
+        } catch (Exception ignored) {
+            // Custom endpoints and HTTP errors need not return JSON or echo request headers.
+        }
+        return "";
+    }
+
 }

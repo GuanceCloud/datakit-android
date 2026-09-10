@@ -532,7 +532,8 @@ public class FTRUMConfig {
     /**
      * Enables HTTP/HTTPS URLConnection Resources when the Resource master switch is also enabled.
      * Default false. Requires ft-plugin 1.3.9-alpha01 or newer at the creation call site.
-     * Total duration includes application stream consumption. No bodies or Trace headers are collected.
+     * Total duration includes application stream consumption. No bodies are collected.
+     * Trace headers and RUM trace/span linkage follow {@link FTTraceConfig}.
      * Connections created while disabled are not retroactively wrapped. Long-lived streams should be
      * excluded with {@link #setResourceUrlHandler(FTInTakeUrlHandler)} (five-minute idle retention).
      */

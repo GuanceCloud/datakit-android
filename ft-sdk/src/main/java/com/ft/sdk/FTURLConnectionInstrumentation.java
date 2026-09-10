@@ -12,7 +12,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Binary entry point used by ft-plugin for URL.openConnection() and openConnection(Proxy).
- * Real I/O always belongs to the original connection. No Trace headers are injected.
+ * Real I/O always belongs to the original connection. Trace propagation follows FTTraceConfig.
  */
 public final class FTURLConnectionInstrumentation {
     // Both sides are weak: a live original connection must not retain its wrapper through this table.

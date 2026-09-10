@@ -428,4 +428,184 @@ public class URLConnectionDeviceTest {
         return Arrays.asList(new java.lang.ref.WeakReference<>(original), new java.lang.ref.WeakReference<>(wrapped));
     }
 
+    private static FTURLConnectionRequestState requestState(HttpURLConnection connection) throws Exception {
+        Field field = connection.getClass().getDeclaredField("delegate");
+        field.setAccessible(true);
+        return ((FTURLConnectionDelegate) field.get(connection)).state;
+    }
+
+    private static String[] wireTraceIds(TraceType type, Map<String, String> headers) throws Exception {
+        switch (type) {
+            case DDTRACE:
+                return new String[]{headers.get("x-datadog-trace-id"), headers.get("x-datadog-parent-id")};
+            case ZIPKIN_MULTI_HEADER:
+                return new String[]{headers.get("X-B3-TraceId"), headers.get("X-B3-SpanId")};
+            case ZIPKIN_SINGLE_HEADER:
+                return Arrays.copyOf(headers.get("b3").split("-"), 2);
+            case TRACEPARENT:
+                String[] parent = headers.get("traceparent").split("-");
+                return new String[]{parent[1], parent[2]};
+            case JAEGER:
+                return Arrays.copyOf(headers.get("uber-trace-id").split(":"), 2);
+            case SKYWALKING:
+                String[] sw = headers.get("sw8").split("-");
+                return new String[]{new String(android.util.Base64.decode(sw[1], 0), "UTF-8"),
+                        new String(android.util.Base64.decode(sw[2], 0), "UTF-8") + sw[3]};
+            default: throw new AssertionError(type);
+        }
+    }
+
+    private static boolean hasTag(String record, String key, String value) {
+        return java.util.regex.Pattern.compile("(^|,)" + key + "="
+                + java.util.regex.Pattern.quote(value) + "(?=[ ,])").matcher(record).find();
+    }
+
+    @Test public void traceHeadersMatchStoredResourceIdsForEveryFormatWithoutOkHttp() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        try { Class.forName("okhttp3.OkHttpClient"); fail("Trace must not require OkHttp"); }
+        catch (ClassNotFoundException expected) { }
+        int count = 0;
+        Set<String> traceIds = new HashSet<>();
+        for (boolean secure : new boolean[]{false, true}) {
+            try (LoopbackServer server = new LoopbackServer(tests, secure, false)) {
+                for (TraceType type : TraceType.values()) {
+                    FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(type)
+                            .setSamplingRate(1f).setEnableAutoTrace(true).setEnableLinkRUMData(true));
+                    for (String scenario : new String[]{"GET", "POST", "ERROR"}) {
+                        HttpURLConnection c = connection(server, scenario.equals("ERROR") ? "/status/404" : "/data", true);
+                        FTURLConnectionRequestState state = requestState(c);
+                        if (scenario.equals("POST")) {
+                            c.setDoOutput(true); c.setRequestMethod("POST");
+                            try (OutputStream output = c.getOutputStream()) { output.write(new byte[]{1, 2, 3}); }
+                        }
+                        consume(c);
+                        Map<String, String> headers = server.requestHeaders.poll(3, TimeUnit.SECONDS);
+                        assertNotNull(headers);
+                        String[] ids = wireTraceIds(type, headers);
+                        assertNotNull(ids[0]); assertFalse(ids[0].isEmpty());
+                        assertNotNull(ids[1]); assertFalse(ids[1].isEmpty());
+                        assertTrue("Every request must have its own context", traceIds.add(ids[0]));
+                        assertCounts(++count);
+                        String record = null;
+                        for (String line : resources()) if (hasTag(line, "resource_id", state.id)) record = line;
+                        assertNotNull(record);
+                        assertTrue(type + " trace_id", hasTag(record, "trace_id", ids[0]));
+                        assertTrue(type + " span_id", hasTag(record, "span_id", ids[1]));
+                        assertNull("Completed context must be released", FTTraceManager.get().getHandler(state.id));
+                    }
+                }
+            }
+        }
+    }
+
+    @Test public void traceSwitchesSamplingAndFiltersControlPropagationAndRumLink() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        try (LoopbackServer server = new LoopbackServer(tests, true, false)) {
+            int count = 0;
+            for (boolean automatic : new boolean[]{false, true}) for (boolean linked : new boolean[]{false, true}) {
+                FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.TRACEPARENT)
+                        .setSamplingRate(0f).setEnableAutoTrace(automatic).setEnableLinkRUMData(linked));
+                HttpURLConnection c = connection(server, "/data", true);
+                FTURLConnectionRequestState state = requestState(c);
+                consume(c);
+                Map<String, String> headers = server.requestHeaders.poll(3, TimeUnit.SECONDS);
+                assertNotNull(headers);
+                assertEquals(automatic, headers.containsKey("traceparent"));
+                if (automatic) assertTrue(headers.get("traceparent").endsWith("-00"));
+                assertCounts(++count);
+                String record = null;
+                for (String line : resources()) if (hasTag(line, "resource_id", state.id)) record = line;
+                assertNotNull(record);
+                assertEquals(automatic && linked, record.contains(",trace_id="));
+                assertEquals(automatic && linked, record.contains(",span_id="));
+            }
+            for (boolean intake : new boolean[]{false, true}) {
+                config.setResourceUrlHandler(url -> !intake);
+                if (intake) FTHttpConfigManager.get().setDatakitUrl(server.url("/").toString());
+                HttpURLConnection excluded = connection(server, "/data", true);
+                assertFalse(excluded instanceof FTHttpsURLConnection);
+                consume(excluded);
+                assertFalse(server.requestHeaders.poll(3, TimeUnit.SECONDS).containsKey("traceparent"));
+            }
+            assertCounts(count);
+        }
+    }
+
+    @Test public void traceContextSurvivesRedirectAndCannotLeakAcrossShutdown() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.TRACEPARENT)
+                .setEnableAutoTrace(true).setEnableLinkRUMData(true));
+        try (LoopbackServer server = new LoopbackServer(tests, true, false)) {
+            HttpURLConnection c = connection(server, "/redirect", true);
+            FTURLConnectionRequestState state = requestState(c);
+            consume(c);
+            String first = server.requestHeaders.poll(3, TimeUnit.SECONDS).get("traceparent");
+            assertEquals(first, server.requestHeaders.poll(3, TimeUnit.SECONDS).get("traceparent"));
+            assertCounts(1);
+            assertTrue(hasTag(resources().get(0), "trace_id", state.traceId));
+            HttpURLConnection pending = connection(server, "/data", true);
+            FTURLConnectionRequestState pendingState = requestState(pending);
+            pending.getResponseCode();
+            assertNotNull(pendingState.traceId);
+            InstrumentationRegistry.getInstrumentation().runOnMainSync(FTSdk::shutDown);
+            assertNull(pendingState.traceId); assertNull(pendingState.spanId);
+            assertNull(FTTraceManager.get().getHandler(pendingState.id));
+            consume(pending);
+            assertEquals(0, FTURLConnectionResourceReporter.activeCount());
+        }
+    }
+
+    @Test public void concurrentAndFailingRequestsKeepTheirOwnTraceContext() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.TRACEPARENT)
+                .setEnableAutoTrace(true).setEnableLinkRUMData(true));
+        Map<String, String[]> expected = new ConcurrentHashMap<>();
+        try (LoopbackServer server = new LoopbackServer(tests, true, false)) {
+            ExecutorService executor = Executors.newFixedThreadPool(4);
+            try {
+                List<Future<?>> tasks = new ArrayList<>();
+                for (int i = 0; i < 8; i++) {
+                    final int scenario = i;
+                    tasks.add(executor.submit(() -> {
+                        try {
+                            HttpURLConnection c = connection(server, scenario == 0 ? "/broken"
+                                    : scenario == 1 ? "/status/204" : scenario == 2 ? "/slow-error" : "/data", true);
+                            FTURLConnectionRequestState state = requestState(c);
+                            c.setRequestProperty("X-Resource-Id", state.id);
+                            if (scenario == 3) c.setRequestMethod("HEAD");
+                            try {
+                                if (scenario == 2) {
+                                    try (InputStream error = c.getErrorStream()) {
+                                        assertNotNull(error); while (error.read() != -1) { }
+                                    }
+                                } else consume(c);
+                                if (scenario == 0) fail("Broken response must fail");
+                            } catch (IOException error) {
+                                if (scenario != 0) throw error;
+                            } finally { c.disconnect(); }
+                            expected.put(state.id, new String[]{state.traceId, state.spanId});
+                        } catch (Exception e) { throw new RuntimeException(e); }
+                    }));
+                }
+                for (Future<?> task : tasks) task.get(10, TimeUnit.SECONDS);
+            } finally { executor.shutdownNow(); }
+            assertCounts(8);
+            Set<String> traceIds = new HashSet<>();
+            for (int i = 0; i < 8; i++) {
+                Map<String, String> headers = server.requestHeaders.poll(3, TimeUnit.SECONDS);
+                assertNotNull(headers);
+                String id = headers.get("X-Resource-Id");
+                String[] ids = wireTraceIds(TraceType.TRACEPARENT, headers);
+                assertArrayEquals(expected.get(id), ids);
+                assertTrue(traceIds.add(ids[0]));
+                String record = null;
+                for (String line : resources()) if (hasTag(line, "resource_id", id)) record = line;
+                assertNotNull(record);
+                assertTrue(hasTag(record, "trace_id", ids[0]));
+                assertTrue(hasTag(record, "span_id", ids[1]));
+                assertNull(FTTraceManager.get().getHandler(id));
+            }
+        }
+    }
+
 }

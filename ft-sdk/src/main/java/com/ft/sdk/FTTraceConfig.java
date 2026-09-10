@@ -191,6 +191,11 @@ public class FTTraceConfig {
     /**
      * {@link #enableAutoTrace}
      *
+     * Enables automatic propagation for OkHttp and instrumented HTTP/HTTPS URLConnection
+     * requests. URLConnection also requires its RUM Resource collection switches to be enabled;
+     * its default headers follow {@link #setTraceType(TraceType)} and {@link #setSamplingRate(float)}.
+     * The custom OkHttp header handler applies only to OkHttp.
+     *
      * @param enableAutoTrace true to automatically inject trace headers for supported requests
      * @return this config for chaining
      */

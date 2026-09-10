@@ -15,6 +15,7 @@ final class LoopbackServer implements Closeable {
     final ServerSocket listener;
     final SSLContext tls;
     final BlockingQueue<String> requests = new LinkedBlockingQueue<>();
+    final BlockingQueue<Map<String, String>> requestHeaders = new LinkedBlockingQueue<>();
     final ExecutorService workers = Executors.newCachedThreadPool();
     final List<Socket> sockets = Collections.synchronizedList(new ArrayList<>());
     volatile boolean closed;
@@ -66,6 +67,7 @@ final class LoopbackServer implements Closeable {
             } else copy(in,body,Integer.parseInt(headers.containsKey("Content-Length")?headers.get("Content-Length"):"0"));
             String[] parts=start.split(" "); String path=parts[1];
             if(path.startsWith("http"))path=new URL(path).getFile();
+            requestHeaders.add(new TreeMap<>(headers));
             requests.add(parts[0]+" "+path+"\n"+headers.toString()+"\n"+Arrays.toString(body.toByteArray()));
             int status=path.equals("/slow-error")?500:path.startsWith("/status/")?Integer.parseInt(path.substring(8)):200;
             byte[] response="response-body".getBytes(StandardCharsets.UTF_8);
