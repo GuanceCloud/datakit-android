@@ -18,4 +18,7 @@ public abstract class FTParameters implements InstrumentationParameters {
 
     @Input
     public abstract Property<Boolean> getVerboseLog();
+
+    @Input
+    public abstract Property<Boolean> getInstrumentHttpURLConnection();
 }

@@ -8,6 +8,9 @@ repositories {
 }
 
 dependencies {
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "org.ow2.asm:asm-tree:9.2"
+    testImplementation "org.ow2.asm:asm-commons:9.2"
     implementation(gradleApi())
     implementation("com.android.tools.build:gradle:8.0.0")
     compileOnly("commons-io:commons-io:2.6")

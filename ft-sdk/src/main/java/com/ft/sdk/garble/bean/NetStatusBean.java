@@ -113,6 +113,12 @@ public class NetStatusBean {
      */
     public boolean connectionReuse = false;
 
+    /** False when the transport cannot observe reuse; omitted from Resource fields. */
+    public boolean connectionReuseKnown = true;
+
+    /** False when only total duration is observable. */
+    public boolean phaseTimingKnown = true;
+
     /**
      * Get tcp connection duration
      *

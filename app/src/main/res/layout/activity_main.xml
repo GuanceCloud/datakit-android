@@ -13,6 +13,12 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/main_mock_okhttp_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Network Test (HTTPS)" />
+
+        <Button
             android:id="@+id/main_mock_crash_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,12 +71,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Log" />
-
-        <Button
-            android:id="@+id/main_mock_okhttp_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Test OkHttp Request Auto Add Interceptor" />
 
         <Button
             android:id="@+id/main_mock_okhttp_custom_content_btn"

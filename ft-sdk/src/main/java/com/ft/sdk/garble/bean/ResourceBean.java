@@ -181,6 +181,13 @@ public class ResourceBean {
     /**
      * Connection reuse
      */
+    public boolean resourceConnectionReuseKnown = true;
+
+    /** Internal URLConnection pending ownership, guarded by its reporter lifecycle lock. */
+    public boolean urlConnectionDiscarded;
+    public boolean urlConnectionViewPending;
+    public boolean urlConnectionActionPending;
+
     public boolean resourceConnectionReuse = false;
 
     /**

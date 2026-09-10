@@ -132,6 +132,7 @@ public class FTSdk {
      * Shutdown running objects within SDK
      */
     public static void shutDown() {
+        FTURLConnectionResourceReporter.shutdown();
         SyncTaskManager.get().release();
         FTRUMConfigManager.get().release();
         FTMonitorManager.release();
@@ -253,6 +254,7 @@ public class FTSdk {
                 }
             }
             FTRUMConfigManager.get().initWithConfig(config);
+            FTURLConnectionResourceReporter.activate();
             LogUtils.d(TAG, "initRUMWithConfig complete:" + config);
 
         } catch (Exception e) {

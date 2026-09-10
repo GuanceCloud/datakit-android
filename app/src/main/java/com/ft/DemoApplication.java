@@ -251,6 +251,7 @@ public class DemoApplication extends BaseApplication {
 //                        .setAllowWebViewHost(new String[]{"10.100.64.166"})
                         .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
                         .setEnableTraceUserResource(true)
+                        .setEnableHttpURLConnectionResource(true)
                         .setEnableTrackAppANR(true)
                         .setEnableTrackAppCrash(true)
 //                        .setEnableTraceWebView(true)

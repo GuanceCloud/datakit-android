@@ -33,6 +33,9 @@ public class FTExtension {
      * Whether to enable auto track
      */
     public boolean openAutoTrack = true;
+
+    /** Wrap URL.openConnection return values. Resource collection still requires runtime opt-in. */
+    public boolean instrumentHttpURLConnection = true;
     /**
      * Whether to automatically upload map files
      */
@@ -124,6 +127,7 @@ public class FTExtension {
                 ", enableFileLog=" + enableFileLog +
                 ", logFilePath='" + logFilePath + '\'' +
                 ", openAutoTrack=" + openAutoTrack +
+                ", instrumentHttpURLConnection=" + instrumentHttpURLConnection +
                 ", autoUploadMap=" + autoUploadMap +
                 ", autoUploadNativeDebugSymbol=" + autoUploadNativeDebugSymbol +
                 ", datakitUrl='" + datakitUrl + '\'' +

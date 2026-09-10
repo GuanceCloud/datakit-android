@@ -1,0 +1,63 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'ft-plugin'
+
+def hucHookAvailable = extensions.getByName('FTExt').getClass().fields.any { it.name == 'instrumentHttpURLConnection' }
+FTExt {
+    if (hucHookAvailable) instrumentHttpURLConnection = !project.hasProperty('ftDisableURLConnection')
+    ignorePackages = ['com.ft.fixture.RawCalls', 'com.ft.fixture.ExcludedCalls']
+}
+
+android {
+    namespace 'com.ft.fixture'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.ft.fixture.urlconnection'
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        testProguardFiles 'test-proguard-rules.pro'
+        buildConfigField 'boolean', 'HOOK_ENABLED', String.valueOf(hucHookAvailable && !project.hasProperty('ftDisableURLConnection'))
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    testBuildType project.hasProperty('ftReleaseTest') ? 'release' : 'debug'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions { jvmTarget = '1.8' }
+    sourceSets.androidTest.assets.srcDir "$buildDir/generated/test-assets"
+}
+
+dependencies {
+    implementation project(':ft-sdk')
+    implementation project(':ft-urlconnection-fixture-jar')
+    implementation project(':ft-urlconnection-fixture-aar')
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+}
+
+// Disposable test identity only; never used outside the loopback test server.
+tasks.register('generateTestIdentity', Exec) {
+    def identity = file("$buildDir/generated/test-assets/localhost.p12")
+    outputs.file identity
+    inputs.property 'pkcs12Legacy', true
+    inputs.property 'certificateNames', 'localhost'
+    inputs.property 'certificateDay', java.time.LocalDate.now().toString()
+    doFirst { identity.parentFile.mkdirs(); identity.delete() }
+    commandLine "${System.getProperty('java.home')}/bin/keytool", '-J-Dkeystore.pkcs12.legacy', '-genkeypair', '-alias', 'localhost',
+            '-keyalg', 'RSA', '-keysize', '2048', '-validity', '30', '-dname', 'CN=localhost',
+            '-ext', 'SAN=dns:localhost', '-storetype', 'PKCS12',
+            '-keystore', identity.absolutePath, '-storepass', 'test-only', '-keypass', 'test-only', '-noprompt'
+}
+tasks.configureEach {
+    if (name.startsWith('merge') && name.endsWith('AndroidTestAssets')) dependsOn 'generateTestIdentity'
+}
