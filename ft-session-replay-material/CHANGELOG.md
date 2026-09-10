@@ -1,3 +1,7 @@
+# replay 0.1.9-alpha03
+1. Aligned with Session Replay 0.1.9-alpha03 for the segment compression format fix.
+
+---
 # replay-material 0.1.9-alpha02
 1. No changes.
 

@@ -1,4 +1,4 @@
-# Unreleased
+# replay 0.1.9-alpha03
 1. Fixed Replay segment compression to use a single SYNC_FLUSH-aligned zlib stream, restoring playback when multiple native or external-recorder segments are joined.
 
 ---
