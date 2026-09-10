@@ -2,10 +2,7 @@
 1. Added opt-in HTTP/HTTPS URLConnection RUM Resources through `FTRUMConfig.setEnableHttpURLConnectionResource(true)`, together with the existing Resource master switch. Requires `ft-plugin >= 1.3.9-alpha01` for automatic `URL.openConnection()` / `openConnection(Proxy)` wrapping.
 2. Added transparent connection/stream delegation, error-stream accounting, unique completion, bounded idle cleanup and shutdown isolation. URLConnection metrics report observed bytes and total duration; unobservable network phases and connection reuse are omitted. No request/response bodies are collected. Automatic Trace propagation follows `FTTraceConfig.setEnableAutoTrace(true)`, the configured Trace type and sampling rate; `setEnableLinkRUMData(true)` links the propagated `trace_id` / `span_id` to the Resource.
 3. Existing OkHttp collection is unchanged. Known `okhttp-urlconnection` 3.12.13 adapter types are excluded from outer collection; unknown adapters are not guaranteed to deduplicate. See the root README for integration and coverage boundaries.
-
----
-# Unreleased
-1. Avoided repeated invalid resource lookups and Android `Invalid ID` errors when Session Replay or Heatmap Action target identification encounters runtime-generated View IDs. Existing permanent ID paths and hashes are preserved.
+4. Avoided repeated invalid resource lookups and Android `Invalid ID` errors when Session Replay or Heatmap Action target identification encounters runtime-generated View IDs. Existing permanent ID paths and hashes are preserved.
 
 ---
 # agent 1.7.6-alpha02
