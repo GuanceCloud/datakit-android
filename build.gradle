@@ -10,7 +10,7 @@ buildscript {
                 ftSessionReplay           : "0.1.9-alpha03",
                 replayMiniAgentSupport    : "1.7.0",
                 ftPlugin                  : "1.3.9-alpha01",
-                ftPluginBuildscript       : "1.3.8",
+                ftPluginBuildscript       : "1.3.9-alpha01",
                 pluginMinAgentSupport     : "1.7.6-alpha03",
                 ftNative                  : "1.1.3"
         ]
