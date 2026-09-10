@@ -1,3 +1,7 @@
+# Unreleased
+1. Avoided repeated invalid resource lookups and Android `Invalid ID` errors when Session Replay or Heatmap Action target identification encounters runtime-generated View IDs. Existing permanent ID paths and hashes are preserved.
+
+---
 # agent 1.7.5
 1. Added OkHttp WebSocket handshake RUM Resource collection through `FTRUMConfig.setEnableTraceUserResource(true)`. With `ft-plugin >= 1.3.8`, calls can be collected automatically; without Plugin instrumentation, use `FTWebSocket.newWebSocket(...)` or `FTWebSocket.wrap(...)`. Added `resource_type=websocket`, `resource_websocket_collection_level=handshake`, and `resource_websocket_handshake_state` (`success`, `rejected`, or `failed`).
 2. Fixed cold-start Action `app_launch_type` classification when a background component starts before the first Activity, and excluded device deep-sleep time from cold-start duration.
