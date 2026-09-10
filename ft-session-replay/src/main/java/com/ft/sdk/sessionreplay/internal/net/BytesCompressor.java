@@ -1,43 +1,36 @@
 package com.ft.sdk.sessionreplay.internal.net;
 
 import java.io.ByteArrayOutputStream;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 import java.io.IOException;
+import java.util.zip.Deflater;
 
 public class BytesCompressor {
 
     public byte[] compressBytes(byte[] uncompressedData) throws IOException {
-        // Create the compressor with highest level of compression.
         Deflater deflater = new Deflater(COMPRESSION_LEVEL);
-        // We will start with an OutputStream double the size of the data
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(uncompressedData.length * 2);
-        // Compress the data
-        // in order to align with dogweb way of decompressing the segments we need to compress
-        // using the SYNC_FLUSH flag which adds the 0000FFFF flag at the end of the
-        // compressed data
-        compress(deflater, uncompressedData, outputStream, Deflater.SYNC_FLUSH);
-        // in order to align with dogweb way of decompressing the segments we need to add
-        // a fake checksum at the end
-        compress(deflater, new byte[0], outputStream, Deflater.FULL_FLUSH);
-        deflater.end();
-        // Get the compressed data
-        return outputStream.toByteArray();
-    }
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            deflater.setInput(uncompressedData);
 
-    private void compress(
-        Deflater deflater,
-        byte[] data,
-        ByteArrayOutputStream output,
-        int flag
-    ) throws IOException {
-        deflater.reset();
-        deflater.setInput(data);
-        deflater.finish();
-        byte[] buffer = new byte[1024];
-        while (!deflater.finished()) {
-            int count = deflater.deflate(buffer);
-            output.write(buffer, 0, count);
+            // Replay segments must end on a byte boundary so their deflate blocks can
+            // be joined after removing each segment's zlib header and final trailer.
+            int count;
+            do {
+                count = deflater.deflate(buffer, 0, buffer.length, Deflater.SYNC_FLUSH);
+                outputStream.write(buffer, 0, count);
+            } while (count == buffer.length);
+
+            // Finish the same stream: an empty final block and this payload's checksum.
+            // Resetting here would append a second zlib stream and break segment joins.
+            deflater.finish();
+            while (!deflater.finished()) {
+                count = deflater.deflate(buffer);
+                outputStream.write(buffer, 0, count);
+            }
+            return outputStream.toByteArray();
+        } finally {
+            deflater.end();
         }
     }
 
@@ -45,7 +38,6 @@ public class BytesCompressor {
     public static final int SYNC_FLAG_SIZE_IN_BYTES = 4;
     public static final int CHECKSUM_FLAG_SIZE_IN_BYTES = 6;
 
-    // We are using compression level 6 in order to align with the same compression type used
-    // in the browser sdk.
+    // Match the compression level used in the Browser SDK.
     private static final int COMPRESSION_LEVEL = 6;
 }

@@ -1,3 +1,7 @@
+# Unreleased
+1. Fixed Replay segment compression to use a single SYNC_FLUSH-aligned zlib stream, restoring playback when multiple native or external-recorder segments are joined.
+
+---
 # replay 0.1.9-alpha02
 1. Fixed native and external recorder handoffs so queued records remain linked to their original active RUM View, closed Views stop accepting new records, and native recording resumes across a clean View boundary.
 2. Added budgeted WebP encoding for external recorder images, progressively reducing quality and dimensions before rejecting frames that exceed the configured byte limit.
