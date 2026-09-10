@@ -55,6 +55,7 @@ public class FTClassAdapter extends ClassVisitor {
     private String[] interfaces;
     private final List<String> ignorePackages;
     private final boolean verboseLog;
+    private final boolean instrumentHttpURLConnection;
     /**
      * Whether to skip
      */
@@ -62,7 +63,13 @@ public class FTClassAdapter extends ClassVisitor {
 
     public FTClassAdapter(final ClassVisitor cv, int api, List<String> ignorePackages,
                           boolean verboseLog, List<String> additionalWebviews) {
+        this(cv, api, ignorePackages, verboseLog, additionalWebviews, true);
+    }
+
+    public FTClassAdapter(final ClassVisitor cv, int api, List<String> ignorePackages,
+                          boolean verboseLog, List<String> additionalWebviews, boolean instrumentHttpURLConnection) {
         super(api, cv);
+        this.instrumentHttpURLConnection = instrumentHttpURLConnection;
         // Convert dot notation to slash notation for ignorePackages
         this.ignorePackages = new ArrayList<>();
         if (ignorePackages != null) {
@@ -155,7 +162,12 @@ public class FTClassAdapter extends ClassVisitor {
                 return mv;
             }
         }
-        return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName, api, verboseLog, knownWebviews);
+        MethodVisitor tracked = new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName, api, verboseLog, knownWebviews);
+        return instrumentHttpURLConnection && !className.startsWith("java/")
+                && !className.startsWith("javax/") && !className.startsWith("android/")
+                && !className.startsWith("com/android/") && !className.startsWith("sun/")
+                ? new FTURLConnectionMethodAdapter(api, access, name, desc, signature, exceptions, tracked)
+                : tracked;
     }
 
     /**

@@ -63,6 +63,7 @@ public class NetworkTestActivity extends NameTitleActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network_test);
+        new HttpsURLConnectionSample(this).bind();
 
         // Normal network request test
         Button normalRequestBtn = findViewById(R.id.btn_normal_request);

@@ -62,10 +62,11 @@ public class FTRUMConfig {
      */
     private boolean enableTraceUserViewInFragment;
 
-    /**
-     * Whether to enable user Resource tracking
-     */
-    private boolean enableTraceUserResource;
+    /** Opt-in URLConnection Resource collection, also gated by the Resource master switch. */
+    private volatile boolean enableHttpURLConnectionResource = false;
+
+    /** Whether to enable automatic user Resource tracking. */
+    private volatile boolean enableTraceUserResource;
 
     /**
      * Enable resource host ip collection
@@ -498,14 +499,15 @@ public class FTRUMConfig {
     }
 
     /**
-     * Returns whether supported OkHttp Resource tracking is enabled.
+     * Returns whether the automatic Resource master switch is enabled.
      */
     public boolean isEnableTraceUserResource() {
         return enableTraceUserResource;
     }
 
     /**
-     * Enables automatic OkHttp Resource collection. The default is {@code false}.
+     * Enables automatic Resource collection. The default is {@code false}.
+     * URLConnection also requires {@link #setEnableHttpURLConnectionResource(boolean)}.
      *
      * <p>With a compatible {@code ft-plugin} version, this also instruments OkHttp
      * {@code newWebSocket()} calls and records one Resource for each WebSocket handshake. Without
@@ -525,6 +527,23 @@ public class FTRUMConfig {
     public FTRUMConfig setEnableTraceUserResource(boolean enableTraceUserResource) {
         this.enableTraceUserResource = enableTraceUserResource;
         return this;
+    }
+
+    /**
+     * Enables HTTP/HTTPS URLConnection Resources when the Resource master switch is also enabled.
+     * Default false. Requires ft-plugin 1.3.9-alpha01 or newer at the creation call site.
+     * Total duration includes application stream consumption. No bodies are collected.
+     * Trace headers and RUM trace/span linkage follow {@link FTTraceConfig}.
+     * Connections created while disabled are not retroactively wrapped. Long-lived streams should be
+     * excluded with {@link #setResourceUrlHandler(FTInTakeUrlHandler)} (five-minute idle retention).
+     */
+    public FTRUMConfig setEnableHttpURLConnectionResource(boolean enabled) {
+        enableHttpURLConnectionResource = enabled;
+        return this;
+    }
+
+    public boolean isEnableHttpURLConnectionResource() {
+        return enableHttpURLConnectionResource;
     }
 
     /**

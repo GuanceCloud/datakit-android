@@ -96,13 +96,18 @@ final class FTViewPermanentIdResolver {
     }
 
     private static String resolveResourceName(View view) {
-        if (view.getId() == View.NO_ID) {
+        int viewId = view.getId();
+        // Resource IDs contain non-zero package and type bytes (0xPPTTEEEE).
+        // Runtime View IDs, including generateViewId(), are not resource-table entries.
+        // Skip them before Android logs an Invalid ID error and constructs an exception.
+        if (viewId == View.NO_ID || (viewId & 0xff000000) == 0
+                || (viewId & 0x00ff0000) == 0) {
             return null;
         }
 
         try {
             Resources resources = view.getResources();
-            return resources == null ? null : resources.getResourceName(view.getId());
+            return resources == null ? null : resources.getResourceName(viewId);
         } catch (Resources.NotFoundException ignored) {
             return null;
         }

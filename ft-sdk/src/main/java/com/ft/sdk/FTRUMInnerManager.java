@@ -594,6 +594,18 @@ public class FTRUMInnerManager {
      * @param resourceId resource Id
      */
     void startResource(String resourceId, HashMap<String, Object> property) {
+        startResource(resourceId, property, false);
+    }
+
+    void startURLConnectionResource(String resourceId, long startedAt, long wallTime) {
+        ResourceBean bean = onCreateResource(resourceId);
+        bean.id = resourceId;
+        bean.startTimeNanoForDuration = startedAt;
+        bean.startTime = wallTime;
+        startResource(resourceId, null, true);
+    }
+
+    private void startResource(String resourceId, HashMap<String, Object> property, boolean urlConnection) {
         checkSessionRefresh(true);
         ResourceBean bean = onCreateResource(resourceId);
         LogUtils.d(TAG, "startResource:" + resourceId);
@@ -609,11 +621,13 @@ public class FTRUMInnerManager {
         attachRUMRelativeForResource(bean);
         final String actionId = bean.actionId;
         final String viewId = bean.viewId;
-        EventConsumerThreadPool.get().execute(new Runnable() {
+        runResourcePending(urlConnection, bean, true, new Runnable() {
             @Override
             public void run() {
                 FTDataStoreManager.get().increaseViewPendingResource(viewId);
+                if (urlConnection) bean.urlConnectionViewPending = true;
                 FTDataStoreManager.get().increaseActionPendingResource(actionId);
+                if (urlConnection) bean.urlConnectionActionPending = true;
             }
         });
     }
@@ -633,6 +647,14 @@ public class FTRUMInnerManager {
      * @param property   additional attribute parameters
      */
     void stopResource(final String resourceId, HashMap<String, Object> property) {
+        stopResource(resourceId, property, false);
+    }
+
+    void stopURLConnectionResource(String resourceId) {
+        stopResource(resourceId, null, true);
+    }
+
+    private void stopResource(final String resourceId, HashMap<String, Object> property, boolean urlConnection) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
         if (bean != null) {
             if (property != null) {
@@ -641,18 +663,60 @@ public class FTRUMInnerManager {
             final String actionId = bean.actionId;
             final String viewId = bean.viewId;
             bean.endTimeNanoForDuration = System.nanoTime();
-            increaseResourceCount(viewId, actionId);
-            EventConsumerThreadPool.get().execute(new Runnable() {
+            if (urlConnection) {
+                FTDataStoreManager.get().increaseViewResource(viewId);
+                FTDataStoreManager.get().increaseActionResource(actionId);
+            } else {
+                increaseResourceCount(viewId, actionId);
+            }
+            runResourcePending(urlConnection, bean, false, new Runnable() {
                 @Override
                 public void run() {
                     FTDataStoreManager.get().reduceViewPendingResource(viewId);
+                    if (urlConnection) bean.urlConnectionViewPending = false;
                     FTDataStoreManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
                     FTDataStoreManager.get().reduceActionPendingResource(actionId);
+                    if (urlConnection) bean.urlConnectionActionPending = false;
                     FTTraceManager.get().removeByStopResource(resourceId);
                 }
             });
+            if (urlConnection) checkActionClose();
             generateRumData();
         }
+    }
+
+    private void runResourcePending(boolean urlConnection, ResourceBean bean, boolean starting, Runnable task) {
+        EventConsumerThreadPool.get().execute(() -> {
+            if (urlConnection) {
+                synchronized (FTURLConnectionResourceReporter.LOCK) {
+                    try {
+                        if (!bean.urlConnectionDiscarded) task.run();
+                    } finally {
+                        if (starting) FTURLConnectionResourceReporter.pendingStartProcessed(bean.id);
+                    }
+                }
+            } else {
+                task.run();
+            }
+        });
+    }
+
+    /** URLConnection abandonment: balance pending without counting a completed Resource or error. */
+    void discardResource(String resourceId) {
+        ResourceBean bean = resourceBeanMap.remove(resourceId);
+        if (bean != null) {
+            bean.urlConnectionDiscarded = true;
+            if (bean.urlConnectionViewPending) {
+                FTDataStoreManager.get().reduceViewPendingResource(bean.viewId);
+                bean.urlConnectionViewPending = false;
+            }
+            if (bean.urlConnectionActionPending) {
+                FTDataStoreManager.get().reduceActionPendingResource(bean.actionId);
+                bean.urlConnectionActionPending = false;
+            }
+        }
+        FTTraceManager.get().removeByStopResource(resourceId);
+        FTTraceManager.get().removeByAddResource(resourceId);
     }
 
     /**
@@ -1165,27 +1229,30 @@ public class FTRUMInnerManager {
         } else {
             LogUtils.d(TAG, "setNetState:" + resourceId);
         }
-        bean.resourceDNS = netStatusBean.getDNSTime();
-        bean.resourceDNSStart = netStatusBean.getDNSStartTime();
-        bean.resourceSSL = netStatusBean.getSSLTime();
-        bean.resourceSSLStart = netStatusBean.getSslStartTime();
-        bean.resourceTCP = netStatusBean.getTcpTime();
-        bean.resourceTCPStart = netStatusBean.getConnectStartTime();
-        bean.resourceTrans = netStatusBean.getResponseTime();
-        bean.resourceTTFB = netStatusBean.getTTFB();
+        if (netStatusBean.phaseTimingKnown) {
+            bean.resourceDNS = netStatusBean.getDNSTime();
+            bean.resourceDNSStart = netStatusBean.getDNSStartTime();
+            bean.resourceSSL = netStatusBean.getSSLTime();
+            bean.resourceSSLStart = netStatusBean.getSslStartTime();
+            bean.resourceTCP = netStatusBean.getTcpTime();
+            bean.resourceTCPStart = netStatusBean.getConnectStartTime();
+            bean.resourceTrans = netStatusBean.getResponseTime();
+            bean.resourceTTFB = netStatusBean.getTTFB();
+            bean.resourceFirstByte = netStatusBean.getFirstByteTime();
+            bean.resourceFirstByteStart = netStatusBean.getFirstByteStartTime();
+            bean.resourceDownloadTime = netStatusBean.getDownloadTime();
+            bean.resourceDownloadTimeStart = netStatusBean.getDownloadTimeStart();
+        }
         long resourceLoad = netStatusBean.getHoleRequestTime();
         if (resourceLoad <= 0 && bean.endTimeNanoForDuration > bean.startTimeNanoForDuration) {
             resourceLoad = bean.endTimeNanoForDuration - bean.startTimeNanoForDuration;
         }
         bean.resourceLoad = Math.max(0, resourceLoad);
-        bean.resourceFirstByte = netStatusBean.getFirstByteTime();
-        bean.resourceFirstByteStart = netStatusBean.getFirstByteStartTime();
-        bean.resourceDownloadTime = netStatusBean.getDownloadTime();
-        bean.resourceDownloadTimeStart = netStatusBean.getDownloadTimeStart();
         bean.resourceHostIP = netStatusBean.resourceHostIP;
         bean.resourceResponseBodySize = netStatusBean.responseBodySize;
         bean.resourceRequestBodySize = netStatusBean.requestBodySize;
         bean.resourceConnectionReuse = netStatusBean.connectionReuse;
+        bean.resourceConnectionReuseKnown = netStatusBean.connectionReuseKnown;
         bean.netStateSet = true;
         checkToAddResource(resourceId, bean);
     }
@@ -1347,7 +1414,9 @@ public class FTRUMInnerManager {
             if (!Utils.isNullOrEmpty(bean.resourceProtocol)) {
                 fields.put(Constants.KEY_RUM_RESOURCE_HTTP_PROTOCOL, bean.resourceProtocol);
             }
-            fields.put(Constants.KEY_RUM_RESOURCE_CONNECTION_REUSE, bean.resourceConnectionReuse);
+            if (bean.resourceConnectionReuseKnown) {
+                fields.put(Constants.KEY_RUM_RESOURCE_CONNECTION_REUSE, bean.resourceConnectionReuse);
+            }
             fields.put(Constants.KEY_RUM_RESPONSE_HEADER, bean.responseHeader);
 
 

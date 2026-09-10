@@ -18,6 +18,56 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HttpsURLConnection Automatic Collection"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Tap a button to send an HTTPS request. The base URL must support /get, /post, and /status/404. Response previews appear only on this page. Filter RUM Resources by resource_collection_source=http_url_connection." />
+
+        <EditText
+            android:id="@+id/et_https_base_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri"
+            android:singleLine="true"
+            android:hint="HTTPS base URL"
+            android:text="https://httpbin.org" />
+
+        <Button
+            android:id="@+id/btn_https_get"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HTTPS GET /get" />
+
+        <Button
+            android:id="@+id/btn_https_post"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HTTPS POST /post" />
+
+        <Button
+            android:id="@+id/btn_https_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HTTPS 404 /status/404" />
+
+        <TextView
+            android:id="@+id/tv_https_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:fontFamily="monospace"
+            android:text="Ready to send a request"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+
         <Button
             android:id="@+id/btn_normal_request"
             android:layout_width="match_parent"

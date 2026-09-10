@@ -1,3 +1,8 @@
+# plugin 1.3.9-alpha01
+1. Added automatic return-value wrapping for exactly `URL.openConnection()` and `URL.openConnection(Proxy)`, retaining each original call and argument evaluation. Requires `ft-sdk >= 1.7.6-alpha03`; older Agents are rejected at build time.
+2. Added `FTExt.instrumentHttpURLConnection` (default true) as a Gradle instrumentation cache input. Existing package/class/method exclusions apply; repeated transforms do not add duplicate URLConnection hooks.
+
+---
 # plugin 1.3.8
 1. Added automatic OkHttp `newWebSocket()` instrumentation for WebSocket handshake RUM Resource collection when `FTRUMConfig.setEnableTraceUserResource(true)` is enabled; requires `ft-sdk >= 1.7.5`.
 

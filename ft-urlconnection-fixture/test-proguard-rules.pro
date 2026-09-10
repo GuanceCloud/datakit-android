@@ -1,0 +1,4 @@
+-keep class com.ft.sdk.URLConnectionDeviceTest { *; }
+-keepattributes *Annotation*
+-dontwarn com.google.errorprone.annotations.**
+-dontwarn okhttp3.**

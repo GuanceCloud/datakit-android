@@ -9,6 +9,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.ft.replay.LabeledReplayImageMapper;
+import com.ft.replay.LabeledReplayImageView;
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
@@ -140,7 +142,7 @@ public class DemoApplication extends BaseApplication {
     }
 
     private static FTSDKConfig buildFTSDKConfig(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//Set whether it's debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(10)
@@ -249,6 +251,7 @@ public class DemoApplication extends BaseApplication {
 //                        .setAllowWebViewHost(new String[]{"10.100.64.166"})
                         .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
                         .setEnableTraceUserResource(true)
+                        .setEnableHttpURLConnectionResource(true)
                         .setEnableTrackAppANR(true)
                         .setEnableTrackAppCrash(true)
 //                        .setEnableTraceWebView(true)
@@ -346,6 +349,7 @@ public class DemoApplication extends BaseApplication {
                         .addExtensionSupport(new ComposeExtensionSupport())
                         .addExtensionSupport(new MaterialExtensionSupport())
                         .addExtensionSupport(new CustomExtensionSupport()
+                                .addMapper(LabeledReplayImageView.class, new LabeledReplayImageMapper())
                                 .addMapper(new MapperTypeWrapper<>(com.tencent.smtt.sdk.WebView.class,
                                         new WebViewXWireframeMapper())))
 

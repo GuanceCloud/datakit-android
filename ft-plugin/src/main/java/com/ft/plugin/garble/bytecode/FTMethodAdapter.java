@@ -679,7 +679,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         if (Constants.IGNORE_ANNOTATION.equals(descriptor)) {
             Logger.debug("ignoreAOP-> class:" + className + ",super:" + superName + ", method:" + methodName);
             needSkip = true;
-            return null;
+            return super.visitAnnotation(descriptor, visible);
         }
         return super.visitAnnotation(descriptor, visible);
     }

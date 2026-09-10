@@ -101,6 +101,7 @@ public class FTPlugin implements Plugin<Project> {
                                 parameters.getKnownWebViewClasses().set(extension.knownWebViewClasses);
                                 parameters.getAsmVersion().set(extension.asmVersion);
                                 parameters.getVerboseLog().set(extension.verboseLog);
+                                parameters.getInstrumentHttpURLConnection().set(extension.instrumentHttpURLConnection);
                                 return Unit.INSTANCE;
                             }
                         }

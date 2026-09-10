@@ -12,6 +12,53 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/session_replay_invalid_id_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/replay_invalid_id_entry" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@string/replay_labeled_images_description" />
+
+        <!-- Fixed widths exceed the replay player's 58-unit threshold for showing labels. -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <com.ft.replay.LabeledReplayImageView
+                android:id="@+id/replay_image_a"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:contentDescription="@string/replay_image_a"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ic_home" />
+
+            <com.ft.replay.LabeledReplayImageView
+                android:id="@+id/replay_image_b"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/replay_image_b"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ic_person" />
+
+            <com.ft.replay.LabeledReplayImageView
+                android:id="@+id/replay_image_c"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/replay_image_c"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ic_notifications" />
+        </LinearLayout>
+
+        <Button
             android:id="@+id/session_replay_dialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

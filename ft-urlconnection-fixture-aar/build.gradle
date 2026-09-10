@@ -1,0 +1,6 @@
+apply plugin: 'com.android.library'
+android {
+    namespace 'com.ft.fixtureaar'
+    compileSdk 34
+    defaultConfig { minSdk 21 }
+}
