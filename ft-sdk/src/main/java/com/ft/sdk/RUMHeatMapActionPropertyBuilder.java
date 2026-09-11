@@ -12,6 +12,9 @@ final class RUMHeatMapActionPropertyBuilder {
     }
 
     static HashMap<String, Object> build(Object object, HashMap<String, Object> extra) {
+        if (!FTRUMConfigManager.get().isHeatMapEnabled()) {
+            return new HashMap<>();
+        }
         View targetView = RUMActionTargetResolver.resolve(object, extra);
         MotionEvent motionEvent = null;
         if (extra != null && extra.get(EXTRA_MOTION_EVENT) instanceof MotionEvent) {

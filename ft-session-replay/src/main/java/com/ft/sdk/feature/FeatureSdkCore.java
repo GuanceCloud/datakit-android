@@ -13,6 +13,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public interface FeatureSdkCore extends SdkCore {
 
+    /** Effective RUM Heatmap setting. Older Agent implementations default to disabled. */
+    default boolean isHeatMapEnabled() {
+        return false;
+    }
+
     /**
      * Logger for the internal SDK purposes.
      */
@@ -105,4 +110,3 @@ public interface FeatureSdkCore extends SdkCore {
 
     long getErrorTimeLine();
 }
-

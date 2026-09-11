@@ -137,3 +137,33 @@ The HTTP/HTTPS proxy forwarding methods are adapted from Firebase Performance at
 `9fa84de12aaa9ce0afb6634030e4b6d26d66b3d0`, Copyright 2020 Google LLC, Apache License 2.0.
 The original license headers are retained; request lifecycle/reporting and stream accounting are
 implemented for this SDK.
+
+
+## Experimental Android Heatmap
+
+Heatmap collection is **disabled by default**. Configure the shared RUM/native Replay switch
+before initializing RUM; changing the config object afterwards does not change the active setting.
+Existing Heatmap users must explicitly enable it when upgrading:
+
+```java
+FTSdk.initRUMWithConfig(new FTRUMConfig()
+        .setRumAppId("your-rum-app-id")
+        .setEnableTraceUserAction(true)
+        .setEnableHeatMap(true));
+```
+
+Use `setEnableHeatMap(false)` (or omit it) as a fallback to stop Heatmap-specific touch target
+lookup, `action_position` / `action_target` generation, automatic RUM `display` enrichment,
+Replay `permanentId` resource-name/path/hash calculation, and transparent Heatmap binding nodes.
+These paths are skipped before calculation, avoiding their resource lookup and `Invalid ID`
+overhead. Ordinary RUM Actions, Views and Resources, native replay recording, replay viewport
+dimensions and replay touch visualization keep their existing settings. Caller-supplied fields
+and already stored records are not removed. This does not suppress unrelated Android resource
+errors or guarantee elimination of all application jank.
+
+Use the Agent and Replay changes together for the complete switch. An older Replay still calls
+the Agent resolver, which returns immediately when disabled, but does not skip its transparent
+binding nodes. A new Replay with an older Agent defaults Heatmap bindings to disabled.
+Enabling Heatmap does not enable automatic Action collection or change Replay sampling.
+Only initialization configuration is supported; there is no runtime or remote toggle.
+The SDK configuration log includes `enableHeatMap`.

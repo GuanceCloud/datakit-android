@@ -102,7 +102,9 @@ public class TreeViewTraversal {
             }}, true);
         }
         List<Wireframe> resolvedWireframes = mapper.map(view, mappingContext, jobStatusCallback, internalLogger);
-        attachPermanentId(view, resolvedWireframes);
+        if (mappingContext.isHeatMapEnabled()) {
+            attachPermanentId(view, resolvedWireframes);
+        }
         return new TraversedTreeView(resolvedWireframes, traversalStrategy);
     }
 

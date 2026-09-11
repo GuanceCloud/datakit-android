@@ -442,6 +442,9 @@ public class FTAutoTrack {
      * Keeps the last window touch event so click-only hooks can still report a relative action position.
      */
     public static void trackWindowTouch(MotionEvent motionEvent) {
+        if (!FTRUMConfigManager.get().isHeatMapEnabled()) {
+            return;
+        }
         View rootView = null;
         Activity activity = FTActivityManager.get().curentActivity();
         if (activity != null && activity.getWindow() != null) {

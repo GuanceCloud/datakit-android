@@ -14,6 +14,8 @@ import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -25,6 +27,17 @@ import java.util.HashMap;
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE, sdk = 28)
 public class RUMHeatMapActionPropertyBuilderTest {
+
+    @Before
+    public void enableHeatMap() throws Exception {
+        HeatMapTestConfig.set(new FTRUMConfig().setRumAppId("test-app").setEnableHeatMap(true));
+    }
+
+    @After
+    public void resetHeatMap() {
+        FTRUMConfigManager.get().release();
+    }
+
 
     @Test
     public void menuItemActionUsesTouchedToolbarView() throws Exception {

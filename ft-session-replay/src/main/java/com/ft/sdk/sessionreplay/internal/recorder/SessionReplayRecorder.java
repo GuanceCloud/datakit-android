@@ -204,7 +204,8 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                                         customOptionSelectorDetectors
                                 ),
                                 touchPrivacyManager,
-                                internalLogger
+                                internalLogger,
+                                sdkCore
                         ),
                         recordedDataQueueHandler,
                         sdkCore, dynamicOptimizationEnabled

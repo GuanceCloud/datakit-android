@@ -22,7 +22,7 @@ final class RUMTouchPositionTracker {
     }
 
     static void record(MotionEvent motionEvent, View rootView) {
-        if (motionEvent == null) {
+        if (!FTRUMConfigManager.get().isHeatMapEnabled() || motionEvent == null) {
             return;
         }
         int action = motionEvent.getActionMasked();
@@ -32,6 +32,10 @@ final class RUMTouchPositionTracker {
             lastTouchEvent = new LastTouchEvent(rawX, rawY, motionEvent.getEventTime(),
                     findTouchTarget(rootView, rawX, rawY));
         }
+    }
+
+    static void clear() {
+        lastTouchEvent = null;
     }
 
     static View resolveLastTouchTarget() {

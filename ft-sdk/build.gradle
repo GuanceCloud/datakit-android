@@ -59,6 +59,7 @@ dependencies {
     testImplementation 'com.google.mockwebserver:mockwebserver:20130706'
     testImplementation 'com.squareup.okhttp3:okhttp:4.5.0'
     testRuntimeOnly project(":ft-native")
+    testImplementation project(":ft-session-replay")
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation project(':ft-test')

@@ -43,6 +43,7 @@ public class FTRUMConfigManager {
     }
 
     private FTRUMConfig config;
+    private volatile boolean heatMapEnabled;
 
     /**
      * Bind user data
@@ -63,6 +64,8 @@ public class FTRUMConfigManager {
      */
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
+        heatMapEnabled = config.isRumEnable() && config.isEnableHeatMap();
+        RUMTouchPositionTracker.clear();
 
         FTDBCachePolicy.get().initRUMParam(config);
         FTRUMGlobalManager.get().initConfig(config);
@@ -189,6 +192,11 @@ public class FTRUMConfigManager {
      */
     public boolean isRumEnable() {
         return config != null && config.getRumAppId() != null;
+    }
+
+    /** Effective Heatmap setting captured during RUM initialization. */
+    public boolean isHeatMapEnabled() {
+        return heatMapEnabled;
     }
 
 
@@ -365,6 +373,8 @@ public class FTRUMConfigManager {
     }
 
     void release() {
+        heatMapEnabled = false;
+        RUMTouchPositionTracker.clear();
         config = null;
     }
 }

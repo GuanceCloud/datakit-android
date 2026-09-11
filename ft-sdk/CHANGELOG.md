@@ -3,6 +3,7 @@
 2. Added transparent connection/stream delegation, error-stream accounting, unique completion, bounded idle cleanup and shutdown isolation. URLConnection metrics report observed bytes and total duration; unobservable network phases and connection reuse are omitted. No request/response bodies are collected. Automatic Trace propagation follows `FTTraceConfig.setEnableAutoTrace(true)`, the configured Trace type and sampling rate; `setEnableLinkRUMData(true)` links the propagated `trace_id` / `span_id` to the Resource.
 3. Existing OkHttp collection is unchanged. Known `okhttp-urlconnection` 3.12.13 adapter types are excluded from outer collection; unknown adapters are not guaranteed to deduplicate. See the root README for integration and coverage boundaries.
 4. Avoided repeated invalid resource lookups and Android `Invalid ID` errors when Session Replay or Heatmap Action target identification encounters runtime-generated View IDs. Existing permanent ID paths and hashes are preserved.
+5. Added `FTRUMConfig.setEnableHeatMap(boolean)` as an initialization-only fallback switch, disabled by default. Disabling skips Heatmap touch target lookup, Action attributes, automatic RUM display enrichment and Replay permanent ID resolution before resource-name/path/hash calculation. Ordinary RUM and replay recording remain available. Existing Heatmap users must explicitly opt in; use the matching Replay update to also skip transparent binding nodes.
 
 ---
 # agent 1.7.6-alpha02

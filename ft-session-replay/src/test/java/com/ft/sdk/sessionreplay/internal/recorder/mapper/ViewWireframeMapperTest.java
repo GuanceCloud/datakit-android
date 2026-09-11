@@ -1,5 +1,6 @@
 package com.ft.sdk.sessionreplay.internal.recorder.mapper;
 
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -116,6 +117,34 @@ public class ViewWireframeMapperTest {
         Assert.assertEquals(0f, wireframe.getShapeStyle().getOpacity().floatValue(), 0f);
     }
 
+    @Test
+    public void disabledHeatMapSkipsTransparentBindingAndPreservesVisibleBackground() {
+        View view = new View(RuntimeEnvironment.application);
+        view.setClickable(true);
+        MappingContext enabled = createMappingContext();
+        MappingContext disabled = new MappingContext(enabled.getSystemInformation(), null,
+                false, null, null, null, null);
+        Assert.assertTrue(createMapper().map(view, disabled,
+                new NoOpAsyncJobStatusCallback(), null).isEmpty());
+
+        view.setBackgroundColor(android.graphics.Color.RED);
+        List<Wireframe> wireframes = createMapper().map(view, disabled,
+                new NoOpAsyncJobStatusCallback(), null);
+        Assert.assertEquals(1, wireframes.size());
+        Assert.assertNull(wireframes.get(0).getPermanentId());
+        Assert.assertEquals(VIEW_BOUNDS.getWidth(), ((ShapeWireframe) wireframes.get(0)).getWidth());
+    }
+
+    @Test
+    public void mappingContextCopiesPreserveHeatMapSetting() {
+        for (boolean enabled : new boolean[]{false, true}) {
+            MappingContext context = new MappingContext(createMappingContext().getSystemInformation(),
+                    null, false, null, null, null, null, enabled);
+            Assert.assertEquals(enabled, context.copy(true).isHeatMapEnabled());
+            Assert.assertEquals(enabled, context.copy(null, null).isHeatMapEnabled());
+        }
+    }
+
     private ViewWireframeMapper createMapper() {
         ViewIdentifierResolver identifierResolver = new ViewIdentifierResolver() {
             @Override
@@ -150,7 +179,8 @@ public class ViewWireframeMapperTest {
                 return "#000000ff";
             }
         };
-        DrawableToColorMapper drawableMapper = (drawable, internalLogger) -> null;
+        DrawableToColorMapper drawableMapper = (drawable, internalLogger) -> drawable instanceof ColorDrawable
+                ? ((ColorDrawable) drawable).getColor() : null;
         return new ViewWireframeMapper(
                 identifierResolver,
                 colorFormatter,
@@ -166,6 +196,6 @@ public class ViewWireframeMapperTest {
                 1f,
                 null
         );
-        return new MappingContext(systemInformation, null, false, null, null, null, null);
+        return new MappingContext(systemInformation, null, false, null, null, null, null, true);
     }
 }

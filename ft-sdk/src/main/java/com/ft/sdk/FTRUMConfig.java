@@ -52,6 +52,8 @@ public class FTRUMConfig {
      * Whether to enable user action tracking
      */
     private boolean enableTraceUserAction;
+    /** Whether to collect experimental Heatmap data. Disabled by default. */
+    private boolean enableHeatMap;
     /**
      * Whether to enable user view tracking
      */
@@ -449,6 +451,26 @@ public class FTRUMConfig {
      */
     public boolean isEnableTraceUserAction() {
         return enableTraceUserAction;
+    }
+
+    /** Returns whether experimental Heatmap collection is requested. */
+    public boolean isEnableHeatMap() {
+        return enableHeatMap;
+    }
+
+    /**
+     * Enables experimental Heatmap collection for RUM and native Session Replay. Default is false.
+     * Configure before {@link FTSdk#initRUMWithConfig(FTRUMConfig)}; runtime switching is not supported.
+     * Disabling skips Heatmap target lookup, resource-name/path resolution and replay bindings,
+     * while ordinary RUM and Session Replay recording remain available. Enabling does not enable
+     * automatic Action tracking or change Session Replay sampling.
+     *
+     * @param enableHeatMap true to collect Heatmap data
+     * @return this config for chaining
+     */
+    public FTRUMConfig setEnableHeatMap(boolean enableHeatMap) {
+        this.enableHeatMap = enableHeatMap;
+        return this;
     }
 
     /**
@@ -916,6 +938,7 @@ public class FTRUMConfig {
                 ", blockDurationMS=" + blockDurationMS +
                 ", enableTrackAppANR=" + enableTrackAppANR +
                 ", enableTraceUserAction=" + enableTraceUserAction +
+                ", enableHeatMap=" + enableHeatMap +
                 ", enableTraceUserView=" + enableTraceUserView +
                 ", enableTraceUserResource=" + enableTraceUserResource +
                 ", enableResourceHostIP=" + enableResourceHostIP +

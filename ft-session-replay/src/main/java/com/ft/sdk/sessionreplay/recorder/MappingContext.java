@@ -16,6 +16,7 @@ public class MappingContext {
     private final TouchPrivacyManager touchPrivacyManager;
     private final InteropViewCallback interopViewCallback;
     private final boolean hasOptionSelectorParent;
+    private final boolean heatMapEnabled;
 
     /**
      * Creates a mapping context.
@@ -32,6 +33,15 @@ public class MappingContext {
             , boolean hasOptionSelectorParent,
                           TextAndInputPrivacy textAndInputPrivacy, ImagePrivacy imagePrivacy,
                           TouchPrivacyManager touchPrivacyManager, InteropViewCallback interopViewCallback) {
+        this(systemInformation, imageWireframeHelper, hasOptionSelectorParent, textAndInputPrivacy,
+                imagePrivacy, touchPrivacyManager, interopViewCallback, false);
+    }
+
+    /** Creates a context with the effective Heatmap setting for this recording pass. */
+    public MappingContext(SystemInformation systemInformation, ImageWireframeHelper imageWireframeHelper,
+                          boolean hasOptionSelectorParent, TextAndInputPrivacy textAndInputPrivacy,
+                          ImagePrivacy imagePrivacy, TouchPrivacyManager touchPrivacyManager,
+                          InteropViewCallback interopViewCallback, boolean heatMapEnabled) {
         this.systemInformation = systemInformation;
         this.imageWireframeHelper = imageWireframeHelper;
         this.hasOptionSelectorParent = hasOptionSelectorParent;
@@ -39,6 +49,12 @@ public class MappingContext {
         this.imagePrivacy = imagePrivacy;
         this.touchPrivacyManager = touchPrivacyManager;
         this.interopViewCallback = interopViewCallback;
+        this.heatMapEnabled = heatMapEnabled;
+    }
+
+    /** Returns whether this recording pass should generate Heatmap bindings. */
+    public boolean isHeatMapEnabled() {
+        return heatMapEnabled;
     }
 
     /**
@@ -99,7 +115,7 @@ public class MappingContext {
     public MappingContext copy(boolean hasOptionSelectorParent) {
         return new MappingContext(systemInformation,
                 imageWireframeHelper, hasOptionSelectorParent, textAndInputPrivacy, imagePrivacy,
-                touchPrivacyManager, interopViewCallback);
+                touchPrivacyManager, interopViewCallback, heatMapEnabled);
     }
 
     /**
@@ -112,7 +128,7 @@ public class MappingContext {
     public MappingContext copy(ImagePrivacy imagePrivacy, TextAndInputPrivacy textAndInputPrivacy) {
         return new MappingContext(systemInformation, imageWireframeHelper,
                 hasOptionSelectorParent, textAndInputPrivacy, imagePrivacy,
-                touchPrivacyManager, interopViewCallback);
+                touchPrivacyManager, interopViewCallback, heatMapEnabled);
     }
 
 }

@@ -1,5 +1,6 @@
 # replay 0.1.9-alpha03
 1. Fixed Replay segment compression to use a single SYNC_FLUSH-aligned zlib stream, restoring playback when multiple native or external-recorder segments are joined.
+2. Native Replay now follows the Agent Heatmap setting and skips permanent ID resolution and transparent Heatmap binding nodes when disabled, preserving ordinary wireframes, viewport dimensions and touch visualization. Requires an Agent exposing the shared Heatmap setting to opt in; older Agents default to disabled.
 
 ---
 # replay 0.1.9-alpha02

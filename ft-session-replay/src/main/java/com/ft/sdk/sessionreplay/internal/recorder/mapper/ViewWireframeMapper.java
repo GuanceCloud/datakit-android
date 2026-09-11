@@ -50,7 +50,7 @@ public class ViewWireframeMapper extends BaseWireframeMapper<View> {
                 ? resolveShapeStyle(view.getBackground(), view.getAlpha(), internalLogger)
                 : null;
 
-        if (shapeStyle == null && isHeatmapBindingTarget(view)) {
+        if (shapeStyle == null && mappingContext.isHeatMapEnabled() && isHeatmapBindingTarget(view)) {
             shapeStyle = new ShapeStyle(TRANSPARENT_HEATMAP_COLOR, 0f, null);
         }
 

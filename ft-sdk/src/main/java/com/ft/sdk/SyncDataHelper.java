@@ -291,7 +291,8 @@ public class SyncDataHelper {
                                  HashMap<String, Object> fields, long timeStamp, DataType dataType, String uuid) {
         boolean webViewLog = dataType == DataType.LOG && tags != null
                 && Boolean.TRUE.equals(tags.get(Constants.KEY_RUM_VIEW_IS_WEB_VIEW));
-        if (fields != null && isRUMDataType(dataType)) {
+        if (fields != null && isRUMDataType(dataType)
+                && FTRUMConfigManager.get().isHeatMapEnabled()) {
             RUMHeatMapPropertyBuilder.appendDisplay(fields);
         }
         applyModifier(tags);

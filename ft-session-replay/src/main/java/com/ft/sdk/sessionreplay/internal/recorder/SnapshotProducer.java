@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.UiThread;
 
+import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.R;
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
@@ -31,6 +32,7 @@ public class SnapshotProducer {
     private final OptionSelectorDetector optionSelectorDetector;
     private final TouchPrivacyManager touchPrivacyManager;
     private final InternalLogger internalLogger;
+    private final FeatureSdkCore sdkCore;
 
     public SnapshotProducer(
             ImageWireframeHelper imageWireframeHelper,
@@ -39,11 +41,24 @@ public class SnapshotProducer {
             TouchPrivacyManager touchPrivacyManager,
             InternalLogger internalLogger
     ) {
+        this(imageWireframeHelper, treeViewTraversal, optionSelectorDetector,
+                touchPrivacyManager, internalLogger, null);
+    }
+
+    public SnapshotProducer(
+            ImageWireframeHelper imageWireframeHelper,
+            TreeViewTraversal treeViewTraversal,
+            OptionSelectorDetector optionSelectorDetector,
+            TouchPrivacyManager touchPrivacyManager,
+            InternalLogger internalLogger,
+            FeatureSdkCore sdkCore
+    ) {
         this.imageWireframeHelper = imageWireframeHelper;
         this.treeViewTraversal = treeViewTraversal;
         this.optionSelectorDetector = optionSelectorDetector;
         this.touchPrivacyManager = touchPrivacyManager;
         this.internalLogger = internalLogger;
+        this.sdkCore = sdkCore;
     }
 
     @UiThread
@@ -60,7 +75,7 @@ public class SnapshotProducer {
                         false, textAndInputPrivacy, imagePrivacy,
                         touchPrivacyManager, new DefaultInteropViewCallback(
                         treeViewTraversal, recordedDataQueueRefs
-                )),
+                ), sdkCore != null && sdkCore.isHeatMapEnabled()),
                 new LinkedList<>(),
                 recordedDataQueueRefs
         );

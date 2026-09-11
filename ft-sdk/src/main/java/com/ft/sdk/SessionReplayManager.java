@@ -414,7 +414,15 @@ public class SessionReplayManager implements FeatureSdkCore {
     }
 
     public String resolvePermanentId(View view) {
+        if (!isHeatMapEnabled()) {
+            return null;
+        }
         return FTViewPermanentIdResolver.resolve(view);
+    }
+
+    @Override
+    public boolean isHeatMapEnabled() {
+        return FTRUMConfigManager.get().isHeatMapEnabled();
     }
 
     public void tryGetFullSnapshotForLinkView() {
