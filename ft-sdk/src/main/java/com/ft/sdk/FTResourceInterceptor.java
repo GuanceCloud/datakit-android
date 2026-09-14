@@ -163,6 +163,10 @@ public class FTResourceInterceptor implements Interceptor {
         }
         FTRUMInnerManager.get().startResource(resourceId);
         ResourceParams params = new ResourceParams();
+        FTVisitorIdInterceptor.Snapshot visitor = request.tag(FTVisitorIdInterceptor.Snapshot.class);
+        if (visitor != null) {
+            FTRUMInnerManager.get().setResourceVisitorId(resourceId, visitor.id);
+        }
         params.url = url;
         params.requestHeader = request.headers().toString();
         params.resourceMethod = request.method();

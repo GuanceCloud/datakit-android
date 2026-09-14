@@ -152,6 +152,12 @@ public class SyncData implements Cloneable {
     public static SyncData getSyncData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean,
                                        long dataGenerateTime)
             throws FTInvalidParameterException {
+        return getSyncData(helper, dataType, bean, dataGenerateTime, null);
+    }
+
+    public static SyncData getSyncData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean,
+                                       long dataGenerateTime, String visitorId)
+            throws FTInvalidParameterException {
         String uuid = Utils.getGUID_16();
         SyncData recordData = new SyncData(dataType);
         if (dataGenerateTime > 0) {
@@ -167,7 +173,7 @@ public class SyncData implements Cloneable {
             recordData.setUuid(uuid);
         }
         String bodyContent = helper.getBodyContent(bean.getMeasurement(), bean.getTags(),
-                bean.getFields(), bean.getTimeNano(), dataType, uuid);
+                bean.getFields(), bean.getTimeNano(), dataType, uuid, visitorId);
         if (Utils.isNullOrEmpty(bodyContent)) {
             return null;
         }

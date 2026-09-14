@@ -870,6 +870,9 @@ public class FTAutoTrack {
                 LogUtils.d(TAG, "Skip default FTTraceInterceptor setting");
             }
         }
+        if (FTVisitorIdManager.get().isEnabled()) {
+            FTVisitorIdInterceptor.install(builder);
+        }
         return builder.build();
     }
 

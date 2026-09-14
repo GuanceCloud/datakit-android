@@ -289,11 +289,27 @@ public class SyncDataHelper {
 
     public String getBodyContent(String measurement, HashMap<String, Object> tags,
                                  HashMap<String, Object> fields, long timeStamp, DataType dataType, String uuid) {
+        return getBodyContent(measurement, tags, fields, timeStamp, dataType, uuid, null);
+    }
+
+    /** Serializes a trusted event-time Visitor ID snapshot; never reads a newer manager value. */
+    public String getBodyContent(String measurement, HashMap<String, Object> tags,
+                                 HashMap<String, Object> fields, long timeStamp, DataType dataType,
+                                 String uuid, String visitorId) {
+        if (dataType != DataType.RUM_APP && dataType != DataType.RUM_APP_ERROR_SAMPLED) {
+            visitorId = null;
+        }
         boolean webViewLog = dataType == DataType.LOG && tags != null
                 && Boolean.TRUE.equals(tags.get(Constants.KEY_RUM_VIEW_IS_WEB_VIEW));
         if (fields != null && isRUMDataType(dataType)
                 && FTRUMConfigManager.get().isHeatMapEnabled()) {
             RUMHeatMapPropertyBuilder.appendDisplay(fields);
+        }
+        if (visitorId != null) {
+            // Ordinary contexts cannot replace the trusted snapshot. The final modifiers
+            // receive that snapshot below, matching Web's context -> beforeSend ordering.
+            if (tags != null) tags.remove(FTVisitorIdManager.KEY);
+            if (fields != null) fields.remove(FTVisitorIdManager.KEY);
         }
         applyModifier(tags);
         applyModifier(fields);
@@ -331,6 +347,16 @@ public class SyncDataHelper {
                 fields.putAll(rumStaticFields);
             } else {
                 mergeWebViewNativeTags(mergeTags, rumTags);
+                // Browser owns this identity (including its absence). Native global
+                // contexts must not replace it or add a second copy beside a Browser field.
+                mergeTags.remove(FTVisitorIdManager.KEY);
+                if (tags != null && tags.containsKey(FTVisitorIdManager.KEY)) {
+                    mergeTags.put(FTVisitorIdManager.KEY, tags.get(FTVisitorIdManager.KEY));
+                }
+            }
+            if (visitorId != null) {
+                fields.remove(FTVisitorIdManager.KEY);
+                mergeTags.put(FTVisitorIdManager.KEY, applyModifier(FTVisitorIdManager.KEY, visitorId));
             }
             if (appLineModifier(dataType, measurement, uuid, mergeTags, fields)) {
                 return "";

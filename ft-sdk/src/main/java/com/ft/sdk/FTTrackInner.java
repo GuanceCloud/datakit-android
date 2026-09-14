@@ -254,6 +254,11 @@ public class FTTrackInner {
      */
     void rum(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields,
              RunnerCompleteCallBack callBack, CollectType collectType) {
+        rum(time, measurement, tags, fields, callBack, collectType, null);
+    }
+
+    void rum(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields,
+             RunnerCompleteCallBack callBack, CollectType collectType, String requestVisitorId) {
         long viewDataGenerateTime = 0;//Due to the view update principle, the start time cannot be used, otherwise it will be discarded
         switch (collectType) {
             case NOT_COLLECT:
@@ -270,7 +275,8 @@ public class FTTrackInner {
                 syncRUMDataBackground(collectType == CollectType.COLLECT_BY_ERROR_SAMPLE ?
                                 DataType.RUM_APP_ERROR_SAMPLED : DataType.RUM_APP,
                         viewDataGenerateTime, time, measurement,
-                        tags, fields, callBack);
+                        tags, fields, callBack, requestVisitorId == null
+                                ? FTVisitorIdManager.get().getId() : requestVisitorId);
                 break;
         }
 
@@ -325,12 +331,19 @@ public class FTTrackInner {
     private void syncRUMDataBackground(final DataType dataType, final long dataGenerateTime, final long time,
                                        final String measurement, final HashMap<String, Object> tags,
                                        final HashMap<String, Object> fields, RunnerCompleteCallBack callBack) {
+        syncRUMDataBackground(dataType, dataGenerateTime, time, measurement, tags, fields, callBack, null);
+    }
+
+    private void syncRUMDataBackground(final DataType dataType, final long dataGenerateTime, final long time,
+                                       final String measurement, final HashMap<String, Object> tags,
+                                       final HashMap<String, Object> fields, RunnerCompleteCallBack callBack,
+                                       final String visitorId) {
         DataProcessThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     SyncData recordData = SyncData.getSyncData(dataHelper, dataType,
-                            new LineProtocolBean(measurement, tags, fields, time), dataGenerateTime);
+                            new LineProtocolBean(measurement, tags, fields, time), dataGenerateTime, visitorId);
                     if (recordData == null) {
                         if (callBack != null) {
                             callBack.onComplete();

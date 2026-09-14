@@ -18,6 +18,8 @@ public class ResourceBean {
      * request uuid
      */
     public String id = "";
+    /** SDK-captured Visitor ID used by this request, independent of user properties. */
+    public String visitorId;
     /**
      * Request resource address
      */

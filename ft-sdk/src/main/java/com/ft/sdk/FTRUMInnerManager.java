@@ -1421,7 +1421,7 @@ public class FTRUMInnerManager {
 
 
             FTTrackInner.getInstance().rum(bean.startTime,
-                    Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields, null, collectType);
+                    Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields, null, collectType, bean.visitorId);
 
             long time = Utils.getCurrentNanoTime();
 
@@ -1475,7 +1475,7 @@ public class FTRUMInnerManager {
                     public void onComplete() {
                         increaseError(tags);
                     }
-                }, collectType);
+                }, collectType, bean.visitorId);
             }
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -1501,6 +1501,11 @@ public class FTRUMInnerManager {
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
         setTransformContent(resourceId, params, false);
         setNetState(resourceId, netStatusBean);
+    }
+
+    void setResourceVisitorId(String resourceId, String visitorId) {
+        ResourceBean bean = resourceBeanMap.get(resourceId);
+        if (bean != null) bean.visitorId = visitorId;
     }
 
     /**

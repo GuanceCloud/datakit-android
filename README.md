@@ -14,6 +14,114 @@ GuanceCloud Application Monitoring can collect metric data from various Android 
 ## Documentation
  [Documentation Center](https://docs.guance.com/real-user-monitoring/android/app-access/)   
 
+## Visitor ID request headers (unreleased)
+
+Visitor ID provides an anonymous rate-limiting and RUM correlation key independently of
+Trace and RUM sampling. Set a valid `FTVisitorIdConfig` to enable it; omitting the configuration
+or setting it to `null` disables it. Initialize before building business OkHttp clients:
+
+```java
+FTSdk.install(FTSDKConfig.builder("https://your-intake.example/"));
+FTSdk.initRUMWithConfig(new FTRUMConfig()
+        .setRumAppId("your-rum-app-id")
+        .setVisitorIdConfig(new FTVisitorIdConfig()
+                .setHeader("x-rum-visitor-id")
+                .addMatch("https://api.example.com/")
+                .setTtlHours(24)));
+```
+
+The existing Plugin `OkHttpClient.Builder.build()` hook installs Visitor ID independently
+of automatic Resource and Trace collection. There is no new Plugin hook or coordinated
+Plugin release requirement. Without Plugin instrumentation, install manually after configuring
+your other interceptors and before `build()`:
+
+```java
+OkHttpClient.Builder builder = new OkHttpClient.Builder();
+// Add your other interceptors, including optional FTResourceInterceptor/FTTraceInterceptor.
+OkHttpClient client = FTVisitorIdInterceptor.install(builder).build();
+
+// Only after your application confirms sign-out or an account switch:
+FTSdk.resetVisitorId();
+```
+
+`install(builder)` adds both an application interceptor and a network redirect guard, deduplicates
+them, places the application interceptor first and the guard last. Using only
+`addInterceptor(new FTVisitorIdInterceptor())` omits redirect protection; use the installer.
+Clients built before initialization need manual installation or rebuilding. An installed interceptor
+becomes inactive after SDK shutdown. The helper does not enable Resource or Trace collection.
+
+Configuration is captured at initialization; changing the configuration object afterwards does not
+change the running SDK. There is no separate `setEnabled` switch. `header` must be a lowercase HTTP token, with no
+authentication, CSRF, signature, Trace or protocol-reserved header name. The header is required
+when enabled; there is no brand-specific default. Invalid configuration disables only Visitor ID
+and emits a diagnostic through SDK logging (enable `FTSDKConfig.setDebug(true)` to inspect it).
+Provide at least one matching rule: `addMatch(String)` requires a complete URL prefix with the
+same scheme, host and effective port; `addMatch(Pattern)` searches the full URL;
+`addMatch(FTVisitorIdConfig.UrlMatcher)` accepts a predicate. Matching predicates should be pure
+and may run more than once per request; exceptions are isolated as non-matches.
+
+Matched requests replace all existing values of the configured header with the SDK value.
+Unmatched requests retain caller headers. SDK intake endpoint prefixes are excluded under the
+configured DataKit/Dataway base path: RUM (including replay uploads), logging, replay asset checks,
+remote configuration and filter polling. Exclusion follows dynamic upload-address changes;
+same-origin business APIs remain eligible. `FTRUMConfig.setResourceUrlHandler(...)` also excludes
+Visitor headers, independently of Resource collection; a throwing exclusion callback skips injection.
+The redirect guard checks each network destination and removes SDK-injected headers outside the
+match range. Allowed redirect/retry hops retain the initial request ID even after TTL/reset.
+
+The default TTL is 24 hours, measured from generation without sliding renewal. Expiration is
+checked on the next read. SharedPreferences stores `p` plus 32 lowercase hexadecimal characters;
+failed persistence falls back to `s` plus 32 lowercase hexadecimal characters for the current
+manager lifetime. Reads, rotation and reset are synchronized. A valid persistent record survives
+process restarts; damaged records self-heal. A fallback remains stable until TTL/reset even if
+storage recovers, then retries persistence. When storage cannot be written, a reset cannot be
+guaranteed to survive process death; the fallback lifetime ends with that process/SDK lifecycle.
+Do not parse IDs in business logic. Each app process has its own storage record and ID; this is
+not a cross-process SharedPreferences coordination mechanism. The SDK defaults to its main process.
+
+Native RUM events carry `visitor_id` as a tag. Requests capture an ID before execution; their
+Resource and associated network Error use that snapshot even if reset occurs in flight.
+Other native RUM events capture the current ID before entering the asynchronous write queue.
+When a trusted snapshot exists, ordinary Global/View/Event contexts cannot override it. Following
+Web 3.3.15's `beforeSend` semantics, final modifiers may explicitly change the reported value:
+the SDK applies `DataModifier` to the trusted ID, then `LineDataModifier` to the assembled event,
+then data filters. Return an empty string for `visitor_id` to omit the tag from line protocol.
+The existing Modifier contract is unchanged: `null` means no modification; returning a map without
+`visitor_id` also leaves it unchanged. These changes affect RUM only, never the manager or request
+header, so deliberate redaction breaks Header-to-RUM equality for that event.
+Browser RUM inside WebView retains the Browser SDK's Visitor ID; native global contexts do not
+supply or overwrite it.
+Historical recovered events without an original Visitor ID snapshot are not retroactively labeled.
+
+```java
+// Configure on FTSDKConfig before FTSdk.install(...).
+baseConfig.setLineDataModifier((measurement, data) -> {
+    HashMap<String, Object> changes = new HashMap<>();
+    if (data.containsKey("visitor_id")) {
+        changes.put("visitor_id", ""); // Explicitly omit it from RUM, as with Web beforeSend deletion.
+    }
+    return changes;
+});
+```
+
+`resetVisitorId()` does not reset the RUM Session, bound user, Trace IDs or sampling. It is not
+implicitly called by `unbindRumUserData()`, a 401 response, a network failure or an unsampled
+session. An unsampled session still sends Visitor headers but does not force RUM data collection.
+
+Coverage is OkHttp HTTP(S) requests. WebSocket handshakes, HttpURLConnection, Cronet, WebView
+internal traffic and other network stacks are outside the initial coverage. No runtime dependency,
+minimum Android version or database schema change is required.
+
+Visitor ID is client-controlled and is only a rate-limit bucket/correlation key, never an
+authentication, tenant-isolation or audit identity. For Cloudflare Advanced Rate Limiting, use
+two separate rules: requests with the configured header count by that header; missing-header
+traffic counts by `ip.src`. Keep penalties short and adapt thresholds to the service.
+The [Web Visitor ID guide](https://docs.guance.com/real-user-monitoring/web/visitor-id/)
+includes a two-rule template, including `counting_expression`; the same template applies to
+Android traffic using the same header. Follow the
+[Cloudflare API documentation](https://developers.cloudflare.com/waf/rate-limiting-rules/create-api/)
+to adapt it to an existing `http_ratelimit` ruleset. SDK initialization does not deploy gateway rules.
+
 ## Open Source Code Usage
 * [ft-session-replay](ft-session-replay) is a secondary development based on datadog [dd-sdk-android-session-replay](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay)
 * [ft-session-replay-material](ft-session-replay-material) is a secondary development based on datadog [dd-sdk-android-session-replay-material](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay-material)

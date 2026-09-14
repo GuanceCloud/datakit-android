@@ -625,6 +625,23 @@ public class FTRUMConfig {
         return !Utils.isNullOrEmpty(rumAppId);
     }
 
+    private FTVisitorIdConfig visitorIdConfig;
+
+    /**
+     * Setting a non-null configuration enables visitor headers; null (the default) disables them.
+     * Independent of RUM/Trace sampling and Resource collection.
+     * Configuration is captured during initRUMWithConfig; subsequent mutations do not apply.
+     */
+    public FTRUMConfig setVisitorIdConfig(FTVisitorIdConfig config) {
+        visitorIdConfig = config;
+        return this;
+    }
+
+    /** Returns the initialization-only Visitor ID configuration, or null when not configured. */
+    public FTVisitorIdConfig getVisitorIdConfig() {
+        return visitorIdConfig;
+    }
+
     /***
      * Add global parameters in RUM
      * @param key attribute key
