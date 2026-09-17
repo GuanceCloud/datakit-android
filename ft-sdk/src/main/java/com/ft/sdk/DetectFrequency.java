@@ -17,7 +17,7 @@ import com.ft.sdk.garble.utils.Constants;
  * {@link Constants#KEY_FPS_MINI}
  * Display accuracy
  * <p>
- *  Set via {@link FTRUMConfig#setDeviceMetricsMonitorType(DeviceMetricsMonitorType, DetectFrequency)}
+ *  Set via {@link FTRUMConfig#setDeviceMetricsMonitorTypes(DetectFrequency, DeviceMetricsMonitorType...)}
  *
  * For collection types, see {@link DeviceMetricsMonitorType}
  *
@@ -56,4 +56,3 @@ public enum DetectFrequency {
         return value;
     }
 }
-

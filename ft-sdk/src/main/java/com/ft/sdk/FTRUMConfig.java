@@ -662,9 +662,110 @@ public class FTRUMConfig {
 
 
     /**
-     * Support or parameter battery | cpu | memory
+     * Selects device metrics for RUM views without manually building a bit mask.
+     * Configure this before passing the config to {@link FTSdk#initRUMWithConfig(FTRUMConfig)}.
+     * <pre>{@code
+     * config.setDeviceMetricsMonitorTypes(
+     *         DeviceMetricsMonitorType.CPU,
+     *         DeviceMetricsMonitorType.MEMORY,
+     *         DeviceMetricsMonitorType.FPS);
+     *
+     * // All metrics
+     * config.setDeviceMetricsMonitorTypes(DeviceMetricsMonitorType.ALL);
+     *
+     * // Disable device metrics
+     * config.setDeviceMetricsMonitorTypes();
+     * }</pre>
+     * Each call replaces the previous selection. Duplicate types have no additional effect.
+     * The configured collection interval is preserved, initially
+     * {@link DetectFrequency#DEFAULT} (500 ms). See
+     * {@link #setDeviceMetricsMonitorTypes(DetectFrequency, DeviceMetricsMonitorType...)}
+     * to configure the interval.
+     *
+     * @param types non-null metric types; an empty argument list disables device metrics
+     * @return this config for chaining
+     * @throws IllegalArgumentException if the array or any element is null;
+     *                                  the previous configuration is preserved
+     */
+    public FTRUMConfig setDeviceMetricsMonitorTypes(@NonNull DeviceMetricsMonitorType... types) {
+        return setDeviceMetricsMonitorType(toDeviceMetricsMonitorMask(types));
+    }
+
+    /**
+     * Selects device metrics and their collection interval for RUM views.
+     * Configure this before passing the config to {@link FTSdk#initRUMWithConfig(FTRUMConfig)}.
+     * <pre>{@code
+     * config.setDeviceMetricsMonitorTypes(
+     *         DetectFrequency.RARE,
+     *         DeviceMetricsMonitorType.CPU,
+     *         DeviceMetricsMonitorType.MEMORY);
+     * }</pre>
+     * Each call replaces both the previous selection and collection interval.
+     * Duplicate types have no additional effect; {@link DeviceMetricsMonitorType#ALL}
+     * selects all metrics. No metric arguments disable device metrics while updating the interval.
      * <p>
-     * setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
+     * Prefer {@link DetectFrequency#DEFAULT} (500 ms) for normal use.
+     * {@link DetectFrequency#RARE} (1000 ms) reduces sampling frequency but may miss
+     * short-lived changes. Reserve {@link DetectFrequency#FREQUENT} (100 ms) for
+     * short-term diagnostics after evaluating collection overhead.
+     *
+     * @param frequency non-null metric collection frequency
+     * @param types non-null metric types; an empty argument list disables device metrics
+     * @return this config for chaining
+     * @throws IllegalArgumentException if the frequency, array, or any element is null;
+     *                                  the previous configuration is preserved
+     */
+    public FTRUMConfig setDeviceMetricsMonitorTypes(@NonNull DetectFrequency frequency,
+                                                  @NonNull DeviceMetricsMonitorType... types) {
+        if (frequency == null) {
+            throw new IllegalArgumentException("Device metric collection frequency must not be null");
+        }
+        return setDeviceMetricsMonitorType(toDeviceMetricsMonitorMask(types), frequency);
+    }
+
+    private static int toDeviceMetricsMonitorMask(DeviceMetricsMonitorType... types) {
+        if (types == null) {
+            throw new IllegalArgumentException("Device metric types must not be null");
+        }
+        int mask = DeviceMetricsMonitorType.NO_SET;
+        for (DeviceMetricsMonitorType type : types) {
+            if (type == null) {
+                throw new IllegalArgumentException("Device metric type must not be null");
+            }
+            mask |= type.getValue();
+        }
+        return mask;
+    }
+
+    /**
+     * Sets the device metrics collected for RUM views. Monitoring is disabled by default.
+     * For enum-based selection, prefer {@link #setDeviceMetricsMonitorTypes(DeviceMetricsMonitorType...)}.
+     * Configure this before passing the config to {@link FTSdk#initRUMWithConfig(FTRUMConfig)}.
+     * <p>
+     * Select only the metrics your application needs. For general view monitoring, consider
+     * CPU, memory, and FPS; add battery monitoring when needed (unsupported on TV devices).
+     * Use {@link DeviceMetricsMonitorType#getValue()} for each type and combine values with
+     * the bitwise OR operator ({@code |}):
+     * <pre>{@code
+     * // Single metric
+     * config.setDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU.getValue());
+     *
+     * // Multiple metrics
+     * config.setDeviceMetricsMonitorType(
+     *         DeviceMetricsMonitorType.CPU.getValue()
+     *                 | DeviceMetricsMonitorType.MEMORY.getValue()
+     *                 | DeviceMetricsMonitorType.FPS.getValue());
+     *
+     * // All metrics
+     * config.setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue());
+     *
+     * // Disable device metrics
+     * config.setDeviceMetricsMonitorType(DeviceMetricsMonitorType.NO_SET);
+     * }</pre>
+     * Each call replaces the previous selection; repeated calls do not add metrics.
+     * This overload preserves the configured collection interval, initially
+     * {@link DetectFrequency#DEFAULT} (500 ms). Use
+     * {@link #setDeviceMetricsMonitorType(int, DetectFrequency)} to change the interval.
      *
      * @param deviceMetricsMonitorType bit mask built from {@link DeviceMetricsMonitorType}
      * @return this config for chaining
@@ -679,6 +780,8 @@ public class FTRUMConfig {
      *
      * @param deviceMetricsMonitorType device metric type to collect
      * @return this config for chaining
+     * @deprecated Use {@link #setDeviceMetricsMonitorType(int)} with {@code type.getValue()}.
+     * Multiple types can be combined using {@code |}.
      */
     @Deprecated
     public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType) {
@@ -688,9 +791,24 @@ public class FTRUMConfig {
 
     /**
      * Sets the device metric types and collection frequency for RUM view monitoring.
+     * For enum-based selection, prefer
+     * {@link #setDeviceMetricsMonitorTypes(DetectFrequency, DeviceMetricsMonitorType...)}.
+     * See {@link #setDeviceMetricsMonitorType(int)} for metric selection examples.
+     * Each call replaces both the previous selection and collection interval.
+     * <p>
+     * Prefer {@link DetectFrequency#DEFAULT} (500 ms) for normal use.
+     * {@link DetectFrequency#RARE} (1000 ms) reduces sampling frequency but may miss
+     * short-lived changes. Reserve {@link DetectFrequency#FREQUENT} (100 ms) for
+     * short-term diagnostics after evaluating collection overhead.
+     * <pre>{@code
+     * config.setDeviceMetricsMonitorType(
+     *         DeviceMetricsMonitorType.CPU.getValue()
+     *                 | DeviceMetricsMonitorType.MEMORY.getValue(),
+     *         DetectFrequency.RARE);
+     * }</pre>
      *
      * @param deviceMetricsMonitorType bit mask built from {@link DeviceMetricsMonitorType}
-     * @param frequency                metric collection frequency
+     * @param frequency                non-null metric collection frequency
      * @return this config for chaining
      */
     public FTRUMConfig setDeviceMetricsMonitorType(int deviceMetricsMonitorType, DetectFrequency frequency) {
@@ -703,8 +821,10 @@ public class FTRUMConfig {
      * Use {@link #setDeviceMetricsMonitorType(int, DetectFrequency)} instead
      *
      * @param deviceMetricsMonitorType device metric type to collect
-     * @param frequency                metric collection frequency
+     * @param frequency                non-null metric collection frequency
      * @return this config for chaining
+     * @deprecated Use {@link #setDeviceMetricsMonitorType(int, DetectFrequency)} with
+     * {@code type.getValue()}. Multiple types can be combined using {@code |}.
      */
     @Deprecated
     public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType, DetectFrequency frequency) {

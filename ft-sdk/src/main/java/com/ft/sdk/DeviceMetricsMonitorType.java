@@ -11,13 +11,17 @@ import java.util.HashMap;
  * Output the battery, memory, CPU, FPS, etc. of the page, through these information to judge the experience of the user browsing the current page,
  * Through observation of the cloud Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">View</a> for inspection
  * <p>
- * Set in {@link FTRUMConfig#setDeviceMetricsMonitorType(DeviceMetricsMonitorType, DetectFrequency)}
+ * Select metrics with {@link FTRUMConfig#setDeviceMetricsMonitorTypes(DeviceMetricsMonitorType...)}.
  * See {@link DetectFrequency } for collection frequency
  *
- * <pre>
- * //Through or operation to achieve multi-selection effect
- * DeviceMetricsMonitorType.ALL = DeviceMetricsMonitorType.ALL|DeviceMetricsMonitorType.BATTERY
- * <pre/>
+ * Pass one or more enum values directly. Use {@link #ALL} for all metrics or no arguments
+ * to disable monitoring. The integer overloads also accept values combined with bitwise OR
+ * ({@code |}) and {@link #NO_SET} to disable monitoring.
+ * <pre>{@code
+ * config.setDeviceMetricsMonitorTypes(
+ *         DeviceMetricsMonitorType.CPU,
+ *         DeviceMetricsMonitorType.MEMORY);
+ * }</pre>
  *
  * @author Brandon
  */
