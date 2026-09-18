@@ -15,7 +15,10 @@ public class RemoteConfigBean {
     public static final String KEY_COMPRESS_INTAKE_REQUESTS = "compressIntakeRequests";
     public static final String KEY_SYNC_PAGE_SIZE = "syncPageSize";
     public static final String KEY_SYNC_SLEEP_TIME = "syncSleepTime";
+    /** @deprecated Use KEY_SESSION_SAMPLING_RATE (percentage). */
+    @Deprecated
     public static final String KEY_RUM_SAMPLE_RATE = "rumSampleRate";
+    public static final String KEY_SESSION_SAMPLING_RATE = "sessionSamplingRate";
     public static final String KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE = "rumSessionOnErrorSampleRate";
     public static final String KEY_RUM_ENABLE_TRACE_USER_ACTION = "rumEnableTraceUserAction";
     public static final String KEY_RUM_ENABLE_TRACE_USER_VIEW = "rumEnableTraceUserView";
@@ -27,12 +30,18 @@ public class RemoteConfigBean {
     public static final String KEY_RUM_ENABLE_TRACK_APP_ANR = "rumEnableTrackAppANR";
     public static final String KEY_RUM_ENABLE_TRACE_WEB_VIEW = "rumEnableTraceWebView";
     public static final String KEY_RUM_ALLOW_WEB_VIEW_HOST = "rumAllowWebViewHost";
+    /** @deprecated Use KEY_LOG_SAMPLING_RATE (percentage). */
+    @Deprecated
     public static final String KEY_LOG_SAMPLE_RATE = "logSampleRate";
+    public static final String KEY_LOG_SAMPLING_RATE = "logSamplingRate";
     public static final String KEY_LOG_LEVEL_FILTERS = "logLevelFilters";
     public static final String KEY_LOG_ENABLE_CUSTOM_LOG = "logEnableCustomLog";
     public static final String KEY_LOG_ENABLE_CONSOLE_LOG = "logEnableConsoleLog";
     public static final String KEY_LOG_ENABLE_WEB_VIEW_LOG = "logEnableWebViewLog";
+    /** @deprecated Use KEY_TRACE_SAMPLING_RATE (percentage). */
+    @Deprecated
     public static final String KEY_TRACE_SAMPLE_RATE = "traceSampleRate";
+    public static final String KEY_TRACE_SAMPLING_RATE = "traceSamplingRate";
     public static final String KEY_TRACE_ENABLE_AUTO_TRACE = "traceEnableAutoTrace";
     public static final String KEY_TRACE_TYPE = "traceType";
     public static final String KEY_SESSION_REPLAY_SAMPLE_RATE = "sessionReplaySampleRate";
@@ -113,6 +122,24 @@ public class RemoteConfigBean {
         return obj.has(key) && obj.opt(key) instanceof String;
     }
 
+    private Float parseSamplingRate(JSONObject content, String percentageKey, String legacyKey) {
+        if (content.has(percentageKey)) {
+            Object value = content.opt(percentageKey);
+            if (value instanceof Number) {
+                double percentage = ((Number) value).doubleValue();
+                if (!Double.isNaN(percentage) && !Double.isInfinite(percentage)
+                        && percentage >= 0d && percentage <= 100d) {
+                    return (float) (percentage / 100d);
+                }
+            }
+            LogUtils.e(TAG, percentageKey + " must be a finite number in [0, 100]; ignoring update");
+            // An invalid new key must not silently fall back to a conflicting legacy key.
+            return null;
+        }
+        // Preserve the parsing behavior of released 0..1 configuration keys.
+        return isNumber(content, legacyKey) ? (float) content.optDouble(legacyKey) : null;
+    }
+
     void parse(String data) {
         try {
             if (data == null) return;
@@ -132,7 +159,7 @@ public class RemoteConfigBean {
             if (isBoolean(content, KEY_COMPRESS_INTAKE_REQUESTS)) compressIntakeRequests = content.optBoolean(KEY_COMPRESS_INTAKE_REQUESTS);
             if (isNumber(content, KEY_SYNC_PAGE_SIZE)) syncPageSize = content.optInt(KEY_SYNC_PAGE_SIZE);
             if (isNumber(content, KEY_SYNC_SLEEP_TIME)) syncSleepTime = content.optInt(KEY_SYNC_SLEEP_TIME);
-            if (isNumber(content, KEY_RUM_SAMPLE_RATE)) rumSampleRate = (float) content.optDouble(KEY_RUM_SAMPLE_RATE);
+            rumSampleRate = parseSamplingRate(content, KEY_SESSION_SAMPLING_RATE, KEY_RUM_SAMPLE_RATE);
             if (isNumber(content, KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE)) rumSessionOnErrorSampleRate = (float) content.optDouble(KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE);
             if (isBoolean(content, KEY_RUM_ENABLE_TRACE_USER_ACTION)) rumEnableTraceUserAction = content.optBoolean(KEY_RUM_ENABLE_TRACE_USER_ACTION);
             if (isBoolean(content, KEY_RUM_ENABLE_TRACE_USER_VIEW)) rumEnableTraceUserView = content.optBoolean(KEY_RUM_ENABLE_TRACE_USER_VIEW);
@@ -165,7 +192,7 @@ public class RemoteConfigBean {
                 LogUtils.e(TAG, KEY_RUM_ALLOW_WEB_VIEW_HOST + " is not a valid JSONArray or String");
             }
 
-            if (isNumber(content, KEY_LOG_SAMPLE_RATE)) logSampleRate = (float) content.optDouble(KEY_LOG_SAMPLE_RATE);
+            logSampleRate = parseSamplingRate(content, KEY_LOG_SAMPLING_RATE, KEY_LOG_SAMPLE_RATE);
 
             Object logFilterObj = content.opt(KEY_LOG_LEVEL_FILTERS);
             if (logFilterObj instanceof String) {
@@ -191,7 +218,7 @@ public class RemoteConfigBean {
             if (isBoolean(content, KEY_LOG_ENABLE_CUSTOM_LOG)) logEnableCustomLog = content.optBoolean(KEY_LOG_ENABLE_CUSTOM_LOG);
             if (isBoolean(content, KEY_LOG_ENABLE_CONSOLE_LOG)) logEnableConsoleLog = content.optBoolean(KEY_LOG_ENABLE_CONSOLE_LOG);
             if (isBoolean(content, KEY_LOG_ENABLE_WEB_VIEW_LOG)) logEnableWebViewLog = content.optBoolean(KEY_LOG_ENABLE_WEB_VIEW_LOG);
-            if (isNumber(content, KEY_TRACE_SAMPLE_RATE)) traceSampleRate = (float) content.optDouble(KEY_TRACE_SAMPLE_RATE);
+            traceSampleRate = parseSamplingRate(content, KEY_TRACE_SAMPLING_RATE, KEY_TRACE_SAMPLE_RATE);
             if (isBoolean(content, KEY_TRACE_ENABLE_AUTO_TRACE)) traceEnableAutoTrace = content.optBoolean(KEY_TRACE_ENABLE_AUTO_TRACE);
             if (isString(content, KEY_TRACE_TYPE)) traceType = content.optString(KEY_TRACE_TYPE);
             if (isNumber(content, KEY_SESSION_REPLAY_SAMPLE_RATE)) sessionReplaySampleRate = (float) content.optDouble(KEY_SESSION_REPLAY_SAMPLE_RATE);
@@ -225,6 +252,11 @@ public class RemoteConfigBean {
 
     public Integer getSyncSleepTime() {
         return syncSleepTime;
+    }
+
+    /** Returns the effective percentage, or null when no valid update is present. */
+    public Float getSessionSamplingRate() {
+        return rumSampleRate == null ? null : rumSampleRate * 100f;
     }
 
     public Float getRumSampleRate() {
@@ -267,6 +299,11 @@ public class RemoteConfigBean {
         return rumAllowWebViewHost;
     }
 
+    /** Returns the effective percentage, or null when no valid update is present. */
+    public Float getLogSamplingRate() {
+        return logSampleRate == null ? null : logSampleRate * 100f;
+    }
+
     public Float getLogSampleRate() {
         return logSampleRate;
     }
@@ -281,6 +318,11 @@ public class RemoteConfigBean {
 
     public Boolean getLogEnableWebViewLog() {
         return logEnableWebViewLog;
+    }
+
+    /** Returns the effective percentage, or null when no valid update is present. */
+    public Float getTraceSamplingRate() {
+        return traceSampleRate == null ? null : traceSampleRate * 100f;
     }
 
     public Float getTraceSampleRate() {
@@ -537,6 +579,9 @@ public class RemoteConfigBean {
             }
             if (rumSampleRate != null) {
                 content.put(KEY_RUM_SAMPLE_RATE, rumSampleRate);
+                if (content.has(KEY_SESSION_SAMPLING_RATE)) {
+                    content.put(KEY_SESSION_SAMPLING_RATE, rumSampleRate * 100d);
+                }
             }
             if (rumSessionOnErrorSampleRate != null) {
                 content.put(KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE, rumSessionOnErrorSampleRate);
@@ -577,6 +622,9 @@ public class RemoteConfigBean {
             }
             if (logSampleRate != null) {
                 content.put(KEY_LOG_SAMPLE_RATE, logSampleRate);
+                if (content.has(KEY_LOG_SAMPLING_RATE)) {
+                    content.put(KEY_LOG_SAMPLING_RATE, logSampleRate * 100d);
+                }
             }
             if (logLevelFilters != null) {
                 JSONArray logFilterArray = new JSONArray();
@@ -596,6 +644,9 @@ public class RemoteConfigBean {
             }
             if (traceSampleRate != null) {
                 content.put(KEY_TRACE_SAMPLE_RATE, traceSampleRate);
+                if (content.has(KEY_TRACE_SAMPLING_RATE)) {
+                    content.put(KEY_TRACE_SAMPLING_RATE, traceSampleRate * 100d);
+                }
             }
             if (traceEnableAutoTrace != null) {
                 content.put(KEY_TRACE_ENABLE_AUTO_TRACE, traceEnableAutoTrace);

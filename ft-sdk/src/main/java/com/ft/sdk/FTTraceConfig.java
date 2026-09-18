@@ -14,6 +14,7 @@ public class FTTraceConfig {
      * Sampling rate, [0,1]
      */
     private float samplingRate = 1;
+    private boolean percentageSamplingRateSet;
     /**
      * Trace type chain
      */
@@ -77,7 +78,9 @@ public class FTTraceConfig {
 
     /**
      * Returns the trace sampling rate.
+     * @deprecated Use {@link #getTraceSamplingRate()} with a percentage.
      */
+    @Deprecated
     public float getSamplingRate() {
         return samplingRate;
     }
@@ -87,10 +90,45 @@ public class FTTraceConfig {
      *
      * @param samplingRate sampling rate in the range [0, 1]
      * @return this config for chaining
+     * @deprecated Use {@link #setTraceSamplingRate(float)} with a percentage.
      */
+    @Deprecated
     public FTTraceConfig setSamplingRate(float samplingRate) {
-        this.samplingRate = samplingRate;
+        if (!percentageSamplingRateSet) {
+            this.samplingRate = samplingRate;
+        }
         return this;
+    }
+
+    /**
+     * Returns the effective traceSamplingRate percentage in [0, 100]. Default: 100.
+     */
+    public float getTraceSamplingRate() {
+        return samplingRate * 100f;
+    }
+
+    /**
+     * Sets traceSamplingRate as a percentage. For example, 0.1f means 0.1%.
+     * Takes precedence over the deprecated setSamplingRate, regardless of call order.
+     * Remote configuration continues to override local configuration.
+     *
+     * @param traceSamplingRate finite percentage in [0, 100]
+     * @return this config for chaining
+     * @throws IllegalArgumentException for a non-finite or out-of-range value
+     */
+    public FTTraceConfig setTraceSamplingRate(float traceSamplingRate) {
+        if (Float.isNaN(traceSamplingRate) || Float.isInfinite(traceSamplingRate)
+                || traceSamplingRate < 0f || traceSamplingRate > 100f) {
+            throw new IllegalArgumentException("traceSamplingRate must be a finite number in [0, 100]");
+        }
+        this.samplingRate = traceSamplingRate / 100f;
+        this.percentageSamplingRateSet = true;
+        return this;
+    }
+
+    // Remote values have already been normalized to the legacy probability scale.
+    void setRemoteSamplingRate(float samplingRate) {
+        this.samplingRate = samplingRate;
     }
 
     /**
