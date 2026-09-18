@@ -115,7 +115,7 @@ public class FTRemoteConfigManager {
                 config.setRemoteSamplingRate(mRemoteConfig.getRumSampleRate());
             }
             if (mRemoteConfig.getRumSessionOnErrorSampleRate() != null) {
-                config.setSessionErrorSampleRate(mRemoteConfig.getRumSessionOnErrorSampleRate());
+                config.setRemoteSessionErrorSampleRate(mRemoteConfig.getRumSessionOnErrorSampleRate());
             }
             if (mRemoteConfig.getRumEnableTraceUserAction() != null) {
                 config.setEnableTraceUserAction(mRemoteConfig.getRumEnableTraceUserAction());
@@ -413,7 +413,7 @@ public class FTRemoteConfigManager {
                 rumConfig.setRemoteSamplingRate(bean.getRumSampleRate());
             }
             if (bean.getRumSessionOnErrorSampleRate() != null) {
-                rumConfig.setSessionErrorSampleRate(bean.getRumSessionOnErrorSampleRate());
+                rumConfig.setRemoteSessionErrorSampleRate(bean.getRumSessionOnErrorSampleRate());
             }
 
             boolean replayEnable = FTSdk.isSessionReplaySupport();

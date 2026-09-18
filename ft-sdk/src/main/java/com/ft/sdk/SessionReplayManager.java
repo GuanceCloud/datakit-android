@@ -91,19 +91,34 @@ public class SessionReplayManager implements FeatureSdkCore {
      *
      * @param sessionReplaySampleRate
      * @param sessionReplayOnErrorSampleRate
+     * @deprecated Use hotUpdateSamplingRates with percentage values.
      */
+    @Deprecated
     public void hotUpdate(Float sessionReplaySampleRate, Float sessionReplayOnErrorSampleRate) {
         if (sessionReplayFeature != null) {
             if (sessionReplayFeature.isRecording()) {
-                if (sessionReplaySampleRate == 0) {
+                if (sessionReplaySampleRate != null && sessionReplaySampleRate == 0) {
                     FTRUMInnerManager.get().forceRefreshSessionReplay();
                 }
             } else {
-                if (sessionReplaySampleRate == 1 || sessionReplayOnErrorSampleRate == 1) {
+                if ((sessionReplaySampleRate != null && sessionReplaySampleRate == 1)
+                        || (sessionReplayOnErrorSampleRate != null && sessionReplayOnErrorSampleRate == 1)) {
                     FTRUMInnerManager.get().forceRefreshSessionReplay();
                 }
             }
         }
+    }
+
+    /**
+     * Applies the existing session-refresh decision using percentages in [0,100].
+     * Null means no update for that field. This lifecycle notification does not
+     * assign sampler values; set them through the corresponding setters first.
+     */
+    public void hotUpdateSamplingRates(Float sessionReplaySamplingRate, Float sessionReplayOnErrorSamplingRate) {
+        if (sessionReplaySamplingRate != null) validateSamplingPercentage(sessionReplaySamplingRate);
+        if (sessionReplayOnErrorSamplingRate != null) validateSamplingPercentage(sessionReplayOnErrorSamplingRate);
+        hotUpdate(sessionReplaySamplingRate == null ? null : sessionReplaySamplingRate / 100f,
+                sessionReplayOnErrorSamplingRate == null ? null : sessionReplayOnErrorSamplingRate / 100f);
     }
 
     private final Map<String, Map<String, Object>> fieldLinkMap = new ConcurrentHashMap<>();
@@ -136,18 +151,24 @@ public class SessionReplayManager implements FeatureSdkCore {
         }
     }
 
+    /** @deprecated Use setSessionReplaySamplingRate, in percent. */
+    @Deprecated
     public void setSampleRate(float sampleRate) {
         if (sessionReplayFeature != null) {
             sessionReplayFeature.updateSampleRate(sampleRate);
         }
     }
 
+    /** @deprecated Use setSessionReplayOnErrorSamplingRate, in percent. */
+    @Deprecated
     public void setSessionReplayOnErrorSampleRate(float sessionReplayOnErrorSampleRate) {
         if (sessionReplayFeature != null) {
             sessionReplayFeature.updateSessionReplayOnErrorSampleRate(sessionReplayOnErrorSampleRate);
         }
     }
 
+    /** @deprecated Use getSessionReplaySamplingRate, in percent. */
+    @Deprecated
     public Float sampleRate() {
         if (sessionReplayFeature != null) {
             return sessionReplayFeature.getSampleRate();
@@ -155,11 +176,43 @@ public class SessionReplayManager implements FeatureSdkCore {
         return null;
     }
 
+    /** @deprecated Use getSessionReplayOnErrorSamplingRate, in percent. */
+    @Deprecated
     public Float sessionReplayOnErrorSampleRate() {
         if (sessionReplayFeature != null) {
             return sessionReplayFeature.getSessionReplayOnErrorSampleRate();
         }
         return null;
+    }
+
+    /** Sets the active Replay sampling percentage in [0,100]. */
+    public void setSessionReplaySamplingRate(float percentage) {
+        validateSamplingPercentage(percentage);
+        setSampleRate(percentage / 100f);
+    }
+
+    /** Sets the active error-Replay sampling percentage in [0,100]. */
+    public void setSessionReplayOnErrorSamplingRate(float percentage) {
+        validateSamplingPercentage(percentage);
+        setSessionReplayOnErrorSampleRate(percentage / 100f);
+    }
+
+    /** Returns the active Replay percentage, or null when Replay is unavailable. */
+    public Float getSessionReplaySamplingRate() {
+        Float probability = sampleRate();
+        return probability == null ? null : probability * 100f;
+    }
+
+    /** Returns the active error-Replay percentage, or null when Replay is unavailable. */
+    public Float getSessionReplayOnErrorSamplingRate() {
+        Float probability = sessionReplayOnErrorSampleRate();
+        return probability == null ? null : probability * 100f;
+    }
+
+    private static void validateSamplingPercentage(float percentage) {
+        if (Float.isNaN(percentage) || Float.isInfinite(percentage) || percentage < 0f || percentage > 100f) {
+            throw new IllegalArgumentException("Sampling percentage must be finite and within [0,100]");
+        }
     }
 
     public RecordWriter getCurrentSessionWriter() {

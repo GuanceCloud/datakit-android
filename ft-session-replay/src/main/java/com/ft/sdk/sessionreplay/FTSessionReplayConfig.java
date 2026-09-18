@@ -27,6 +27,8 @@ public class FTSessionReplayConfig {
     @FloatRange(from = 0.0, to = 1.0)
     private float sampleRate = 1f;
     private float sessionReplayOnErrorSampleRate = 0f;
+    private boolean percentageSamplingRateSet;
+    private boolean percentageErrorSamplingRateSet;
     private boolean delayInit;
     private String[] rumLinkKeys = new String[]{};
     private boolean fineGrainedMaskingSet = false;
@@ -42,9 +44,11 @@ public class FTSessionReplayConfig {
      *
      * @param sampleRate the sampling rate to apply
      * @return the current configuration instance
+     * @deprecated Use setSessionReplaySamplingRate(float), in percent.
      */
+    @Deprecated
     public FTSessionReplayConfig setSampleRate(@FloatRange(from = 0.0, to = 1.0) float sampleRate) {
-        this.sampleRate = sampleRate;
+        if (!percentageSamplingRateSet) this.sampleRate = sampleRate;
         return this;
     }
 
@@ -54,10 +58,48 @@ public class FTSessionReplayConfig {
      *
      * @param sessionReplayOnErrorSampleRate the error-session sampling rate to apply
      * @return the current configuration instance
+     * @deprecated Use setSessionReplayOnErrorSamplingRate(float), in percent.
      */
+    @Deprecated
     public FTSessionReplayConfig setSessionReplayOnErrorSampleRate(@FloatRange(from = 0.0, to = 1.0) float sessionReplayOnErrorSampleRate) {
-        this.sessionReplayOnErrorSampleRate = sessionReplayOnErrorSampleRate;
+        if (!percentageErrorSamplingRateSet) this.sessionReplayOnErrorSampleRate = sessionReplayOnErrorSampleRate;
         return this;
+    }
+
+    /** Returns the effective SessionReplaySamplingRate percentage. */
+    public float getSessionReplaySamplingRate() { return sampleRate * 100f; }
+
+    /** Sets a finite percentage in [0,100]; explicit new values take precedence over legacy values. */
+    public FTSessionReplayConfig setSessionReplaySamplingRate(@FloatRange(from = 0.0, to = 100.0) float percentage) {
+        validatePercentage(percentage);
+        sampleRate = percentage / 100f;
+        percentageSamplingRateSet = true;
+        return this;
+    }
+
+    /** Returns the effective SessionReplayOnErrorSamplingRate percentage. */
+    public float getSessionReplayOnErrorSamplingRate() { return sessionReplayOnErrorSampleRate * 100f; }
+
+    /** Sets a finite percentage in [0,100]; explicit new values take precedence over legacy values. */
+    public FTSessionReplayConfig setSessionReplayOnErrorSamplingRate(@FloatRange(from = 0.0, to = 100.0) float percentage) {
+        validatePercentage(percentage);
+        sessionReplayOnErrorSampleRate = percentage / 100f;
+        percentageErrorSamplingRateSet = true;
+        return this;
+    }
+
+    private static void validatePercentage(float percentage) {
+        if (Float.isNaN(percentage) || Float.isInfinite(percentage) || percentage < 0f || percentage > 100f) {
+            throw new IllegalArgumentException("Sampling percentage must be finite and within [0,100]");
+        }
+    }
+
+    // Reflection-only SDK bridge: retain the existing 0..1 native protocol and remote priority.
+    // Return true to distinguish this path from an older Replay module without this method.
+    boolean applyRemoteSamplingRates(Float probability, Float errorProbability) {
+        if (probability != null) sampleRate = probability;
+        if (errorProbability != null) sessionReplayOnErrorSampleRate = errorProbability;
+        return true;
     }
 
     /**
@@ -267,14 +309,18 @@ public class FTSessionReplayConfig {
 
     /**
      * Returns the regular Session Replay sampling rate.
+     * @deprecated Use getSessionReplaySamplingRate(), in percent.
      */
+    @Deprecated
     public float getSampleRate() {
         return sampleRate;
     }
 
     /**
      * Returns the error-session sampling rate.
+     * @deprecated Use getSessionReplayOnErrorSamplingRate(), in percent.
      */
+    @Deprecated
     public float getSessionReplayOnErrorSampleRate() {
         return sessionReplayOnErrorSampleRate;
     }

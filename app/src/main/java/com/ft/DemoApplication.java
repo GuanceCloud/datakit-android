@@ -171,9 +171,9 @@ public class DemoApplication extends BaseApplication {
                         }
 
                         if (isVip) {
-                            configBean.setLogSampleRate(0f);
-                            configBean.setRumSampleRate(0f);
-                            configBean.setTraceSampleRate(0f);
+                            configBean.setLogSamplingRate(0f);
+                            configBean.setSessionSamplingRate(0f);
+                            configBean.setTraceSamplingRate(0f);
                         }
                         return configBean;
                     }
@@ -229,7 +229,7 @@ public class DemoApplication extends BaseApplication {
 
     private static void initFTSDKFeatures(Context context) {
         FTSdk.initLogWithConfig(new FTLoggerConfig()
-                .setSamplingRate(1f)
+                .setLogSamplingRate(100f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
                 .setEnableWebViewLog(true)
@@ -242,8 +242,8 @@ public class DemoApplication extends BaseApplication {
 
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                        .setSamplingRate(1f)
-                        .setSessionErrorSampleRate(1f)
+                        .setSessionSamplingRate(100f)
+                        .setSessionOnErrorSamplingRate(100f)
                         .setRumAppId(BuildConfig.RUM_APP_ID)
                         .setEnableTraceUserAction(true)
                         .setEnableTraceUserView(true)
@@ -324,7 +324,7 @@ public class DemoApplication extends BaseApplication {
         FTSdk.bindRumUserData(userData);
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
-                .setSamplingRate(1f)
+                .setTraceSamplingRate(100f)
                 .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(true)
                 // Adapts to configured TraceType. For custom traceId/spanId use new TraceContext.Simple(headers, traceId, spanId)
@@ -339,8 +339,8 @@ public class DemoApplication extends BaseApplication {
                 .setTraceType(TraceType.DDTRACE));
 
         FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
-                        .setSampleRate(1f)
-//                        .setSessionReplayOnErrorSampleRate(1f)
+                        .setSessionReplaySamplingRate(100f)
+//                        .setSessionReplayOnErrorSamplingRate(100f)
 //                        .setPrivacy(SessionReplayPrivacy.MASK)
                         .setTouchPrivacy(TouchPrivacy.SHOW)
                         .setTextAndInputPrivacy(TextAndInputPrivacy.MASK_SENSITIVE_INPUTS)
