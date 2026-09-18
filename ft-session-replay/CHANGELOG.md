@@ -1,6 +1,6 @@
-# Unreleased
-- Add float `setSessionReplaySamplingRate` and `setSessionReplayOnErrorSamplingRate` (0–100), matching getters and feature runtime update APIs. Deprecate the old 0–1 APIs while retaining behavior for legacy callers.
-- Preserve explicit zero and new-over-old initialization precedence; remote configuration still overrides explicit new local settings.
+# replay 0.1.9-alpha05
+1. Added `FTSessionReplayConfig.setSessionReplaySamplingRate(float)` (0–100, default 100) and `setSessionReplayOnErrorSamplingRate(float)` (0–100, default 0), matching getters and feature runtime update APIs. Deprecated the old 0–1 APIs while retaining behavior for legacy callers.
+2. Preserved fractional percentages, explicit zero and new-over-old initialization precedence. When using the new config APIs with remote configuration, use `ft-sdk >= 1.7.6-alpha05` so remote values continue to override explicit new local settings.
 
 ---
 # replay 0.1.9-alpha04

@@ -1,6 +1,7 @@
-# Unreleased
-- Add `setSessionOnErrorSamplingRate` and the three remaining percentage remote keys, covering error sessions and both Replay sampling modes. Deprecate the old 0–1 accessors; add percentage callback setters/getters for all six remote sampling fields.
-- Add Replay runtime percentage APIs and preserve remote-over-local priority with new Replay configs while retaining compatibility with older optional Replay modules.
+# agent 1.7.6-alpha05
+1. Added `FTRUMConfig.setSessionOnErrorSamplingRate(float)` (0–100, default 0) and matching getter. Deprecated the old 0–1 error-session accessors while retaining compatibility; explicit new settings take precedence regardless of setter order.
+2. Added percentage remote keys `sessionOnErrorSamplingRate`, `sessionReplaySamplingRate`, and `sessionReplayOnErrorSamplingRate`, plus percentage callback setters/getters for all six sampling fields. Fractional percentages and explicit zero are supported; invalid new remote values ignore that field without falling back to its legacy alias.
+3. Added Replay runtime percentage APIs and preserved remote-over-local priority with new Replay configs, including cached remote configuration. The new Replay config APIs require `ft-session-replay >= 0.1.9-alpha05`; older optional Replay modules remain supported through the legacy bridge.
 
 ---
 # agent 1.7.6-alpha04

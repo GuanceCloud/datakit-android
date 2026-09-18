@@ -1,3 +1,7 @@
+# replay-compose 0.1.9-alpha05
+1. Aligned with Session Replay 0.1.9-alpha05 for percentage sampling configuration; no module-specific changes.
+
+---
 # replay-compose 0.1.9-alpha04
 1. Aligned with Session Replay 0.1.9-alpha04 for the opt-in Heatmap setting; no module-specific changes.
 
