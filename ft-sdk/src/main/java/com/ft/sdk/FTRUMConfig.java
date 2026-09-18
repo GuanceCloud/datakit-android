@@ -15,6 +15,7 @@ public class FTRUMConfig {
      * Sampling rate, [0,1], scope is all View, Action, LongTask, Error data under the same session_id
      */
     private float samplingRate = 1;
+    private boolean percentageSamplingRateSet;
 
     /**
      * Error sampling rate, [0,1], scope is all View, Action, LongTask, Error data under the same session_id
@@ -193,7 +194,9 @@ public class FTRUMConfig {
      * Get sampling rate
      *
      * @return Sampling rate, float, 0~1
+     * @deprecated Use {@link #getSessionSamplingRate()} with a percentage.
      */
+    @Deprecated
     public float getSamplingRate() {
         return samplingRate;
     }
@@ -204,10 +207,45 @@ public class FTRUMConfig {
      *
      * @param samplingRate RUM session sampling rate in the range [0, 1]
      * @return this config for chaining
+     * @deprecated Use {@link #setSessionSamplingRate(float)} with a percentage.
      */
+    @Deprecated
     public FTRUMConfig setSamplingRate(float samplingRate) {
-        this.samplingRate = samplingRate;
+        if (!percentageSamplingRateSet) {
+            this.samplingRate = samplingRate;
+        }
         return this;
+    }
+
+    /**
+     * Returns the effective sessionSamplingRate percentage in [0, 100]. Default: 100.
+     */
+    public float getSessionSamplingRate() {
+        return samplingRate * 100f;
+    }
+
+    /**
+     * Sets sessionSamplingRate as a percentage. For example, 0.1f means 0.1%.
+     * Takes precedence over the deprecated setSamplingRate, regardless of call order.
+     * Remote configuration continues to override local configuration.
+     *
+     * @param sessionSamplingRate finite percentage in [0, 100]
+     * @return this config for chaining
+     * @throws IllegalArgumentException for a non-finite or out-of-range value
+     */
+    public FTRUMConfig setSessionSamplingRate(float sessionSamplingRate) {
+        if (Float.isNaN(sessionSamplingRate) || Float.isInfinite(sessionSamplingRate)
+                || sessionSamplingRate < 0f || sessionSamplingRate > 100f) {
+            throw new IllegalArgumentException("sessionSamplingRate must be a finite number in [0, 100]");
+        }
+        this.samplingRate = sessionSamplingRate / 100f;
+        this.percentageSamplingRateSet = true;
+        return this;
+    }
+
+    // Remote values have already been normalized to the legacy probability scale.
+    void setRemoteSamplingRate(float samplingRate) {
+        this.samplingRate = samplingRate;
     }
 
     /**

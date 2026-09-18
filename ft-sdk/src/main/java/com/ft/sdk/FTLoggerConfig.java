@@ -22,6 +22,7 @@ public class FTLoggerConfig {
      * Sampling rate, [0,1]
      */
     private float samplingRate = 1;
+    private boolean percentageSamplingRateSet;
     /**
      * Whether to associate with RUM data
      */
@@ -74,7 +75,9 @@ public class FTLoggerConfig {
      * Get sampling rate
      *
      * @return log sampling rate in the range [0, 1]
+     * @deprecated Use {@link #getLogSamplingRate()} with a percentage.
      */
+    @Deprecated
     public float getSamplingRate() {
         return samplingRate;
     }
@@ -84,10 +87,45 @@ public class FTLoggerConfig {
      *
      * @param samplingRate log sampling rate in the range [0, 1]
      * @return this config for chaining
+     * @deprecated Use {@link #setLogSamplingRate(float)} with a percentage.
      */
+    @Deprecated
     public FTLoggerConfig setSamplingRate(float samplingRate) {
-        this.samplingRate = samplingRate;
+        if (!percentageSamplingRateSet) {
+            this.samplingRate = samplingRate;
+        }
         return this;
+    }
+
+    /**
+     * Returns the effective logSamplingRate percentage in [0, 100]. Default: 100.
+     */
+    public float getLogSamplingRate() {
+        return samplingRate * 100f;
+    }
+
+    /**
+     * Sets logSamplingRate as a percentage. For example, 0.1f means 0.1%.
+     * Takes precedence over the deprecated setSamplingRate, regardless of call order.
+     * Remote configuration continues to override local configuration.
+     *
+     * @param logSamplingRate finite percentage in [0, 100]
+     * @return this config for chaining
+     * @throws IllegalArgumentException for a non-finite or out-of-range value
+     */
+    public FTLoggerConfig setLogSamplingRate(float logSamplingRate) {
+        if (Float.isNaN(logSamplingRate) || Float.isInfinite(logSamplingRate)
+                || logSamplingRate < 0f || logSamplingRate > 100f) {
+            throw new IllegalArgumentException("logSamplingRate must be a finite number in [0, 100]");
+        }
+        this.samplingRate = logSamplingRate / 100f;
+        this.percentageSamplingRateSet = true;
+        return this;
+    }
+
+    // Remote values have already been normalized to the legacy probability scale.
+    void setRemoteSamplingRate(float samplingRate) {
+        this.samplingRate = samplingRate;
     }
 
     /**

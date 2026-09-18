@@ -112,7 +112,7 @@ public class FTRemoteConfigManager {
     void mergeRUMConfigFromCache(FTRUMConfig config) {
         if (mRemoteConfig != null) {
             if (mRemoteConfig.getRumSampleRate() != null) {
-                config.setSamplingRate(mRemoteConfig.getRumSampleRate());
+                config.setRemoteSamplingRate(mRemoteConfig.getRumSampleRate());
             }
             if (mRemoteConfig.getRumSessionOnErrorSampleRate() != null) {
                 config.setSessionErrorSampleRate(mRemoteConfig.getRumSessionOnErrorSampleRate());
@@ -160,7 +160,7 @@ public class FTRemoteConfigManager {
     void mergeLogConfigFromCache(FTLoggerConfig config) {
         if (mRemoteConfig != null) {
             if (mRemoteConfig.getLogSampleRate() != null) {
-                config.setSamplingRate(mRemoteConfig.getLogSampleRate());
+                config.setRemoteSamplingRate(mRemoteConfig.getLogSampleRate());
             }
 
             if (mRemoteConfig.getLogLevelFilters() != null) {
@@ -184,7 +184,7 @@ public class FTRemoteConfigManager {
     void mergeTraceConfigFromCache(FTTraceConfig config) {
         if (mRemoteConfig != null) {
             if (mRemoteConfig.getTraceSampleRate() != null) {
-                config.setSamplingRate(mRemoteConfig.getTraceSampleRate());
+                config.setRemoteSamplingRate(mRemoteConfig.getTraceSampleRate());
             }
             if (mRemoteConfig.getTraceEnableAutoTrace() != null) {
                 config.setEnableAutoTrace(mRemoteConfig.getTraceEnableAutoTrace());
@@ -382,7 +382,7 @@ public class FTRemoteConfigManager {
                 loggerConfig.setEnableConsoleLog(bean.getLogEnableConsoleLog());
             }
             if (bean.getLogSampleRate() != null) {
-                loggerConfig.setSamplingRate(bean.getLogSampleRate());
+                loggerConfig.setRemoteSamplingRate(bean.getLogSampleRate());
             }
             if (bean.getLogEnableWebViewLog() != null) {
                 loggerConfig.setEnableWebViewLog(bean.getLogEnableWebViewLog());
@@ -397,7 +397,7 @@ public class FTRemoteConfigManager {
         FTTraceConfig traceConfig = FTTraceConfigManager.get().getConfig();
         if (traceConfig != null) {
             if (bean.getTraceSampleRate() != null) {
-                traceConfig.setSamplingRate(bean.getTraceSampleRate());
+                traceConfig.setRemoteSamplingRate(bean.getTraceSampleRate());
             }
         }
 
@@ -410,7 +410,7 @@ public class FTRemoteConfigManager {
                 rumConfig.setAllowWebViewHost(bean.getRumAllowWebViewHost());
             }
             if (bean.getRumSampleRate() != null) {
-                rumConfig.setSamplingRate(bean.getRumSampleRate());
+                rumConfig.setRemoteSamplingRate(bean.getRumSampleRate());
             }
             if (bean.getRumSessionOnErrorSampleRate() != null) {
                 rumConfig.setSessionErrorSampleRate(bean.getRumSessionOnErrorSampleRate());
