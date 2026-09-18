@@ -285,18 +285,47 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     }
 
 
+    /** Updates regular Replay sampling using a finite percentage in [0,100]. */
+    public void updateSessionReplaySamplingRate(float percentage) {
+        validateSamplingPercentage(percentage);
+        updateSampleRate(percentage / 100f);
+    }
+
+    /** Updates error-Replay sampling using a finite percentage in [0,100]. */
+    public void updateSessionReplayOnErrorSamplingRate(float percentage) {
+        validateSamplingPercentage(percentage);
+        updateSessionReplayOnErrorSampleRate(percentage / 100f);
+    }
+
+    public float getSessionReplaySamplingRate() { return getSampleRate() * 100f; }
+    public float getSessionReplayOnErrorSamplingRate() { return getSessionReplayOnErrorSampleRate() * 100f; }
+
+    private static void validateSamplingPercentage(float percentage) {
+        if (Float.isNaN(percentage) || Float.isInfinite(percentage) || percentage < 0f || percentage > 100f) {
+            throw new IllegalArgumentException("Sampling percentage must be finite and within [0,100]");
+        }
+    }
+
+    /** @deprecated Use updateSessionReplaySamplingRate, in percent. */
+    @Deprecated
     public void updateSampleRate(float sampleRate) {
         sessionRelaySampler = new RateBasedSampler(sampleRate);
     }
 
+    /** @deprecated Use updateSessionReplayOnErrorSamplingRate, in percent. */
+    @Deprecated
     public void updateSessionReplayOnErrorSampleRate(float sessionReplayOnErrorSampleRate) {
         sessionRelayErrorSampler = new RateBasedSampler(sessionReplayOnErrorSampleRate);
     }
 
+    /** @deprecated Use getSessionReplaySamplingRate, in percent. */
+    @Deprecated
     public float getSampleRate() {
         return sessionRelaySampler.getSampleRate();
     }
 
+    /** @deprecated Use getSessionReplayOnErrorSamplingRate, in percent. */
+    @Deprecated
     public float getSessionReplayOnErrorSampleRate() {
         return sessionRelayErrorSampler.getSampleRate();
     }

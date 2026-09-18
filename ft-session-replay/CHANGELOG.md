@@ -1,3 +1,8 @@
+# Unreleased
+- Add float `setSessionReplaySamplingRate` and `setSessionReplayOnErrorSamplingRate` (0–100), matching getters and feature runtime update APIs. Deprecate the old 0–1 APIs while retaining behavior for legacy callers.
+- Preserve explicit zero and new-over-old initialization precedence; remote configuration still overrides explicit new local settings.
+
+---
 # replay 0.1.9-alpha04
 1. Native Replay now follows the Agent Heatmap setting and skips permanent ID resolution and transparent Heatmap binding nodes when disabled, preserving ordinary wireframes, viewport dimensions and touch visualization. Requires `ft-sdk >= 1.7.6-alpha04` to opt in through `FTRUMConfig.setEnableHeatMap(true)`; older Agents default to disabled.
 

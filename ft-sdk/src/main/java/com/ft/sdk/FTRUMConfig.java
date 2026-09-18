@@ -21,6 +21,7 @@ public class FTRUMConfig {
      * Error sampling rate, [0,1], scope is all View, Action, LongTask, Error data under the same session_id
      */
     private float sessionErrorSampleRate = 0;
+    private boolean percentageErrorSamplingRateSet;
 
     /**
      * RUM appID
@@ -252,7 +253,9 @@ public class FTRUMConfig {
      * Get error sampling rate
      *
      * @return RUM error-session sampling rate in the range [0, 1]
+     * @deprecated Use getSessionOnErrorSamplingRate(), in percent.
      */
+    @Deprecated
     public float getSessionErrorSampleRate() {
         return sessionErrorSampleRate;
     }
@@ -264,11 +267,33 @@ public class FTRUMConfig {
      * Scope is all View, Action, LongTask, Error under the same session_id
      *
      * @param sessionErrorSampleRate error-session sampling rate in the range [0, 1]
+     * @deprecated Use setSessionOnErrorSamplingRate(float), in percent.
      */
+    @Deprecated
     public FTRUMConfig setSessionErrorSampleRate(float sessionErrorSampleRate) {
-        this.sessionErrorSampleRate = sessionErrorSampleRate;
+        if (!percentageErrorSamplingRateSet) this.sessionErrorSampleRate = sessionErrorSampleRate;
         return this;
     }
+
+    /** Returns the effective error-session percentage; default 0. */
+    public float getSessionOnErrorSamplingRate() { return sessionErrorSampleRate * 100f; }
+
+    /**
+     * Sets error-session sampling in [0,100], including fractions; default 0.
+     * An explicit new value wins over the legacy setter regardless of call order.
+     * @throws IllegalArgumentException for a non-finite or out-of-range value
+     */
+    public FTRUMConfig setSessionOnErrorSamplingRate(float percentage) {
+        if (Float.isNaN(percentage) || Float.isInfinite(percentage) || percentage < 0f || percentage > 100f) {
+            throw new IllegalArgumentException("sessionOnErrorSamplingRate must be finite and within [0,100]");
+        }
+        sessionErrorSampleRate = percentage / 100f;
+        percentageErrorSamplingRateSet = true;
+        return this;
+    }
+
+    // Remote values already use the internal probability scale and retain source priority.
+    void setRemoteSessionErrorSampleRate(float probability) { sessionErrorSampleRate = probability; }
 
     /**
      * Set serviceName

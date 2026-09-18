@@ -356,11 +356,11 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         if (isVip) {
-                            configBean.setLogSampleRate(1f);
-                            configBean.setRumSampleRate(1f);
-                            configBean.setTraceSampleRate(1f);
-                            configBean.setSessionReplaySampleRate(1f);
-                            configBean.setSessionReplayOnErrorSampleRate(1f);
+                            configBean.setLogSamplingRate(100f);
+                            configBean.setSessionSamplingRate(100f);
+                            configBean.setTraceSamplingRate(100f);
+                            configBean.setSessionReplaySamplingRate(100f);
+                            configBean.setSessionReplayOnErrorSamplingRate(100f);
                         }
                         return configBean;
                     }

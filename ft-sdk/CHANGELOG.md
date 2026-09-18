@@ -1,3 +1,8 @@
+# Unreleased
+- Add `setSessionOnErrorSamplingRate` and the three remaining percentage remote keys, covering error sessions and both Replay sampling modes. Deprecate the old 0–1 accessors; add percentage callback setters/getters for all six remote sampling fields.
+- Add Replay runtime percentage APIs and preserve remote-over-local priority with new Replay configs while retaining compatibility with older optional Replay modules.
+
+---
 # agent 1.7.6-alpha04
 1. Added float percentage APIs `setSessionSamplingRate`, `setLogSamplingRate`, and `setTraceSamplingRate` (0–100, default 100). Deprecated `setSamplingRate`/`getSamplingRate` while retaining 0–1 units. Explicit new settings win regardless of setter order.
 2. Added matching remote keys with fractional percentages and zero support; remote configuration retains priority over local settings. Invalid new remote values ignore that field without falling back to its legacy alias.

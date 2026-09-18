@@ -116,6 +116,11 @@ final class SessionReplayBridge {
         if (sessionReplayConfig == null) {
             return;
         }
+        if (Boolean.TRUE.equals(invoke(sessionReplayConfig, "applyRemoteSamplingRates",
+                new Class[]{Float.class, Float.class}, sampleRate, onErrorSampleRate))) {
+            return;
+        }
+        // Older Replay dependencies only expose the legacy setters.
         if (sampleRate != null) {
             invoke(sessionReplayConfig, "setSampleRate", new Class[]{float.class}, sampleRate);
         }
