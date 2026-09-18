@@ -807,19 +807,22 @@ public class FTRUMConfig {
      *
      * @param deviceMetricsMonitorType bit mask built from {@link DeviceMetricsMonitorType}
      * @return this config for chaining
+     * @deprecated Use {@link #setDeviceMetricsMonitorTypes(DeviceMetricsMonitorType...)}
+     * and pass enum values directly instead of combining their integer values.
      */
+    @Deprecated
     public FTRUMConfig setDeviceMetricsMonitorType(int deviceMetricsMonitorType) {
         this.deviceMetricsMonitorType = deviceMetricsMonitorType;
         return this;
     }
 
     /**
-     * Use {@link #setDeviceMetricsMonitorType(int)} instead
+     * Use {@link #setDeviceMetricsMonitorTypes(DeviceMetricsMonitorType...)} instead.
      *
      * @param deviceMetricsMonitorType device metric type to collect
      * @return this config for chaining
-     * @deprecated Use {@link #setDeviceMetricsMonitorType(int)} with {@code type.getValue()}.
-     * Multiple types can be combined using {@code |}.
+     * @deprecated Use {@link #setDeviceMetricsMonitorTypes(DeviceMetricsMonitorType...)}
+     * and pass enum values directly.
      */
     @Deprecated
     public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType) {
@@ -848,7 +851,10 @@ public class FTRUMConfig {
      * @param deviceMetricsMonitorType bit mask built from {@link DeviceMetricsMonitorType}
      * @param frequency                non-null metric collection frequency
      * @return this config for chaining
+     * @deprecated Use {@link #setDeviceMetricsMonitorTypes(DetectFrequency, DeviceMetricsMonitorType...)}
+     * with the frequency first, followed by enum values.
      */
+    @Deprecated
     public FTRUMConfig setDeviceMetricsMonitorType(int deviceMetricsMonitorType, DetectFrequency frequency) {
         this.deviceMetricsMonitorType = deviceMetricsMonitorType;
         this.deviceMetricsDetectFrequency = frequency;
@@ -856,13 +862,13 @@ public class FTRUMConfig {
     }
 
     /**
-     * Use {@link #setDeviceMetricsMonitorType(int, DetectFrequency)} instead
+     * Use {@link #setDeviceMetricsMonitorTypes(DetectFrequency, DeviceMetricsMonitorType...)} instead.
      *
      * @param deviceMetricsMonitorType device metric type to collect
      * @param frequency                non-null metric collection frequency
      * @return this config for chaining
-     * @deprecated Use {@link #setDeviceMetricsMonitorType(int, DetectFrequency)} with
-     * {@code type.getValue()}. Multiple types can be combined using {@code |}.
+     * @deprecated Use {@link #setDeviceMetricsMonitorTypes(DetectFrequency, DeviceMetricsMonitorType...)}
+     * with the frequency first, followed by enum values.
      */
     @Deprecated
     public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType, DetectFrequency frequency) {
