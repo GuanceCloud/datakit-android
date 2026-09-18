@@ -51,6 +51,8 @@ public class HistoricalRumProviderTest {
         ContentValues view = new ContentValues();
         view.put(FTSQL.RUM_COLUMN_ID, "view");
         view.put(FTSQL.RUM_COLUMN_ERROR_COUNT, 0);
+        view.put(FTSQL.RUM_COLUMN_IS_CLOSE, 0);
+        view.put(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT, 0);
         assertNotNull(provider.insert(viewUri, view));
 
         Bundle first = provider.call(
@@ -106,13 +108,17 @@ public class HistoricalRumProviderTest {
 
         Cursor countedView = provider.query(
                 viewUri,
-                new String[]{FTSQL.RUM_COLUMN_ERROR_COUNT},
+                new String[]{FTSQL.RUM_COLUMN_ERROR_COUNT,
+                        FTSQL.RUM_COLUMN_IS_CLOSE,
+                        FTSQL.RUM_COLUMN_VIEW_TIME_SPENT},
                 FTSQL.RUM_COLUMN_ID + "=?",
                 new String[]{"view"},
                 null);
         try {
             assertTrue(countedView.moveToFirst());
             assertEquals(1, countedView.getInt(0));
+            assertEquals(1, countedView.getInt(1));
+            assertEquals(30L, countedView.getLong(2));
         } finally {
             countedView.close();
         }
@@ -127,6 +133,8 @@ public class HistoricalRumProviderTest {
                 HistoricalAnrDataId.pendingType(DataType.RUM_APP));
         values.putString(FTSQL.RECORD_COLUMN_DEDUPE_KEY, dedupeKey);
         values.putString(FTSQL.RUM_COLUMN_VIEW_ID, "view");
+        values.putBoolean(FTSQL.RUM_COLUMN_IS_CLOSE, true);
+        values.putLong(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT, 30L);
         return values;
     }
 

@@ -48,6 +48,8 @@ public class HistoricalAnrReporterTest {
         assertEquals("blocked main", sink.fields.get(Constants.KEY_RUM_ERROR_STACK));
         assertFalse(sink.tags.containsKey(Constants.KEY_RUM_ACTION_ID));
         assertEquals("old-view", sink.viewId);
+        assertEquals(10_000_000_000L, sink.viewTimeSpentNs);
+        assertTrue(sink.closeView);
         assertEquals("dedupe", sink.dedupeKey);
         assertEquals(CollectType.COLLECT_BY_SAMPLE, sink.collectType);
     }
@@ -110,12 +112,50 @@ public class HistoricalAnrReporterTest {
         assertEquals("historical-anr", sink.fields.get("provider_field"));
     }
 
+    @Test
+    public void reportDoesNotOverwriteAnAlreadyClosedViewDuration() {
+        RecordingSink sink = new RecordingSink();
+        DefaultHistoricalAnrReporter reporter = new DefaultHistoricalAnrReporter(sink);
+        ProcessExitRecord exit = new ProcessExitRecord(
+                "com.example.app", 123, 20_000,
+                ProcessExitRecord.REASON_ANR, 100, null);
+        HistoricalRumContext context = new HistoricalRumContext(
+                "com.example.app", "run", 1_000, "session", "view", "Home",
+                10_000_000_000L, 3_000_000_000L, true);
+
+        assertEquals(HistoricalAnrReporter.ReportResult.INSERTED,
+                reporter.report(exit, context, "blocked", "dedupe"));
+
+        assertEquals(3_000_000_000L, sink.viewTimeSpentNs);
+        assertFalse(sink.closeView);
+    }
+
+    @Test
+    public void reportClampsDurationWhenExitPrecedesViewStart() {
+        RecordingSink sink = new RecordingSink();
+        DefaultHistoricalAnrReporter reporter = new DefaultHistoricalAnrReporter(sink);
+        ProcessExitRecord exit = new ProcessExitRecord(
+                "com.example.app", 123, 9_999,
+                ProcessExitRecord.REASON_ANR, 100, null);
+        HistoricalRumContext context = new HistoricalRumContext(
+                "com.example.app", "run", 1_000, "session", "view", "Home",
+                10_000_000_000L, 0, false);
+
+        assertEquals(HistoricalAnrReporter.ReportResult.INSERTED,
+                reporter.report(exit, context, "blocked", "dedupe"));
+
+        assertEquals(0, sink.viewTimeSpentNs);
+        assertTrue(sink.closeView);
+    }
+
     private static final class RecordingSink implements HistoricalAnrSink {
         private long occurredAtNs;
         private HashMap<String, Object> tags;
         private HashMap<String, Object> fields;
         private String dedupeKey;
         private String viewId;
+        private long viewTimeSpentNs;
+        private boolean closeView;
         private CollectType collectType;
         private int calls;
 
@@ -125,6 +165,8 @@ public class HistoricalAnrReporterTest {
                                     HashMap<String, Object> fields,
                                     String dedupeKey,
                                     String viewId,
+                                    long viewTimeSpentNs,
+                                    boolean closeView,
                                     CollectType collectType) {
             calls++;
             this.occurredAtNs = occurredAtNs;
@@ -132,6 +174,8 @@ public class HistoricalAnrReporterTest {
             this.fields = fields;
             this.dedupeKey = dedupeKey;
             this.viewId = viewId;
+            this.viewTimeSpentNs = viewTimeSpentNs;
+            this.closeView = closeView;
             this.collectType = collectType;
             return InsertResult.INSERTED;
         }

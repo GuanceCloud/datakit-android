@@ -1117,6 +1117,8 @@ public class FTRUMInnerManager {
                 fields.put(Constants.KEY_RUM_BACKGROUND_CRASH_FREE_DURATION, crashFreeDuration.backgroundDuration);
             }
             attachRUMRelative(tags, fields, true, state);
+            final String issueViewId = HashMapUtils.getString(
+                    tags, Constants.KEY_RUM_VIEW_ID);
 
             EventConsumerThreadPool.get().execute(new Runnable() {
                 @Override
@@ -1153,7 +1155,7 @@ public class FTRUMInnerManager {
                                         increaseError(tags);
                                         if (callBack != null) {
                                             // Java Crash, Native Crash need to record the crash status of the current state
-                                            stopView(null, callBack);
+                                            closeIssueView(issueViewId, callBack);
                                         }
                                     }
                                 }, collectType);
@@ -1638,6 +1640,9 @@ public class FTRUMInnerManager {
     }
 
     private ActiveViewBean findCurrentViewById(String viewId) {
+        if (viewId == null) {
+            return null;
+        }
         ActiveViewBean activeViewBean = activeView;
         if (activeViewBean != null && activeViewBean.getId().equals(viewId)) {
             return activeViewBean;
@@ -1648,6 +1653,36 @@ public class FTRUMInnerManager {
             }
         }
         return null;
+    }
+
+    private void closeIssueView(String viewId, RunnerCompleteCallBack callBack) {
+        ActiveViewBean viewBean = findCurrentViewById(viewId);
+        if (viewBean == null || viewBean.isClose()) {
+            closeActiveIssueView(callBack);
+            return;
+        }
+        if (viewBean == activeView) {
+            stopView(null, callBack);
+            return;
+        }
+        checkActionClose();
+        viewBean.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
+        viewBean.close();
+        closeView(viewBean, new RunnerCompleteCallBack() {
+            @Override
+            public void onComplete() {
+                closeActiveIssueView(callBack);
+            }
+        });
+    }
+
+    private void closeActiveIssueView(RunnerCompleteCallBack callBack) {
+        ActiveViewBean viewBean = activeView;
+        if (viewBean != null && !viewBean.isClose()) {
+            stopView(null, callBack);
+        } else {
+            callBack.onComplete();
+        }
     }
 
     private void closeView(ActiveViewBean activeViewBean) {

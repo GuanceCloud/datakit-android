@@ -33,9 +33,11 @@ public class HistoricalExitShadowStoreTest {
         store.initSumView(view);
 
         assertEquals(InsertResult.INSERTED,
-                store.prepareHistoricalRum("dedupe", "view", data("first")));
+                store.prepareHistoricalRum("dedupe", "view", data("first"),
+                        30L, true));
         assertEquals(InsertResult.ALREADY_EXISTS,
-                store.prepareHistoricalRum("dedupe", "view", data("second")));
+                store.prepareHistoricalRum("dedupe", "view", data("second"),
+                        30L, true));
 
         store.updateDataType(DataType.RUM_APP_ERROR_SAMPLED, 123);
         assertEquals(0, primary.queryDataByDescLimit(0).size());
@@ -47,6 +49,8 @@ public class HistoricalExitShadowStoreTest {
         assertEquals(1, shadow.queryDataByDescLimit(0).size());
         assertEquals(1, primary.querySumView(0, true).get(0).getErrorCount());
         assertEquals(1, shadow.querySumView(0, true).get(0).getErrorCount());
+        assertEquals(30L, primary.querySumView(0, true).get(0).getTimeSpent());
+        assertEquals(30L, shadow.querySumView(0, true).get(0).getTimeSpent());
     }
 
     private SyncData data(String body) {

@@ -161,6 +161,13 @@ public class FTRumFileAggregateStore {
     }
 
     public InsertResult increaseViewErrorOnce(final String viewId, final String dedupeKey) {
+        return updateHistoricalViewOnce(viewId, dedupeKey, 0, false);
+    }
+
+    public InsertResult updateHistoricalViewOnce(final String viewId,
+                                                 final String dedupeKey,
+                                                 final long viewTimeSpentNs,
+                                                 final boolean closeView) {
         if (viewId == null || dedupeKey == null) {
             return InsertResult.FAILED;
         }
@@ -176,21 +183,33 @@ public class FTRumFileAggregateStore {
                     if (keys == null) {
                         keys = new JSONArray();
                     }
+                    boolean duplicate = false;
                     for (int i = 0; i < keys.length(); i++) {
                         if (dedupeKey.equals(keys.optString(i))) {
-                            return InsertResult.ALREADY_EXISTS;
+                            duplicate = true;
+                            break;
                         }
                     }
-                    keys.put(dedupeKey);
-                    json.put(HISTORICAL_ERROR_KEYS, keys);
-                    json.put(FTSQL.RUM_COLUMN_ERROR_COUNT,
-                            json.optInt(FTSQL.RUM_COLUMN_ERROR_COUNT) + 1);
+                    if (!duplicate) {
+                        keys.put(dedupeKey);
+                        json.put(HISTORICAL_ERROR_KEYS, keys);
+                        json.put(FTSQL.RUM_COLUMN_ERROR_COUNT,
+                                json.optInt(FTSQL.RUM_COLUMN_ERROR_COUNT) + 1);
+                    }
+                    if (closeView && json.optInt(FTSQL.RUM_COLUMN_IS_CLOSE) == 0) {
+                        json.put(FTSQL.RUM_COLUMN_IS_CLOSE, 1);
+                        json.put(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT,
+                                Math.max(json.optLong(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT),
+                                        Math.max(0, viewTimeSpentNs)));
+                        json.put(FTSQL.RUM_COLUMN_PENDING_RESOURCE, 0);
+                        json.put(FTSQL.RUM_DATA_UPDATE_TIME, System.currentTimeMillis());
+                    }
                     writeJson(getViewFile(viewId), json);
-                    return InsertResult.INSERTED;
+                    return duplicate ? InsertResult.ALREADY_EXISTS : InsertResult.INSERTED;
                 }
             });
         } catch (Exception e) {
-            LogUtils.e(TAG, "increaseViewErrorOnce failed: " + e.getMessage());
+            LogUtils.e(TAG, "updateHistoricalViewOnce failed: " + e.getMessage());
             return InsertResult.FAILED;
         }
     }

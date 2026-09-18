@@ -417,6 +417,7 @@ public class FTContentProvider extends ContentProvider {
                                 null,
                                 null);
                         if (cursor.moveToFirst()) {
+                            closeHistoricalViewIfNeeded(db, extras);
                             result.putBoolean("success", true);
                             db.setTransactionSuccessful();
                             return;
@@ -445,6 +446,7 @@ public class FTContentProvider extends ContentProvider {
                                             + ",0)+1 WHERE " + FTSQL.RUM_COLUMN_ID + "=?",
                                     new Object[]{viewId});
                         }
+                        closeHistoricalViewIfNeeded(db, extras);
                         result.putBoolean("success", true);
                         result.putBoolean("inserted", true);
                         db.setTransactionSuccessful();
@@ -460,6 +462,28 @@ public class FTContentProvider extends ContentProvider {
             LogUtils.e(TAG, "Historical RUM persist failed: " + e.getMessage());
         }
         return result;
+    }
+
+    private void closeHistoricalViewIfNeeded(SQLiteDatabase db, Bundle extras) {
+        if (!extras.getBoolean(FTSQL.RUM_COLUMN_IS_CLOSE)) {
+            return;
+        }
+        String viewId = extras.getString(FTSQL.RUM_COLUMN_VIEW_ID);
+        if (viewId == null || viewId.length() == 0) {
+            return;
+        }
+        long timeSpent = Math.max(0,
+                extras.getLong(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT));
+        db.execSQL(
+                "UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
+                        + FTSQL.RUM_COLUMN_IS_CLOSE + "=1,"
+                        + FTSQL.RUM_COLUMN_VIEW_TIME_SPENT + "=MAX(COALESCE("
+                        + FTSQL.RUM_COLUMN_VIEW_TIME_SPENT + ",0),?),"
+                        + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0,"
+                        + FTSQL.RUM_DATA_UPDATE_TIME + "=? WHERE "
+                        + FTSQL.RUM_COLUMN_ID + "=? AND COALESCE("
+                        + FTSQL.RUM_COLUMN_IS_CLOSE + ",0)=0",
+                new Object[]{timeSpent, System.currentTimeMillis(), viewId});
     }
 
     private Bundle handleHistoricalRumCommit(final Bundle extras) {

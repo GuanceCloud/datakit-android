@@ -806,6 +806,15 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
     public InsertResult prepareHistoricalRum(@NonNull String dedupeKey,
                                              @NonNull String viewId,
                                              @NonNull SyncData data) {
+        return prepareHistoricalRum(dedupeKey, viewId, data, 0, false);
+    }
+
+    @Override
+    public InsertResult prepareHistoricalRum(@NonNull String dedupeKey,
+                                             @NonNull String viewId,
+                                             @NonNull SyncData data,
+                                             long viewTimeSpentNs,
+                                             boolean closeView) {
         if (!HistoricalAnrDataId.canonicalize(dedupeKey, data)) {
             return InsertResult.FAILED;
         }
@@ -821,6 +830,9 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
             extras.putString(FTSQL.RECORD_COLUMN_DATA_TYPE, pendingType);
             extras.putString(FTSQL.RECORD_COLUMN_DEDUPE_KEY, dedupeKey);
             extras.putString(FTSQL.RUM_COLUMN_VIEW_ID, viewId);
+            extras.putLong(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT,
+                    Math.max(0, viewTimeSpentNs));
+            extras.putBoolean(FTSQL.RUM_COLUMN_IS_CLOSE, closeView);
             Bundle result = contentProvider.call(
                     FTContentProvider.getUriSyncDataFlat(),
                     FTContentProvider.METHOD_HISTORICAL_RUM_PERSIST,

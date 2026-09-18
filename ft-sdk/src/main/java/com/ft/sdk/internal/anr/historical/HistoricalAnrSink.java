@@ -11,5 +11,7 @@ interface HistoricalAnrSink {
                          HashMap<String, Object> fields,
                          String dedupeKey,
                          String viewId,
+                         long viewTimeSpentNs,
+                         boolean closeView,
                          CollectType collectType);
 }

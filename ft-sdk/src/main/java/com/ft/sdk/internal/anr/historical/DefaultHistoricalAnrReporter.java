@@ -23,9 +23,12 @@ final class DefaultHistoricalAnrReporter implements HistoricalAnrReporter {
                                         HashMap<String, Object> fields,
                                         String dedupeKey,
                                         String viewId,
+                                        long viewTimeSpentNs,
+                                        boolean closeView,
                                         CollectType collectType) {
                 return FTTrackInner.getInstance().persistHistoricalRum(
-                        occurredAtNs, tags, fields, dedupeKey, viewId, collectType);
+                        occurredAtNs, tags, fields, dedupeKey, viewId,
+                        viewTimeSpentNs, closeView, collectType);
             }
         }, new IssueFieldsEnricher() {
             @Override
@@ -78,12 +81,21 @@ final class DefaultHistoricalAnrReporter implements HistoricalAnrReporter {
             issueFieldsEnricher.enrich(stack, occurredAtNs, state, tags, fields);
         }
 
+        boolean closeView = !context.isViewClosed();
+        long viewTimeSpentNs = Math.max(0, context.getViewTimeSpentNs());
+        long viewStartNs = context.getViewStartNs();
+        if (closeView && viewStartNs > 0 && occurredAtNs >= viewStartNs) {
+            viewTimeSpentNs = Math.max(viewTimeSpentNs, occurredAtNs - viewStartNs);
+        }
+
         InsertResult result = sink.persist(
                 occurredAtNs,
                 tags,
                 fields,
                 eventDedupeKey,
                 context.getViewId(),
+                viewTimeSpentNs,
+                closeView,
                 context.getCollectType());
         if (result == InsertResult.INSERTED) {
             return ReportResult.INSERTED;

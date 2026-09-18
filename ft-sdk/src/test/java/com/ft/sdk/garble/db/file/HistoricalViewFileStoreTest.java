@@ -14,6 +14,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE, sdk = 21)
@@ -52,9 +53,11 @@ public class HistoricalViewFileStoreTest {
         store.initSumView(view);
 
         assertEquals(InsertResult.INSERTED,
-                store.prepareHistoricalRum("dedupe", "view", data("first")));
+                store.prepareHistoricalRum("dedupe", "view", data("first"),
+                        30L, true));
         assertEquals(InsertResult.ALREADY_EXISTS,
-                store.prepareHistoricalRum("dedupe", "view", data("second")));
+                store.prepareHistoricalRum("dedupe", "view", data("second"),
+                        30L, true));
 
         assertEquals(0, store.queryDataByDescLimit(0).size());
         assertEquals(InsertResult.INSERTED,
@@ -62,7 +65,10 @@ public class HistoricalViewFileStoreTest {
 
         assertEquals(1, store.queryDataByDescLimit(0).size());
         assertEquals("first", store.queryDataByDescLimit(0).get(0).getDataString());
-        assertEquals(1, store.querySumView(0, true).get(0).getErrorCount());
+        ViewBean restored = store.querySumView(0, true).get(0);
+        assertEquals(1, restored.getErrorCount());
+        assertTrue(restored.isClose());
+        assertEquals(30L, restored.getTimeSpent());
     }
 
     private SyncData data(String body) {

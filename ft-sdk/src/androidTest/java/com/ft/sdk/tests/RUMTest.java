@@ -807,6 +807,37 @@ public class RUMTest extends FTBaseTest {
     }
 
     @Test
+    public void crashClosesItsAssociatedBackgroundView() throws Exception {
+        FTRUMGlobalManager.get().startView(FIRST_VIEW);
+        ViewBean foregroundView = Whitebox.getInternalState(
+                FTRUMInnerManager.get(), "activeView");
+        Whitebox.invokeMethod(FTActivityManager.get(), "appBackGround");
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "onAppBackground");
+        Thread.sleep(10L);
+        CountDownLatch completed = new CountDownLatch(1);
+        try {
+            FTExceptionHandler.get().uploadCrashLog(
+                    ERROR, ERROR_MESSAGE, AppState.BACKGROUND, completed::countDown);
+
+            Assert.assertTrue(completed.await(3, TimeUnit.SECONDS));
+            waitEventConsumeInThreadPool();
+
+            LineProtocolData error = getLatestErrorLineProtocolData();
+            String viewId = error.getTagAsString(Constants.KEY_RUM_VIEW_ID);
+            ViewBean view = findViewById(
+                    FTDBManager.get().querySumView(0, true), viewId);
+            Assert.assertTrue(view.isClose());
+            Assert.assertTrue(view.getTimeSpent() > 0);
+            ViewBean closedForegroundView = findViewById(
+                    FTDBManager.get().querySumView(0, true), foregroundView.getId());
+            Assert.assertTrue(closedForegroundView.isClose());
+            Assert.assertTrue(closedForegroundView.getTimeSpent() > 0);
+        } finally {
+            Whitebox.invokeMethod(FTActivityManager.get(), "appForeground");
+        }
+    }
+
+    @Test
     public void providerThrowableDoesNotSkipDefaultExceptionHandler() throws Exception {
         AtomicInteger providerCalls = new AtomicInteger();
         AtomicInteger chainedCalls = new AtomicInteger();

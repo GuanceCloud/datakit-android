@@ -102,6 +102,19 @@ public class FTTrackInner {
                                              String dedupeKey,
                                              String viewId,
                                              CollectType collectType) {
+        return persistHistoricalRum(occurredAtNs, tags, fields, dedupeKey, viewId,
+                0, false, collectType);
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public InsertResult persistHistoricalRum(long occurredAtNs,
+                                             HashMap<String, Object> tags,
+                                             HashMap<String, Object> fields,
+                                             String dedupeKey,
+                                             String viewId,
+                                             long viewTimeSpentNs,
+                                             boolean closeView,
+                                             CollectType collectType) {
         try {
             if (collectType == CollectType.NOT_COLLECT) {
                 return InsertResult.ALREADY_EXISTS;
@@ -146,7 +159,8 @@ public class FTTrackInner {
                 return InsertResult.FAILED;
             }
             InsertResult result = ((HistoricalRumDataStore) store)
-                    .prepareHistoricalRum(dedupeKey, viewId, recordData);
+                    .prepareHistoricalRum(dedupeKey, viewId, recordData,
+                            viewTimeSpentNs, closeView);
             return result;
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));

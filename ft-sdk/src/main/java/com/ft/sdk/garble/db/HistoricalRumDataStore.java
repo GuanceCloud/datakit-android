@@ -12,6 +12,14 @@ public interface HistoricalRumDataStore {
                                       @NonNull String viewId,
                                       @NonNull SyncData data);
 
+    default InsertResult prepareHistoricalRum(@NonNull String dedupeKey,
+                                              @NonNull String viewId,
+                                              @NonNull SyncData data,
+                                              long viewTimeSpentNs,
+                                              boolean closeView) {
+        return prepareHistoricalRum(dedupeKey, viewId, data);
+    }
+
     InsertResult commitHistoricalRum(@NonNull String dedupeKey,
                                      @NonNull DataType committedType);
 }
