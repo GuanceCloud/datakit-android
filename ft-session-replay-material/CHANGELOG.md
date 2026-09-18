@@ -1,3 +1,7 @@
+# replay-material 0.1.9-alpha04
+1. Aligned with Session Replay 0.1.9-alpha04 for the opt-in Heatmap setting; no module-specific changes.
+
+---
 # replay 0.1.9-alpha03
 1. Aligned with Session Replay 0.1.9-alpha03 for the segment compression format fix.
 

@@ -23,7 +23,7 @@ GuanceCloud Application Monitoring can collect metric data from various Android 
 - Datadog [dd-sdk-android](https://github.com/DataDog/dd-sdk-android/blob/develop/LICENSE)
 
 
-## Sampling configuration (unreleased)
+## Sampling configuration (1.7.6-alpha04)
 
 Use `FTRUMConfig.setSessionSamplingRate(float)`,
 `FTLoggerConfig.setLogSamplingRate(float)`, and
