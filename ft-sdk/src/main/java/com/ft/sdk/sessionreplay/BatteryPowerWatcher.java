@@ -1,15 +1,20 @@
 package com.ft.sdk.sessionreplay;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.PowerManager;
 
 import com.ft.sdk.garble.bean.BatteryBean;
 
 public class BatteryPowerWatcher extends BroadcastReceiver {
+
+    //  API 26-32; native enforcement starts at API 33.
+    private static final int RECEIVER_NOT_EXPORTED_COMPAT = 0x4;
 
     final BatteryBean batteryBean = new BatteryBean();
 
@@ -44,11 +49,18 @@ public class BatteryPowerWatcher extends BroadcastReceiver {
     }
 
     // Register this receiver to listen for power save mode and battery changes
+    @SuppressLint({"WrongConstant", "UnspecifiedRegisterReceiverFlag"})
     public void register(Context context) {
         IntentFilter filter = new IntentFilter();
         filter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED);
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        context.registerReceiver(this, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(this, filter, null, null, Context.RECEIVER_NOT_EXPORTED);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.registerReceiver(this, filter, null, null, RECEIVER_NOT_EXPORTED_COMPAT);
+        } else {
+            context.registerReceiver(this, filter);
+        }
     }
 
     public void unRegister(Context context) {

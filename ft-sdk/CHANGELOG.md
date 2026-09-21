@@ -1,3 +1,7 @@
+# Unreleased
+1. Aligned BatteryPowerWatcher broadcast registration with Datadog: explicitly pass RECEIVER_NOT_EXPORTED on API 33+ and the compatibility flag value on API 26–32, retaining legacy registration below API 26. Native non-exported enforcement is available on API 33+.
+
+---
 # agent 1.7.6-alpha05
 1. Added `FTRUMConfig.setSessionOnErrorSamplingRate(float)` (0–100, default 0) and matching getter. Deprecated the old 0–1 error-session accessors while retaining compatibility; explicit new settings take precedence regardless of setter order.
 2. Added percentage remote keys `sessionOnErrorSamplingRate`, `sessionReplaySamplingRate`, and `sessionReplayOnErrorSamplingRate`, plus percentage callback setters/getters for all six sampling fields. Fractional percentages and explicit zero are supported; invalid new remote values ignore that field without falling back to its legacy alias.
