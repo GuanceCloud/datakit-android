@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.http;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 import com.ft.sdk.garble.utils.Constants;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class MsMultiPartFormData {
 
         connection.setRequestProperty(Constants.SYNC_DATA_CONTENT_TYPE_HEADER,
                 "multipart/form-data; boundary=" + boundary);
-        outputStream = connection.getOutputStream();
+        outputStream = DiagnosticsBridge.output(connection.getOutputStream());
         writer = new PrintWriter(new OutputStreamWriter(outputStream, charset),
                 true);
     }

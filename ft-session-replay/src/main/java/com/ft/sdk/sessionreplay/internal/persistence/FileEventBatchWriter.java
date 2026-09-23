@@ -1,5 +1,6 @@
 package com.ft.sdk.sessionreplay.internal.persistence;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 import androidx.annotation.WorkerThread;
 
 import com.ft.sdk.sessionreplay.internal.storage.EventType;
@@ -56,14 +57,17 @@ public class FileEventBatchWriter implements EventBatchWriter {
             if (batchMetadata != null && batchMetadata.length > 0 && metadataFile != null) {
                 writeBatchMetadata(metadataFile, batchMetadata);
             }
+            DiagnosticsBridge.record("storage_write", "replay", 1, event.getData().length, "file_append");
             return true;
         } else {
+            DiagnosticsBridge.record("discard", "replay", 1, event.getData().length, "write_failed");
             return false;
         }
     }
 
     private boolean checkEventSize(int eventSize) {
         if (eventSize > filePersistenceConfig.getMaxItemSize()) {
+            DiagnosticsBridge.record("discard", "replay", 1, eventSize, "item_size_limit");
             internalLogger.e(TAG, String.format(Locale.US, ERROR_LARGE_DATA, eventSize, filePersistenceConfig.getMaxItemSize()));
             return false;
         }

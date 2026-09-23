@@ -12,3 +12,5 @@ include ':ft-sdk-optional-dependency-test'
 if (hasProperty('ftUrlConnectionFixture')) {
     include ':ft-urlconnection-fixture'
 }
+
+include ':ft-diagnostics-api', ':ft-diagnostics'

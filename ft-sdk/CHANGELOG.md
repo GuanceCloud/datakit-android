@@ -1,3 +1,9 @@
+# agent 1.7.6-alpha07
+1. Added default-off SDK self-monitoring hooks for SQLite/file storage writes and cleanup, observed backlog, upload batch selection, filtering, retries, and SDK HTTP request outcomes.
+2. Added HTTP body byte accounting for OkHttp and HttpURLConnection. OkHttp counts encoded bodies at the network interceptor boundary; HttpURLConnection counts application-visible stream bytes. Headers and transport overhead are excluded.
+3. Added the `ft-diagnostics-api:0.1.0-alpha01` runtime dependency. Enable local collection with the optional `ft-diagnostics:0.1.0-alpha01` component; existing SDK configuration and business upload behavior are preserved, and diagnostics are not uploaded automatically. Direct AAR integrations must also include the API AAR.
+
+---
 # agent 1.7.6-alpha06
 1. Aligned BatteryPowerWatcher broadcast registration with Datadog: explicitly pass RECEIVER_NOT_EXPORTED on API 33+ and the compatibility flag value on API 26–32, retaining legacy registration below API 26. Native non-exported enforcement is available on API 33+.
 2. Fixed RUM View `time_spent` remaining zero after Java/native Crash or recovered fatal ANR, including startup and background fallback Views. Historical ANR duration is derived from the system exit timestamp without counting time after process death.

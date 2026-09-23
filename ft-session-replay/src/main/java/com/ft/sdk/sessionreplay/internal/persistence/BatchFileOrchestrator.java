@@ -1,5 +1,6 @@
 package com.ft.sdk.sessionreplay.internal.persistence;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 import androidx.annotation.WorkerThread;
 
 import com.ft.sdk.sessionreplay.internal.storage.FilePersistenceConfig;
@@ -58,6 +59,7 @@ public class BatchFileOrchestrator implements FileOrchestrator {
         if (canDoCleanup()) {
             List<File> files = listBatchFiles();
             files = deleteObsoleteFiles(files);
+            DiagnosticsBridge.backlog("replay", files.size());
             freeSpaceIfNeeded(files);
             lastCleanupTimestamp = System.currentTimeMillis();
         }
@@ -289,6 +291,7 @@ public class BatchFileOrchestrator implements FileOrchestrator {
         long size = FileUtils.lengthSafe(file, internalLogger);
         boolean wasDeleted = FileUtils.deleteSafe(file, internalLogger);
         if (wasDeleted && sendMetric) {
+            DiagnosticsBridge.record("storage_remove", "replay", 1, size, "purged");
             metricsDispatcher.sendBatchDeletedMetric(file, new RemovalReason.Purged());
         }
         return size;

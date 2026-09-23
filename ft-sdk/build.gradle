@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 
 ext {
+    diagnosticsApiVersion = rootProject.ext.sdkVersions.ftDiagnostics
     //Append "-SNAPSHOT" to the end of snapshot version number for publishing
     pkgVersion = rootProject.ext.sdkVersions.ftSdk
     miniReplaySupport = rootProject.ext.sdkVersions.ftSdkMiniReplaySupport
@@ -47,6 +48,7 @@ android {
 configurations { urlConnectionAdapterTest }
 
 dependencies {
+    implementation project(':ft-diagnostics-api')
     urlConnectionAdapterTest "com.squareup.okhttp3:okhttp-urlconnection:3.12.13"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 

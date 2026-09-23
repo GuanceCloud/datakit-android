@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.http;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
 import android.util.Pair;
@@ -182,7 +183,7 @@ public class NativeNetEngine implements INetEngine {
                 } catch (Error e) {
                     LogUtils.e(TAG, "connect with error:" + LogUtils.getStackTraceString(e));
                 }
-                outputStream = mConnection.getOutputStream();
+                outputStream = DiagnosticsBridge.output(mConnection.getOutputStream());
                 outputStream.write(mHttpBuilder.getBodyString().getBytes(CHARSET));
                 outputStream.flush();
             }
@@ -193,6 +194,7 @@ public class NativeNetEngine implements INetEngine {
                 inputStream = mConnection.getInputStream();
             }
             if (inputStream != null) {
+                inputStream = DiagnosticsBridge.input(inputStream);
                 inputStreamReader = new InputStreamReader(inputStream, CHARSET);
                 reader = new BufferedReader(inputStreamReader);
                 while ((tempLine = reader.readLine()) != null) {

@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.db;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 import android.annotation.SuppressLint;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
@@ -119,7 +120,9 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
                 .append(" ASC LIMIT ")
                 .append(limit)
                 .append(")");
-        return db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, where.toString(), null);
+        int deleted=db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, where.toString(), null);
+        DiagnosticsBridge.record("storage_remove",dataType,deleted,-1,"sqlite_full_cleanup");
+        return deleted;
     }
 
     /**
@@ -787,6 +790,8 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
                 // Update existing record
                 int updatedRows = contentProvider.update(uri, contentValues, selection, selectionArgs);
                 if (updatedRows > 0) {
+                    if(DiagnosticsBridge.enabled()) DiagnosticsBridge.record("storage_write",data.getDataType().getValue(),updatedRows,
+                            data.getDataString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length,"sqlite_update");
                     LogUtils.d(TAG, "updateOrInsertSyncData: Updated existing record with UUID: " + data.getUuid());
                     return true;
                 } else {
@@ -841,6 +846,8 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
             if (result == null || !result.getBoolean("success")) {
                 return InsertResult.FAILED;
             }
+            if(result.getBoolean("inserted") && DiagnosticsBridge.enabled()) DiagnosticsBridge.record("storage_write","rum",1,
+                    data.getDataString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length,"historical_insert");
             return result.getBoolean("inserted")
                     ? InsertResult.INSERTED
                     : InsertResult.ALREADY_EXISTS;
@@ -914,6 +921,12 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
             // Use ContentProvider's bulkInsert for better performance
             Uri uri = FTContentProvider.getUriSyncDataFlat();
             int insertedCount = contentProvider.bulkInsert(uri, contentValuesArray);
+            if (DiagnosticsBridge.enabled()) {
+                if (insertedCount == dataList.size()) {
+                    for (SyncData item : dataList) DiagnosticsBridge.record("storage_write", item.getDataType().getValue(), 1,
+                            item.getDataString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length, reInsert ? "sqlite_reinsert" : "sqlite_insert");
+                } else DiagnosticsBridge.record("storage_write", "other", Math.max(0, insertedCount), -1, "sqlite_partial_or_failed");
+            }
 
             if (insertedCount > 0) {
                 if (insertedCount > 1) {
@@ -1022,6 +1035,7 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
                     + FTSQL.RECORD_COLUMN_TM + "< " + expireTimeline;
 
             count = contentProvider.delete(FTContentProvider.getUriSyncDataFlat(), selection, null);
+            DiagnosticsBridge.record("storage_remove", dataType.getValue(), count, -1, "expired");
             if (count > 0) {
                 LogUtils.d(TAG, "deleteExpireCache executed successfully via ContentProvider, deleted: " + count);
             }
@@ -1054,6 +1068,7 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
                     null);
             if (cursor != null && cursor.moveToFirst()) {
                 count = cursor.getInt(0);
+                DiagnosticsBridge.backlog(list != null && list.length == 1 ? list[0].getValue() : "other", count);
             }
             if (cursor != null) {
                 cursor.close();
@@ -1101,6 +1116,7 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
 
             Bundle result = contentProvider.call(FTContentProvider.getUriSyncDataFlat(), FTContentProvider.METHOD_EXEC_SQL, null, extras);
             if (result.getBoolean("success")) {
+                DiagnosticsBridge.record("storage_remove", list != null && list.length == 1 ? list[0].getValue() : "other", -1, -1, "capacity_cleanup_count_unavailable");
 
                 if (FTDBCachePolicy.get().isLimitWithCacheSize()
                         && FTDBCachePolicy.get().isReachCacheLimit()) {
@@ -1241,6 +1257,7 @@ public class FTDBManager extends DBManager implements FTDataStore, HistoricalRum
                     }
                 }
 
+                DiagnosticsBridge.record("storage_remove", "other", totalDeleted, -1, "sqlite_delete_by_id");
                 if (totalDeleted > 0) {
                     //LogUtils.d(TAG, "Batch delete completed successfully, deleted " + totalDeleted + " records");
                 } else {

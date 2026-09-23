@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 
 ext {
+    diagnosticsApiVersion = rootProject.ext.sdkVersions.ftDiagnostics
     pkgVersion = rootProject.ext.sdkVersions.ftSessionReplay
     miniAgentSupport = rootProject.ext.sdkVersions.replayMiniAgentSupport
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
@@ -38,6 +39,7 @@ android {
 }
 
 dependencies {
+    implementation project(':ft-diagnostics-api')
 
     implementation 'com.google.code.gson:gson:2.8.5'
     compileOnly 'com.google.android.material:material:1.3.0'

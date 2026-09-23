@@ -1,5 +1,6 @@
 package com.ft.sdk;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 
 import android.content.SharedPreferences;
 
@@ -378,6 +379,7 @@ public class SyncTaskManager {
                     FTDataFilterManager.get().prepareForUpload(dataType, cacheDataList);
             List<SyncData> filteredDataList = uploadFilterResult.getFilteredDataList();
             if (!filteredDataList.isEmpty()) {
+                DiagnosticsBridge.record("discard", dataType.getValue(), filteredDataList.size(), -1, "upload_filter");
                 deleteLastQuery(filteredDataList);
                 decrementCacheCount(dataType, filteredDataList.size());
             }
@@ -394,6 +396,10 @@ public class SyncTaskManager {
             }
 
             int dataCount = requestDataList.size();
+            if(DiagnosticsBridge.enabled()) {
+                long oldest=Long.MAX_VALUE;for(SyncData item:requestDataList)oldest=Math.min(oldest,item.getTime()/1000000L);
+                DiagnosticsBridge.batch(dataType.getValue(),dataCount,-1,Math.max(0,System.currentTimeMillis()-oldest),"oldest_event_timestamp");
+            }
             LogUtils.d(TAG, "Sync Data Count:" + dataCount);
 
             String seqNumber = "";
@@ -423,6 +429,7 @@ public class SyncTaskManager {
                             }
                             LogUtils.d(TAG, "pkg_id:" + innerLogFlag + " Sync Success-[code:" + code + ",response:" + response + "]");
                         } else {
+                            DiagnosticsBridge.record("discard", dataType.getValue(), requestDataList.size(), -1, "non_retryable_response");
                             LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
                             if (shouldBackoffIgnoredClientError(code)) {
                                 sleepIgnoredClientErrorBackoff(dataType);
@@ -436,6 +443,7 @@ public class SyncTaskManager {
 
                         if (errorCount.get() > 0) {
                             try {
+                                DiagnosticsBridge.record("retry", dataType.getValue(), 1, -1, "retry_scheduled");
                                 SyncTaskManager.this.reInsertData(requestDataList);
                                 Thread.sleep(getRetryBackoffTimeMs(errorCount.get()));
                             } catch (InterruptedException e) {
