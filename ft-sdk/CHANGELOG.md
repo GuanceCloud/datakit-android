@@ -1,4 +1,4 @@
-# Unreleased
+# agent 1.7.6-alpha08
 1. Fixed Log/RUM upload failures when request compression and SDK diagnostics are both enabled. Compression now finishes without closing the caller's request sink, and failures while finalizing compressed output propagate to the upload caller.
 
 ---
