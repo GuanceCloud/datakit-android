@@ -32,7 +32,9 @@ class DeflaterSink extends ForwardingSink {
 
     @Override
     public void close() throws IOException {
-        deflaterOutputStream.close();
-        super.close();
+        // Finish the zlib trailer and drain our buffer, but leave the caller's
+        // request sink open for outer wrappers and OkHttp to finish writing.
+        deflaterOutputStream.finish();
+        deflaterOutputStream.flush();
     }
 }

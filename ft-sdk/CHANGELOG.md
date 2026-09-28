@@ -1,3 +1,7 @@
+# Unreleased
+1. Fixed Log/RUM upload failures when request compression and SDK diagnostics are both enabled. Compression now finishes without closing the caller's request sink, and failures while finalizing compressed output propagate to the upload caller.
+
+---
 # agent 1.7.6-alpha07
 1. Added default-off SDK self-monitoring hooks for SQLite/file storage writes and cleanup, observed backlog, upload batch selection, filtering, retries, and SDK HTTP request outcomes.
 2. Added HTTP body byte accounting for OkHttp and HttpURLConnection. OkHttp counts encoded bodies at the network interceptor boundary; HttpURLConnection counts application-visible stream bytes. Headers and transport overhead are excluded.
