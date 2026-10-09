@@ -683,13 +683,22 @@ public class Constants {
      */
     public static final String KEY_RUM_SESSION_ERROR_TIMESTAMP = "session_error_timestamp";
     /**
-     * Session rum sampling rate
+     * Session RUM sampling percentage in [0,100]
      */
     public static final String KEY_RUM_SESSION_SAMPLE_RATE = "session_sample_rate";
     /**
-     * Session error sampling rate
+     * Session error sampling percentage in [0,100]
      */
     public static final String KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE = "session_on_error_sample_rate";
+
+    /**
+     * Session replay sampling percentage in [0,100]
+     */
+    public static final String KEY_RUM_SESSION_REPLAY_SAMPLE_RATE = "session_replay_sample_rate";
+    /**
+     * Session replay error sampling percentage in [0,100]
+     */
+    public static final String KEY_RUM_SESSION_REPLAY_ON_ERROR_SAMPLE_RATE = "session_replay_on_error_sample_rate";
 
     /**
      * Session type

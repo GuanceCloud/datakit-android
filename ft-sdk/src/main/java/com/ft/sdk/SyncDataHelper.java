@@ -42,7 +42,7 @@ public class SyncDataHelper {
     private final HashMap<String, Object> dynamicBaseTags;
     private final HashMap<String, Object> dynamicLogTags;
     private final HashMap<String, Object> dynamicLRumTags;
-    private final HashMap<String, Object> rumStaticFields;
+    private volatile FTRUMConfig rumConfig;
 
     private final Set<String> rumReservedKeys;
 
@@ -61,7 +61,6 @@ public class SyncDataHelper {
         dynamicBaseTags = new HashMap<>();
         dynamicLogTags = new HashMap<>();
         dynamicLRumTags = new HashMap<>();
-        rumStaticFields = new HashMap<>();
         rumReservedKeys = Collections.newSetFromMap(
                 new ConcurrentHashMap<String, Boolean>());
         rumReservedKeys.add(KEY_SDK_DATA_FLAG);
@@ -84,14 +83,36 @@ public class SyncDataHelper {
     }
 
     void initRUMConfig(FTRUMConfig config) {
+        rumConfig = config;
         rumTags.putAll(basePublicTags);
-        rumStaticFields.put(Constants.KEY_RUM_SESSION_SAMPLE_RATE,
-                applyModifier(Constants.KEY_RUM_SESSION_SAMPLE_RATE, config.getSamplingRate()));
-        rumStaticFields.put(Constants.KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE,
-                applyModifier(Constants.KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE, config.getSessionErrorSampleRate()));
         rumTags.putAll(applyModifier(config.getGlobalContext()));
-        rumReservedKeys.addAll(rumStaticFields.keySet());
+        rumReservedKeys.add(Constants.KEY_RUM_SESSION_SAMPLE_RATE);
+        rumReservedKeys.add(Constants.KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE);
+        rumReservedKeys.add(Constants.KEY_RUM_SESSION_REPLAY_SAMPLE_RATE);
+        rumReservedKeys.add(Constants.KEY_RUM_SESSION_REPLAY_ON_ERROR_SAMPLE_RATE);
         rumReservedKeys.addAll(config.getGlobalContext().keySet());
+    }
+
+    /** Writes effective sampling percentages in [0,100]; serialized records retain their values. */
+    private void appendRUMSamplingFields(HashMap<String, Object> fields) {
+        FTRUMConfig currentConfig = rumConfig;
+        if (currentConfig != null) {
+            fields.put(Constants.KEY_RUM_SESSION_SAMPLE_RATE,
+                    applyModifier(Constants.KEY_RUM_SESSION_SAMPLE_RATE, currentConfig.getSessionSamplingRate()));
+            fields.put(Constants.KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE,
+                    applyModifier(Constants.KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE, currentConfig.getSessionOnErrorSamplingRate()));
+        }
+        // Keep the optional Replay bridge on its existing 0..1 protocol, then report percentages.
+        Float replaySampleRate = SessionReplayBridge.sampleRate();
+        if (replaySampleRate != null) {
+            fields.put(Constants.KEY_RUM_SESSION_REPLAY_SAMPLE_RATE,
+                    applyModifier(Constants.KEY_RUM_SESSION_REPLAY_SAMPLE_RATE, replaySampleRate * 100f));
+        }
+        Float replayOnErrorSampleRate = SessionReplayBridge.sessionReplayOnErrorSampleRate();
+        if (replayOnErrorSampleRate != null) {
+            fields.put(Constants.KEY_RUM_SESSION_REPLAY_ON_ERROR_SAMPLE_RATE,
+                    applyModifier(Constants.KEY_RUM_SESSION_REPLAY_ON_ERROR_SAMPLE_RATE, replayOnErrorSampleRate * 100f));
+        }
     }
 
     HashMap<String, Object> checkSessionReplayRUMLinksKeys(String[] rumLinkKeys) {
@@ -344,7 +365,7 @@ public class SyncDataHelper {
             mergeTags.putAll(dynamicLRumTags);
             if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED) {
                 mergeTags.putAll(rumTags);
-                fields.putAll(rumStaticFields);
+                appendRUMSamplingFields(fields);
             } else {
                 mergeWebViewNativeTags(mergeTags, rumTags);
                 // Browser owns this identity (including its absence). Native global

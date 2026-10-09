@@ -82,8 +82,8 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     private final TouchPrivacy touchPrivacy;
     private final TextAndInputPrivacy textAndInputPrivacy;
     private final ImagePrivacy imagePrivacy;
-    private Sampler sessionRelaySampler;
-    private Sampler sessionRelayErrorSampler;
+    private volatile Sampler sessionRelaySampler;
+    private volatile Sampler sessionRelayErrorSampler;
     private final RecorderProvider recorderProvider;
     private final String[] linkRumKeys;
     private final boolean enableNativeRecorder;
@@ -266,10 +266,11 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         sdkCore.updateFeatureContext(getName(), new SessionReplayRecordCallback.UpdateCallBack() {
             @Override
             public void onUpdate(Map<String, Object> context) {
-                context.put(SESSION_REPLAY_SAMPLE_RATE_KEY, sessionRelaySampler.getSampleRate() != null ?
-                        sessionRelaySampler.getSampleRate() : null);
-                context.put(SESSION_REPLAY_ON_ERROR_SAMPLE_RATE_KEY, sessionRelayErrorSampler.getSampleRate() != null ?
-                        sessionRelayErrorSampler.getSampleRate() : null);
+                Float sampleRate = sessionRelaySampler.getSampleRate();
+                Float onErrorSampleRate = sessionRelayErrorSampler.getSampleRate();
+                context.put(SESSION_REPLAY_SAMPLE_RATE_KEY, sampleRate != null ? sampleRate * 100f : null);
+                context.put(SESSION_REPLAY_ON_ERROR_SAMPLE_RATE_KEY,
+                        onErrorSampleRate != null ? onErrorSampleRate * 100f : null);
                 context.put(SESSION_REPLAY_IMAGE_PRIVACY_KEY, imagePrivacy.toString().toLowerCase(Locale.US));
                 context.put(SESSION_REPLAY_TOUCH_PRIVACY_KEY, touchPrivacy.toString().toLowerCase(Locale.US));
                 context.put(SESSION_REPLAY_TEXT_AND_INPUT_PRIVACY_KEY, textAndInputPrivacy.toString().toLowerCase(Locale.US));

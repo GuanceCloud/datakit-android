@@ -14,13 +14,13 @@ public class FTRUMConfig {
     /**
      * Sampling rate, [0,1], scope is all View, Action, LongTask, Error data under the same session_id
      */
-    private float samplingRate = 1;
+    private volatile float samplingRate = 1;
     private boolean percentageSamplingRateSet;
 
     /**
      * Error sampling rate, [0,1], scope is all View, Action, LongTask, Error data under the same session_id
      */
-    private float sessionErrorSampleRate = 0;
+    private volatile float sessionErrorSampleRate = 0;
     private boolean percentageErrorSamplingRateSet;
 
     /**

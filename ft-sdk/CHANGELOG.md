@@ -1,3 +1,7 @@
+# Unreleased
+1. Fixed Native RUM sampling metadata after remote configuration updates: newly written records report the effective `session_sample_rate`, `session_on_error_sample_rate`, `session_replay_sample_rate`, and `session_replay_on_error_sample_rate` as percentages in 0–100, including fractional values and explicit zero. Replay fields are included when Replay is initialized. Existing serialized records and Browser-owned WebView sampling fields retain their values; internal sampling and legacy configuration APIs continue to use 0–1 probabilities.
+
+---
 # agent 1.7.6-alpha06
 1. Aligned BatteryPowerWatcher broadcast registration with Datadog: explicitly pass RECEIVER_NOT_EXPORTED on API 33+ and the compatibility flag value on API 26–32, retaining legacy registration below API 26. Native non-exported enforcement is available on API 33+.
 2. Fixed RUM View `time_spent` remaining zero after Java/native Crash or recovered fatal ANR, including startup and background fallback Views. Historical ANR duration is derived from the system exit timestamp without counting time after process death.
