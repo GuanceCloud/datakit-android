@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.db.file;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.DataType;
@@ -268,7 +269,9 @@ public class FTSyncFileDataStore {
             return lock.withLock(new FTFileLock.LockedOperation<Integer>() {
                 @Override
                 public Integer run() throws Exception {
-                    return countRecordsByType(list);
+                    int count = countRecordsByType(list);
+                    DiagnosticsBridge.backlog(list != null && list.length == 1 ? list[0].getValue() : "other", count);
+                    return count;
                 }
             });
         } catch (Exception e) {
@@ -660,6 +663,8 @@ public class FTSyncFileDataStore {
         json.put(FTSQL.RECORD_COLUMN_DATA_TYPE, type);
         json.put(FTSQL.RECORD_COLUMN_DEDUPE_KEY, data.getDedupeKey());
         sizeTracker.writeUtf8(file, json.toString());
+        if (DiagnosticsBridge.enabled()) DiagnosticsBridge.record("storage_write", type, 1,
+                data.getDataString().getBytes(java.nio.charset.StandardCharsets.UTF_8).length, "file_write");
     }
 
     private DataType findDataType(String value) {
@@ -709,7 +714,10 @@ public class FTSyncFileDataStore {
     }
 
     private boolean deleteFile(File file) {
-        return sizeTracker.deleteFile(file);
+        long bytes = DiagnosticsBridge.enabled() ? file.length() : -1;
+        boolean removed = sizeTracker.deleteFile(file);
+        if (removed) DiagnosticsBridge.record("storage_remove", "other", 1, bytes, "file_delete");
+        return removed;
     }
 
     private void deleteAllFiles() {

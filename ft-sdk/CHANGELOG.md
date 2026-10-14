@@ -2,6 +2,16 @@
 1. Fixed Native RUM sampling metadata after remote configuration updates: newly written records report the effective `session_sample_rate`, `session_on_error_sample_rate`, `session_replay_sample_rate`, and `session_replay_on_error_sample_rate` as percentages in 0–100, including fractional values and explicit zero. Replay fields are included when Replay is initialized. Existing serialized records and Browser-owned WebView sampling fields retain their values; internal sampling and legacy configuration APIs continue to use 0–1 probabilities.
 
 ---
+# agent 1.7.6-alpha08
+1. Fixed Log/RUM upload failures when request compression and SDK diagnostics are both enabled. Compression now finishes without closing the caller's request sink, and failures while finalizing compressed output propagate to the upload caller.
+
+---
+# agent 1.7.6-alpha07
+1. Added default-off SDK self-monitoring hooks for SQLite/file storage writes and cleanup, observed backlog, upload batch selection, filtering, retries, and SDK HTTP request outcomes.
+2. Added HTTP body byte accounting for OkHttp and HttpURLConnection. OkHttp counts encoded bodies at the network interceptor boundary; HttpURLConnection counts application-visible stream bytes. Headers and transport overhead are excluded.
+3. Added the `ft-diagnostics-api:0.1.0-alpha01` runtime dependency. Enable local collection with the optional `ft-diagnostics:0.1.0-alpha01` component; existing SDK configuration and business upload behavior are preserved, and diagnostics are not uploaded automatically. Direct AAR integrations must also include the API AAR.
+
+---
 # agent 1.7.6-alpha06
 1. Aligned BatteryPowerWatcher broadcast registration with Datadog: explicitly pass RECEIVER_NOT_EXPORTED on API 33+ and the compatibility flag value on API 26–32, retaining legacy registration below API 26. Native non-exported enforcement is available on API 33+.
 2. Fixed RUM View `time_spent` remaining zero after Java/native Crash or recovered fatal ANR, including startup and background fallback Views. Historical ANR duration is derived from the system exit timestamp without counting time after process death.

@@ -1,0 +1,17 @@
+apply plugin: 'com.android.library'
+ext {
+    pkgVersion = rootProject.ext.sdkVersions.ftDiagnostics
+    mavenGroupId = 'com.cloudcare.ft.mobile.sdk.tracker.agent'
+    mavenArtifactId = 'ft-diagnostics-api'
+}
+android {
+    namespace 'com.ft.sdk.diagnostics.internal'
+    compileSdk 34
+    defaultConfig { minSdkVersion 21 }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+}
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20231013'
+}
+apply from: '../maven_aar_publish.gradle'

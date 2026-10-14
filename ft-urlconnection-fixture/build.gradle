@@ -37,10 +37,15 @@ android {
     sourceSets.androidTest.assets.srcDir "$buildDir/generated/test-assets"
 }
 
+repositories {
+    flatDir { dirs 'libs' }
+}
+
 dependencies {
     implementation project(':ft-sdk')
-    implementation project(':ft-urlconnection-fixture-jar')
-    implementation project(':ft-urlconnection-fixture-aar')
+    // Resolve as external artifacts so AGP uses the instrumented dependency DEX.
+    implementation name: 'urlconnection-fixture', ext: 'jar'
+    implementation name: 'urlconnection-fixture', ext: 'aar'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test:runner:1.5.2'
 }

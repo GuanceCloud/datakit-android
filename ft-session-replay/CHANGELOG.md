@@ -2,6 +2,12 @@
 1. Made runtime Replay sampler updates visible across threads so Native RUM sampling metadata can read the effective rates while remote configuration is being updated. Replay feature context sampling fields now use 0–100 percentages; internal samplers and legacy APIs retain 0–1 probabilities.
 
 ---
+# replay 0.1.9-alpha06
+1. Added default-off self-monitoring hooks for Replay serialized event writes, write failures and size rejection, observed file backlog, selected batches, retained retries, and file cleanup.
+2. Added the `ft-diagnostics-api:0.1.0-alpha01` runtime dependency. Use the optional `ft-diagnostics:0.1.0-alpha01` collector to inspect local diagnostics; pair with `ft-sdk >= 1.7.6-alpha07` to also observe SDK HTTP upload attempts and body bytes. Direct AAR integrations must also include the API AAR.
+3. Preserved Replay recording and upload behavior. Replay backlog counts files, and write bytes describe serialized event data before batch framing/encryption rather than physical disk IO.
+
+---
 # replay 0.1.9-alpha05
 1. Added `FTSessionReplayConfig.setSessionReplaySamplingRate(float)` (0–100, default 100) and `setSessionReplayOnErrorSamplingRate(float)` (0–100, default 0), matching getters and feature runtime update APIs. Deprecated the old 0–1 APIs while retaining behavior for legacy callers.
 2. Preserved fractional percentages, explicit zero and new-over-old initialization precedence. When using the new config APIs with remote configuration, use `ft-sdk >= 1.7.6-alpha05` so remote values continue to override explicit new local settings.

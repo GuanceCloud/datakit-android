@@ -8,7 +8,9 @@ include ':ft-sdk-optional-dependency-test'
 
 //include ':WebviewTest'
 
-// Optional, self-contained URLConnection acceptance APK (no local AARs, OkHttp or Replay).
+// Optional URLConnection acceptance APK with checked-in JAR/AAR fixtures (no OkHttp or Replay).
 if (hasProperty('ftUrlConnectionFixture')) {
-    include ':ft-urlconnection-fixture', ':ft-urlconnection-fixture-jar', ':ft-urlconnection-fixture-aar'
+    include ':ft-urlconnection-fixture'
 }
+
+include ':ft-diagnostics-api', ':ft-diagnostics'

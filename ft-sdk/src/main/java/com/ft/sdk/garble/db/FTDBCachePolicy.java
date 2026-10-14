@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.db;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 import android.os.Looper;
 
 import com.ft.sdk.CacheDiscard;
@@ -280,6 +281,12 @@ public class FTDBCachePolicy {
      * @return 0-means data can be inserted, n means old data needs to be deleted, -n means how much data to discard
      */
     public int optLogCachePolicy(int limit) {
+        int result = optLogCachePolicyObserved(limit);
+        if(result<0) DiagnosticsBridge.record("discard","log",-result,-1,"cache_policy");
+        return result;
+    }
+
+    private int optLogCachePolicyObserved(int limit) {
         if (limitWithCacheSize) {
             if (isReachCacheLimit()) {
                 switch (cacheDiscard) {
@@ -330,6 +337,12 @@ public class FTDBCachePolicy {
      * @return @return -1-means directly discard, 0-means data can be inserted, 1-means discard and delete old data
      */
     public int optRUMCachePolicy(int limit) {
+        int result = optRUMCachePolicyObserved(limit);
+        if(result<0) DiagnosticsBridge.record("discard","rum",limit,-1,"cache_policy");
+        return result;
+    }
+
+    private int optRUMCachePolicyObserved(int limit) {
         if (limitWithCacheSize) {
             if (isReachCacheLimit()) {
                 if (deleteOldestLogData(Constants.CACHE_OLD_DATA_REMOVE_COUNT)) {

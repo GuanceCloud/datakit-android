@@ -8,6 +8,16 @@ afterEvaluate {
                 artifactId mavenArtifactId
                 version pkgVersion
                 artifact project.tasks.named('bundleReleaseAar')
+                if (project.ext.has('diagnosticsApiVersion')) {
+                    pom.withXml {
+                        def dependencies = asNode().appendNode('dependencies')
+                        def dependency = dependencies.appendNode('dependency')
+                        dependency.appendNode('groupId', 'com.cloudcare.ft.mobile.sdk.tracker.agent')
+                        dependency.appendNode('artifactId', 'ft-diagnostics-api')
+                        dependency.appendNode('version', project.ext.diagnosticsApiVersion)
+                        dependency.appendNode('scope', 'runtime')
+                    }
+                }
                 // Add source code and Javadoc to the published AAR file
                 artifact androidJavadocsJar
                 artifact androidSourcesJar

@@ -1,5 +1,6 @@
 package com.ft.sdk;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 import android.net.Uri;
 
 import com.ft.sdk.garble.http.EngineFactory;
@@ -56,6 +57,22 @@ public class NetProxy {
      * @return
      */
     public FTResponseData execute() {
+        if (!DiagnosticsBridge.enabled()) return executeRequest();
+        String channel = DiagnosticsBridge.channel(httpBuilder.getModel());
+        DiagnosticsBridge.Attempt attempt = DiagnosticsBridge.begin(channel, -1);
+        DiagnosticsBridge.Transfer previous = DiagnosticsBridge.transfer();
+        DiagnosticsBridge.Transfer transfer = new DiagnosticsBridge.Transfer();
+        DiagnosticsBridge.transfer(transfer);
+        FTResponseData result = null;
+        try { result = executeRequest(); return result; }
+        finally {
+            if (attempt != null) attempt.finish(result == null ? -1 : result.getTransportStatusCode(), transfer.tx, transfer.rx,
+                    engine.getClass().getSimpleName().equals("OkHttpEngine") ? "okhttp_network_encoded_body; failed_writes_may_be_partial" : "urlconnection_application_stream_body; encoding_not_verified; failed_writes_may_be_partial");
+            DiagnosticsBridge.transfer(previous);
+        }
+    }
+
+    private FTResponseData executeRequest() {
         if (!FTNetworkListener.get().getNetworkStateBean().isNetworkAvailable()) {
             return new FTResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE, "");
         }

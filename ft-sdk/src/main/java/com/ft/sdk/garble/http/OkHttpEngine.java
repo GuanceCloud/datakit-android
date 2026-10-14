@@ -41,6 +41,7 @@ public class OkHttpEngine implements INetEngine {
     public void defaultConfig(HttpBuilder httpBuilder) {
         if (client == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.addNetworkInterceptor(new DiagnosticNetworkInterceptor());
             if (httpBuilder.getHttpConfig().isCompressIntakeRequests()) {
                 builder.addInterceptor(new DeflateInterceptor());
             }

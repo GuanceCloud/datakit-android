@@ -1,5 +1,6 @@
 package com.ft.sdk.sessionreplay.internal.storage;
 
+import com.ft.sdk.diagnostics.internal.DiagnosticsBridge;
 import static com.ft.sdk.sessionreplay.internal.storage.FileMover.existsSafe;
 
 import com.ft.sdk.api.ConsentProvider;
@@ -128,6 +129,8 @@ public class ConsentAwareStorage implements Storage {
                 : null;
         List<RawBatchEvent> batchData = batchEventsReaderWriter.readData(batchFile);
 
+        if(DiagnosticsBridge.enabled()) DiagnosticsBridge.batch("replay",batchData.size(),batchFile.length(),
+                Math.max(0,System.currentTimeMillis()-batchFile.lastModified()),"file_last_modified");
         return new BatchData(batchId, batchData, batchMetadata);
     }
 
@@ -145,6 +148,7 @@ public class ConsentAwareStorage implements Storage {
 
         if (batch == null) return;
 
+        if (!deleteBatch) DiagnosticsBridge.record("retry", "replay", 1, -1, "batch_retained");
         if (deleteBatch) {
             deleteBatch(batch, removalReason);
         }
@@ -187,8 +191,10 @@ public class ConsentAwareStorage implements Storage {
     }
 
     private void deleteBatchFile(File batchFile, RemovalReason reason) {
+        long observedBytes = DiagnosticsBridge.enabled() ? batchFile.length() : -1;
         boolean result = fileMover.delete(batchFile);
         if (result) {
+            DiagnosticsBridge.record("storage_remove", "replay", 1, observedBytes, reason.getClass().getSimpleName());
             metricsDispatcher.sendBatchDeletedMetric(batchFile, reason);
         } else {
             internalLogger.w(TAG, String.format(Locale.US, WARNING_DELETE_FAILED, batchFile.getPath()));

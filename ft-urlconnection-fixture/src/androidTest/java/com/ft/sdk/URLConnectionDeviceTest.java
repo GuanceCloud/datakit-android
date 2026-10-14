@@ -95,10 +95,14 @@ public class URLConnectionDeviceTest {
             try {Class.forName(unavailable);fail("Unexpected optional dependency: "+unavailable);}catch(ClassNotFoundException expected){}
         }
         URL url=new URL("https://localhost/unused");
+        String[] sources={"App Java", "App Java proxy", "App Kotlin", "App Kotlin proxy",
+                "JAR", "JAR proxy", "AAR", "AAR proxy"};
+        int source=0;
         for(URLConnection result:new URLConnection[]{Calls.open(url),Calls.open(url,Proxy.NO_PROXY),
                 KotlinCalls.open(url),KotlinCalls.open(url,Proxy.NO_PROXY),
-                com.ft.fixturejar.Calls.open(url),com.ft.fixtureaar.Calls.open(url)}) {
-            assertEquals(com.ft.fixture.BuildConfig.HOOK_ENABLED,result instanceof FTHttpsURLConnection);
+                com.ft.fixturejar.Calls.open(url),com.ft.fixturejar.Calls.open(url,Proxy.NO_PROXY),
+                com.ft.fixtureaar.Calls.open(url),com.ft.fixtureaar.Calls.open(url,Proxy.NO_PROXY)}) {
+            assertEquals(sources[source++],com.ft.fixture.BuildConfig.HOOK_ENABLED,result instanceof FTHttpsURLConnection);
             if(com.ft.fixture.BuildConfig.HOOK_ENABLED)assertSame(result,FTURLConnectionInstrumentation.wrap(result));
         }
         assertFalse(ExcludedCalls.open(url) instanceof FTHttpsURLConnection);

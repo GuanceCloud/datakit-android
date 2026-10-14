@@ -20,6 +20,8 @@ public class FTResponseData {
      * http code
      */
     private int code;
+    private final int transportStatusCode;
+    public int getTransportStatusCode() { return transportStatusCode; }
     /**
      * Error code, part of the datakit network request error code, part of {@link NetCodeStatus} error code
      */
@@ -30,6 +32,7 @@ public class FTResponseData {
     private String message;
 
     public FTResponseData(int code, String data) {
+        transportStatusCode = code >= 100 && code <= 599 ? code : -1;
         if (code == HttpURLConnection.HTTP_OK) {
             this.code = code;
             this.message = data;
