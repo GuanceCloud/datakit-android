@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.bean.MonitorInfoBean;
+import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.threadpool.MonitorRunnable;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -262,6 +264,75 @@ public class FTMonitorManagerTest {
         Assert.assertTrue(runner.getCpuBean().count >= 2);
         manager.removeMonitor("current");
         Assert.assertTrue(service.getQueue().isEmpty());
+    }
+
+    @Test
+    public void endingViewPreservesAllCollectedMetricsThroughPersistence() throws Exception {
+        ViewBean view = new ViewBean();
+        manager.addMonitor(view.getId());
+        MonitorRunnable runner = runners().get(view.getId());
+        service.submit(() -> {
+            seed(runner.getCpuBean(), 100, 160, 130);
+            seed(runner.getMemoryBean(), 1024, 4096, 2560);
+            seed(runner.getFpsBean(), 24, 60, 48);
+            seed(runner.getBatteryBean(), 100, 300, 200);
+            manager.attachMonitorData(view);
+            manager.removeMonitor(view.getId());
+        }).get(2, TimeUnit.SECONDS);
+
+        Assert.assertTrue(service.getQueue().isEmpty());
+        Assert.assertEquals(60, view.getCpuTickCount());
+        Assert.assertTrue(view.getCpuTickCountPerSecond() > 0);
+        assertFixtureMetrics(view);
+        ViewBean persisted = new ViewBean();
+        persisted.setFromAttrJsonString(view.getAttrJsonString());
+        Assert.assertEquals(view.getCpuTickCount(), persisted.getCpuTickCount());
+        Assert.assertEquals(view.getCpuTickCountPerSecond(),
+                persisted.getCpuTickCountPerSecond(), 0.000001);
+        assertFixtureMetrics(persisted);
+
+        // A cancelled runnable cannot change the completed View's result.
+        String completed = view.getAttrJsonString();
+        runner.run();
+        manager.attachMonitorData(view);
+        Assert.assertEquals(completed, view.getAttrJsonString());
+    }
+
+    @Test
+    public void nextViewDoesNotInheritEndedViewMetrics() throws Exception {
+        ViewBean ended = new ViewBean();
+        manager.addMonitor(ended.getId());
+        MonitorRunnable previous = runners().get(ended.getId());
+        service.submit(() -> {
+            seed(previous.getMemoryBean(), 1024, 4096, 2560);
+            manager.attachMonitorData(ended);
+            manager.removeMonitor(ended.getId());
+        }).get(2, TimeUnit.SECONDS);
+
+        ViewBean next = new ViewBean();
+        manager.addMonitor(next.getId());
+        manager.attachMonitorData(next);
+        Assert.assertEquals(0, next.getMemoryMax());
+        Assert.assertEquals(0, next.getMemoryAvg());
+        Assert.assertEquals(4096, ended.getMemoryMax());
+        Assert.assertEquals(2560, ended.getMemoryAvg());
+        Assert.assertEquals(1, runners().size());
+    }
+
+    private static void seed(MonitorInfoBean bean, double minimum, double maximum, double average) {
+        bean.count = 2;
+        bean.miniValue = minimum;
+        bean.maxValue = maximum;
+        bean.avgValue = average;
+    }
+
+    private static void assertFixtureMetrics(ViewBean view) {
+        Assert.assertEquals(2560, view.getMemoryAvg());
+        Assert.assertEquals(4096, view.getMemoryMax());
+        Assert.assertEquals(24, view.getFpsMini(), 0);
+        Assert.assertEquals(48, view.getFpsAvg(), 0);
+        Assert.assertEquals(200, view.getBatteryCurrentAvg());
+        Assert.assertEquals(300, view.getBatteryCurrentMax());
     }
 
     @SuppressWarnings("unchecked")
