@@ -9,7 +9,6 @@ import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 
@@ -41,6 +40,8 @@ public class FTMonitorManager {
     private DetectFrequency detectFrequency = DetectFrequency.DEFAULT;
 
     private final ConcurrentHashMap<String, MonitorRunnable> runnerMap = new ConcurrentHashMap<>();
+    // Accessed while holding runnerMap's monitor.
+    private boolean released;
 
     private FTMonitorManager() {
         service = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
@@ -49,11 +50,12 @@ public class FTMonitorManager {
                 return new Thread(r, "FTMetricsMTR");
             }
         });
+        service.setRemoveOnCancelPolicy(true);
     }
 
     private boolean isTVDevice;
 
-    private final ScheduledExecutorService service;
+    private final ScheduledThreadPoolExecutor service;
 
     public static FTMonitorManager get() {
         synchronized (FTMonitorManager.class) {
@@ -115,8 +117,12 @@ public class FTMonitorManager {
         LogUtils.d(TAG, "addMonitor:" + viewId + ", remain count:" + runnerMap.size());
         if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
-            MonitorRunnable runner = new MonitorRunnable(detectFrequency, service);
-            runnerMap.put(viewId, runner);
+            if (released) return;
+            MonitorRunnable runner = new MonitorRunnable(detectFrequency, service, this);
+            MonitorRunnable previous = runnerMap.put(viewId, runner);
+            if (previous != null) {
+                previous.cancel();
+            }
             runner.run();
         }
     }
@@ -169,9 +175,11 @@ public class FTMonitorManager {
      */
     public void removeMonitor(String viewId) {
         LogUtils.d(TAG, "removeMonitor:" + viewId);
-        if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
-            runnerMap.remove(viewId);
+            MonitorRunnable runner = runnerMap.remove(viewId);
+            if (runner != null) {
+                runner.cancel();
+            }
         }
     }
 
@@ -179,11 +187,20 @@ public class FTMonitorManager {
      * Clear current monitoring configuration items
      */
     public static void release() {
-        if (ftMonitorConfig != null) {
-            ftMonitorConfig.service.shutdown();
+        synchronized (FTMonitorManager.class) {
+            if (ftMonitorConfig != null) {
+                synchronized (ftMonitorConfig.runnerMap) {
+                    ftMonitorConfig.released = true;
+                    for (MonitorRunnable runner : ftMonitorConfig.runnerMap.values()) {
+                        runner.cancel();
+                    }
+                    ftMonitorConfig.runnerMap.clear();
+                    ftMonitorConfig.service.shutdown();
+                }
+            }
+            FpsUtils.release();
+            ftMonitorConfig = null;
         }
-        FpsUtils.release();
-        ftMonitorConfig = null;
     }
 
 

@@ -11,7 +11,9 @@ import com.ft.sdk.garble.utils.CpuUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
 
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,37 +31,67 @@ public class MonitorRunnable implements Runnable {
     private final MonitorInfoBean batteryBean = new MonitorInfoBean();
 
     private final ScheduledExecutorService service;
+    private final FTMonitorManager monitorManager;
+    private final Object lifecycleLock = new Object();
+    private volatile boolean stopped;
+    private ScheduledFuture<?> scheduledTask;
 
     public MonitorRunnable(DetectFrequency detectFrequency, ScheduledExecutorService service) {
+        this(detectFrequency, service, FTMonitorManager.get());
+    }
+
+    public MonitorRunnable(DetectFrequency detectFrequency, ScheduledExecutorService service,
+                           FTMonitorManager monitorManager) {
         this.detectFrequency = detectFrequency;
         this.service = service;
+        this.monitorManager = monitorManager;
+    }
+
+    /** Stop queued collection and prevent an in-flight sample from scheduling again. */
+    public void cancel() {
+        stopped = true;
+        synchronized (lifecycleLock) {
+            if (scheduledTask != null) {
+                scheduledTask.cancel(false);
+                scheduledTask = null;
+            }
+        }
     }
 
 
     @Override
     public void run() {
         // Save resource overhead, only record data when page is in foreground
-        if (!FTActivityLifecycleCallbacks.isAppInForeground()) return;
-        if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
+        if (stopped || !FTActivityLifecycleCallbacks.isAppInForeground()) return;
+        if (monitorManager.isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
             computeCpuBean(cpuBean, CpuUtils.get().getAppCPUTickCount());
         }
 
-        if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
+        if (monitorManager.isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
             double fps = FpsUtils.get().getFps();
             if (fps > 0) {
                 computeMonitorBean(fpsBean, fps);
             }
         }
-        if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.MEMORY)) {
+        if (monitorManager.isDeviceMetricsMonitorType(DeviceMetricsMonitorType.MEMORY)) {
             long memory = DeviceUtils.get().getAppMemoryUseSize();
             computeMonitorBean(memoryBean, memory);
         }
 
-        if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.BATTERY)) {
+        if (monitorManager.isDeviceMetricsMonitorType(DeviceMetricsMonitorType.BATTERY)) {
             computeMonitorBean(batteryBean, BatteryUtils.getBatteryCurrent(FTApplication.getApplication()));
         }
 
-        service.schedule(this, detectFrequency.getValue(), TimeUnit.MILLISECONDS);
+        synchronized (lifecycleLock) {
+            if (stopped || service.isShutdown()) return;
+            try {
+                scheduledTask = service.schedule(this, detectFrequency.getValue(), TimeUnit.MILLISECONDS);
+            } catch (RejectedExecutionException error) {
+                // External shutdown may race with the isShutdown check.
+                if (!service.isShutdown()) throw error;
+                stopped = true;
+            }
+        }
     }
 
 

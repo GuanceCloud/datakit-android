@@ -6,6 +6,8 @@
         android:networkSecurityConfig="@xml/network_security_config">
         <activity android:name="com.ft.sdk.ReplayHeatMapTestActivity"
             android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+        <activity android:name="com.ft.sdk.MonitorLifecycleTestActivity"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
     </application>
 
 </manifest>
