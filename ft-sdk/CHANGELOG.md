@@ -1,6 +1,7 @@
 # Unreleased
 1. Fixed Native RUM sampling metadata after remote configuration updates: newly written records report the effective `session_sample_rate`, `session_on_error_sample_rate`, `session_replay_sample_rate`, and `session_replay_on_error_sample_rate` as percentages in 0–100, including fractional values and explicit zero. Replay fields are included when Replay is initialized. Existing serialized records and Browser-owned WebView sampling fields retain their values; internal sampling and legacy configuration APIs continue to use 0–1 probabilities.
 2. Fixed page device metric tasks remaining scheduled after a RUM View ends. Ended and replaced View tasks are cancelled and removed from the metrics queue, in-flight samples cannot schedule again after cancellation, and SDK shutdown cancels all remaining View monitors.
+3. Shortened the next startup's first automatic upload wait from 10 seconds to 2 seconds after an automatically captured Java crash or live Native crash callback within 5 seconds (inclusive) of the first SDK installation in the process. The marker is consumed at the next SDK installation even when uploading is disabled or unavailable; subsequent upload intervals and retries are unchanged, and another early crash creates a new marker.
 
 ---
 # agent 1.7.6-alpha08
