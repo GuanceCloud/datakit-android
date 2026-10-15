@@ -44,6 +44,11 @@ class FTAppStartCounter {
     private final AtomicBoolean firstDrawDone = new AtomicBoolean(false);
 
     /**
+     * Listener registration does not end startup state tracking.
+     */
+    private final AtomicBoolean firstDrawListenerRegistered = new AtomicBoolean(false);
+
+    /**
      * Startup start timestamp for duration, unit: nanoseconds
      */
     private long coldStartTimeLineForNanoDuration = 0;
@@ -88,6 +93,10 @@ class FTAppStartCounter {
      */
     private boolean launchFromBackground = false;
 
+    private boolean foregroundDuringLaunch = false;
+
+    private boolean backgroundDuringLaunch = false;
+
 
     private FTAppStartCounter() {
     }
@@ -108,6 +117,7 @@ class FTAppStartCounter {
      * @param coldStartEndTimeLine
      */
     void coldStart(long coldStartEndTimeLine) {
+        firstDrawDone.set(true);
         this.coldStartTimeLineForNanoDuration = Utils.getAppStartTimeNs();
         this.coldStartDuration = coldStartEndTimeLine - coldStartTimeLineForNanoDuration;
         this.coldStartTimeLine = Utils.getCurrentNanoTime() - coldStartDuration;
@@ -118,7 +128,8 @@ class FTAppStartCounter {
 
         LogUtils.d(TAG, "coldStart:" + coldStartDuration
                 + ",coldTimeLine:" + coldStartTimeLineForNanoDuration
-                + ",launchFromBackground:" + launchFromBackground);
+                + ",launchFromBackground:" + launchFromBackground
+                + ",appLaunchType:" + getColdStartLaunchType());
     }
 
     void checkFirstActivityPreCreate(long nanoTimeLine) {
@@ -130,9 +141,10 @@ class FTAppStartCounter {
     }
 
     void checkFirstFrameStart(Activity activity, Runnable drawDoneCallback) {
-        if (!firstDrawDone.getAndSet(true)) {
+        onAppForeground();
+        if (!firstDrawDone.get()) {
             View rootView = activity.findViewById(android.R.id.content);
-            if (rootView != null) {
+            if (rootView != null && firstDrawListenerRegistered.compareAndSet(false, true)) {
                 FirstDrawDoneListener.registerForNextDraw(rootView, drawDoneCallback);
             }
         }
@@ -175,7 +187,7 @@ class FTAppStartCounter {
                 preApplicationInit,
                 applicationInit,
                 firstFrameInit,
-                launchFromBackground);
+                getColdStartLaunchType());
         coldStartDuration = 0;
     }
 
@@ -208,7 +220,8 @@ class FTAppStartCounter {
      * @param nanoTimeLine Application.onCreate() timestamp, unit: nanoseconds
      */
     void appOnCreate(long nanoTimeLine, Application application) {
-        if (!firstDrawDone.get()) {
+        // Repeated Application hooks must preserve the first launch snapshot.
+        if (!firstDrawDone.get() && applicationOnCreateTimeLine == 0) {
             applicationOnCreateTimeLine = nanoTimeLine;
             launchFromBackground = isLaunchFromBackground(application);
             LogUtils.d(TAG, "appOnCreate:" + nanoTimeLine
@@ -226,11 +239,38 @@ class FTAppStartCounter {
             applicationOnCreateCompletedTimeLine = nanoTimeLine;
             LogUtils.d(TAG, "appOnCreateCompleted:" + nanoTimeLine
                     + ",firstActivityPreCreate:" + firstActivityPreOnActivityTimeline);
-            if (firstActivityPreOnActivityTimeline == 0) {
+            if (firstActivityPreOnActivityTimeline == 0 && !foregroundDuringLaunch) {
                 launchFromBackground = true;
                 LogUtils.d(TAG, "launchFromBackground:true,noActivityAfterApplication");
             }
         }
+    }
+
+    /**
+     * Records app-wide lifecycle changes until the cold-start measurement ends.
+     */
+    void onAppForeground() {
+        if (!firstDrawDone.get()) {
+            foregroundDuringLaunch = true;
+        }
+    }
+
+    void onAppBackground() {
+        if (!firstDrawDone.get()) {
+            backgroundDuringLaunch = true;
+        }
+    }
+
+    String getColdStartLaunchType() {
+        boolean hasBackground = launchFromBackground || backgroundDuringLaunch;
+        // Foreground importance is provisional until the no-Activity check has run.
+        boolean hasForeground = foregroundDuringLaunch
+                || (applicationOnCreateTimeLine != 0 && !launchFromBackground);
+        if (hasForeground && hasBackground) {
+            return Constants.APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND;
+        }
+        return hasBackground ? Constants.APP_LAUNCH_TYPE_BACKGROUND
+                : Constants.APP_LAUNCH_TYPE_FOREGROUND;
     }
 
     private boolean isLaunchFromBackground(Application application) {

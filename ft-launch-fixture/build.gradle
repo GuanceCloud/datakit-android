@@ -1,0 +1,23 @@
+apply plugin: 'com.android.application'
+apply plugin: 'ft-plugin'
+
+android {
+    namespace 'com.ft.launchfixture'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.ft.fixture.launch'
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation project(':ft-sdk')
+    implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+}

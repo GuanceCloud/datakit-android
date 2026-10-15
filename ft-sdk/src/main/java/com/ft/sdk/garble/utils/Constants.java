@@ -829,6 +829,8 @@ public class Constants {
 
     public static final String APP_LAUNCH_TYPE_BACKGROUND = "background";
 
+    public static final String APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND = "foreground_and_background";
+
     /**
      * Action cycle content long duration count statistics, {@link Constants#FT_MEASUREMENT_RUM_LONG_TASK}
      */

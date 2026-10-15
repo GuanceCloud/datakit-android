@@ -20,6 +20,7 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.FTTraceManager;
 import com.ft.sdk.FTActivityManager;
+import com.ft.sdk.HandlerAction;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceContext;
 import com.ft.sdk.TraceType;
@@ -207,6 +208,40 @@ public class RUMTest extends FTBaseTest {
         SyncData data = list.get(0);
         LineProtocolData lineProtocolData = new LineProtocolData(data.getDataString());
         Assert.assertEquals(Constants.APP_LAUNCH_TYPE_FOREGROUND,
+                lineProtocolData.getField(Constants.KEY_RUM_APP_LAUNCH_TYPE));
+    }
+
+    @Test
+    public void launchActionMixedTypeTest() throws Exception {
+        Whitebox.invokeMethod(FTAutoTrack.class, "putRUMLaunchPerformance",
+                true, DURATION, Utils.getCurrentNanoTime(), null, null, null,
+                Constants.APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND);
+        waitEventConsumeInThreadPool();
+        Thread.sleep(500);
+
+        List<SyncData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        Assert.assertFalse(list.isEmpty());
+        LineProtocolData lineProtocolData = new LineProtocolData(list.get(0).getDataString());
+        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND,
+                lineProtocolData.getField(Constants.KEY_RUM_APP_LAUNCH_TYPE));
+    }
+
+    @Test
+    public void launchActionHandlerKeepsMixedTypeTest() throws Exception {
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID)
+                .setActionTrackingHandler(event -> new HandlerAction("mixed launch")));
+        Whitebox.invokeMethod(FTAutoTrack.class, "putRUMLaunchPerformance",
+                true, DURATION, Utils.getCurrentNanoTime(), null, null, null,
+                Constants.APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND);
+        waitEventConsumeInThreadPool();
+        Thread.sleep(500);
+
+        List<SyncData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        Assert.assertFalse(list.isEmpty());
+        LineProtocolData lineProtocolData = new LineProtocolData(list.get(0).getDataString());
+        Assert.assertEquals("mixed launch",
+                lineProtocolData.getTagAsString(Constants.KEY_RUM_ACTION_NAME));
+        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND,
                 lineProtocolData.getField(Constants.KEY_RUM_APP_LAUNCH_TYPE));
     }
 

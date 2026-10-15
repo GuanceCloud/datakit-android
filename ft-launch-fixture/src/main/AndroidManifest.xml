@@ -1,0 +1,14 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application
+        android:name=".LaunchApplication"
+        android:label="Launch type acceptance"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".LaunchActivity" android:exported="true" />
+        <provider
+            android:name=".LaunchControlProvider"
+            android:authorities="com.ft.fixture.launch.control"
+            android:exported="true" />
+    </application>
+</manifest>

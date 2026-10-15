@@ -14,6 +14,21 @@ GuanceCloud Application Monitoring can collect metric data from various Android 
 ## Documentation
  [Documentation Center](https://docs.guance.com/real-user-monitoring/android/app-access/)   
 
+### Cold-start Action launch type
+
+Automatic cold-start Actions report `app_launch_type` for the observed startup interval,
+from the initial Application startup hook through completion of the first-draw measurement:
+
+| Value | Startup states |
+| --- | --- |
+| `foreground` | Foreground only |
+| `background` | Background only |
+| `foreground_and_background` | Both foreground and background, in either order |
+
+The original total duration is retained. Transitions after cold-start completion do not
+change the recorded type, including when SDK initialization delays reporting. Hot-start
+Actions do not include this field.
+
 ## Open Source Code Usage
 * [ft-session-replay](ft-session-replay) is a secondary development based on datadog [dd-sdk-android-session-replay](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay)
 * [ft-session-replay-material](ft-session-replay-material) is a secondary development based on datadog [dd-sdk-android-session-replay-material](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay-material)
