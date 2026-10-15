@@ -1,6 +1,8 @@
 # Unreleased
 1. Fixed Native RUM sampling metadata after remote configuration updates: newly written records report the effective `session_sample_rate`, `session_on_error_sample_rate`, `session_replay_sample_rate`, and `session_replay_on_error_sample_rate` as percentages in 0–100, including fractional values and explicit zero. Replay fields are included when Replay is initialized. Existing serialized records and Browser-owned WebView sampling fields retain their values; internal sampling and legacy configuration APIs continue to use 0–1 probabilities.
 2. Fixed page device metric tasks remaining scheduled after a RUM View ends. Ended and replaced View tasks are cancelled and removed from the metrics queue, in-flight samples cannot schedule again after cancellation, and SDK shutdown cancels all remaining View monitors.
+3. Fixed repeated Application startup hooks overwriting the first Application timestamp and initial cold-start classification. Cold-start duration calculation is unchanged.
+4. Added cold-start Action `app_launch_type=foreground_and_background` when startup spans both foreground and background states in either order. State tracking continues while the first-draw listener is pending and stops when the cold-start measurement completes; subsequent transitions do not change a delayed startup report. Foreground-only and background-only startup retain their existing values, and hot-start Actions remain unchanged.
 
 ---
 # agent 1.7.6-alpha08

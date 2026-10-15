@@ -41,13 +41,16 @@ assert_final_type() {
     local scenario="$1"
     local expected="$2"
     local logs="$3"
-    local expected_line="launchFromBackground:${expected}"
-    if [[ "${logs}" != *"coldStart:"*"${expected_line}"* ]]; then
-        echo "[FAIL] ${scenario}: expected final ${expected}"
-        echo "${logs}"
-        exit 1
-    fi
-    echo "[PASS] ${scenario}: final ${expected}"
+    local line
+    while IFS= read -r line; do
+        if [[ "${line}" == *"coldStart:"*",appLaunchType:${expected}" ]]; then
+            echo "[PASS] ${scenario}: final ${expected}"
+            return
+        fi
+    done <<< "${logs}"
+    echo "[FAIL] ${scenario}: expected final ${expected}"
+    echo "${logs}"
+    exit 1
 }
 
 run_normal_activity() {
@@ -55,7 +58,7 @@ run_normal_activity() {
     "${ADB_BIN}" shell am start -W -S -n "${TARGET_ACTIVITY}" >/dev/null
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "normal activity" "false" "${logs}"
+    assert_final_type "normal activity" "foreground" "${logs}"
 }
 
 run_receiver() {
@@ -67,7 +70,7 @@ run_receiver() {
     "${ADB_BIN}" shell am start -W -n "${TARGET_ACTIVITY}" >/dev/null
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "broadcast receiver" "true" "${logs}"
+    assert_final_type "broadcast receiver" "foreground_and_background" "${logs}"
 }
 
 start_caller() {
@@ -82,7 +85,7 @@ run_started_service() {
     start_caller "start_service"
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "started service" "true" "${logs}"
+    assert_final_type "started service" "foreground_and_background" "${logs}"
 }
 
 run_bound_service() {
@@ -90,7 +93,7 @@ run_bound_service() {
     start_caller "bind_service"
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "bound service" "true" "${logs}"
+    assert_final_type "bound service" "foreground_and_background" "${logs}"
 }
 
 run_provider() {
@@ -98,7 +101,7 @@ run_provider() {
     start_caller "provider"
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "content provider" "true" "${logs}"
+    assert_final_type "content provider" "foreground_and_background" "${logs}"
 }
 
 run_job() {
@@ -113,7 +116,7 @@ run_job() {
     "${ADB_BIN}" shell am start -W -n "${TARGET_ACTIVITY}" >/dev/null
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "job service" "true" "${logs}"
+    assert_final_type "job service" "foreground_and_background" "${logs}"
 }
 
 run_normal_activity

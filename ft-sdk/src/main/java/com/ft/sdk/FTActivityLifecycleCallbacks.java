@@ -75,6 +75,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         mFragmentLifecycleHelper.register(activity);
         if (activityCount > 0) {
             FTActivityManager.get().appForeground();
+            FTAppStartCounter.get().onAppForeground();
             // Handle FPS monitoring lifecycle
             FpsUtils.onAppForeground();
         }
@@ -199,6 +200,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         if (activityCount == 0 && !hasForegroundSiblingProcess(activity)) {
             mAppRestartCallback.onEnterBackground();
             FTActivityManager.get().appBackGround();
+            FTAppStartCounter.get().onAppBackground();
             if (FTRUMConfigManager.get().isRumEnable()) {
                 FTRUMInnerManager.get().onAppBackground();
             }

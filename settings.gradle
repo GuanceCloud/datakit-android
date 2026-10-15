@@ -13,4 +13,8 @@ if (hasProperty('ftUrlConnectionFixture')) {
     include ':ft-urlconnection-fixture'
 }
 
+if (hasProperty('ftLaunchFixture')) {
+    include ':ft-launch-fixture'
+}
+
 include ':ft-diagnostics-api', ':ft-diagnostics'
