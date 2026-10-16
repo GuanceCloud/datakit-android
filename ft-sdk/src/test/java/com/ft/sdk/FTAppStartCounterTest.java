@@ -469,6 +469,100 @@ public class FTAppStartCounterTest {
         }
     }
 
+    @Test
+    @LooperMode(LooperMode.Mode.PAUSED)
+    public void laterActivityCanCompleteStartupWhenFirstActivityNeverDraws() throws Exception {
+        FTAppStartCounter counter = newCounter();
+        long processStart = System.nanoTime() - TimeUnit.SECONDS.toNanos(2);
+        FTApplication.APP_START_TIME = processStart;
+        counter.appOnCreate(processStart, RuntimeEnvironment.getApplication());
+        long firstActivityTime = processStart + TimeUnit.MILLISECONDS.toNanos(100);
+        counter.checkFirstActivityPreCreate(firstActivityTime);
+        Activity first = Robolectric.buildActivity(Activity.class).create().get();
+        Activity second = resumedActivity();
+        AtomicInteger completions = new AtomicInteger();
+        Runnable done = () -> {
+            completions.incrementAndGet();
+            counter.coldStart(System.nanoTime());
+        };
+        counter.checkFirstFrameStart(first, done);
+        counter.checkFirstActivityPreCreate(System.nanoTime());
+        counter.checkFirstFrameStart(second, done);
+        second.findViewById(android.R.id.content).getViewTreeObserver().dispatchOnDraw();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+
+        Assert.assertEquals(1, completions.get());
+        Assert.assertEquals(firstActivityTime,
+                (long) Whitebox.getInternalState(counter, "firstActivityPreOnActivityTimeline"));
+        Assert.assertEquals(processStart,
+                (long) Whitebox.getInternalState(counter, "coldStartTimeLineForNanoDuration"));
+        Assert.assertTrue((long) Whitebox.getInternalState(counter, "coldStartDuration")
+                >= TimeUnit.SECONDS.toNanos(2));
+    }
+
+    @Test
+    @LooperMode(LooperMode.Mode.PAUSED)
+    public void multipleCandidateDrawsCompleteStartupOnlyOnce() throws Exception {
+        FTAppStartCounter counter = newCounter();
+        Activity first = resumedActivity();
+        Activity second = resumedActivity();
+        AtomicInteger completions = new AtomicInteger();
+        counter.checkFirstFrameStart(first, completions::incrementAndGet);
+        counter.checkFirstFrameStart(second, completions::incrementAndGet);
+        first.findViewById(android.R.id.content).getViewTreeObserver().dispatchOnDraw();
+        second.findViewById(android.R.id.content).getViewTreeObserver().dispatchOnDraw();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        Assert.assertEquals(1, completions.get());
+        AtomicBoolean firstDrawDone = Whitebox.getInternalState(counter, "firstDrawDone");
+        Assert.assertTrue(firstDrawDone.get());
+        Assert.assertTrue(((java.util.Map<?, ?>) Whitebox.getInternalState(
+                counter, "firstDrawListeners")).isEmpty());
+    }
+
+    @Test
+    @LooperMode(LooperMode.Mode.PAUSED)
+    public void cancelledUndrawnCandidateCanBeRegisteredAgain() throws Exception {
+        FTAppStartCounter counter = newCounter();
+        Activity activity = resumedActivity();
+        AtomicInteger completions = new AtomicInteger();
+        counter.checkFirstFrameStart(activity, completions::incrementAndGet);
+        counter.cancelFirstFrame(activity);
+        View root = activity.findViewById(android.R.id.content);
+        root.getViewTreeObserver().dispatchOnDraw();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        Assert.assertEquals(0, completions.get());
+
+        counter.checkFirstFrameStart(activity, completions::incrementAndGet);
+        root.getViewTreeObserver().dispatchOnDraw();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        Assert.assertEquals(1, completions.get());
+    }
+
+    @Test
+    @LooperMode(LooperMode.Mode.PAUSED)
+    public void missingRootDoesNotConsumeStartupOpportunity() throws Exception {
+        FTAppStartCounter counter = newCounter();
+        AtomicInteger completions = new AtomicInteger();
+        counter.checkFirstFrameStart(new Activity() {
+            @Override
+            public <T extends View> T findViewById(int id) {
+                return null;
+            }
+        }, completions::incrementAndGet);
+        Activity target = resumedActivity();
+        counter.checkFirstFrameStart(target, completions::incrementAndGet);
+        target.findViewById(android.R.id.content).getViewTreeObserver().dispatchOnDraw();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        Assert.assertEquals(1, completions.get());
+    }
+
+    private Activity resumedActivity() {
+        Activity activity = Robolectric.buildActivity(Activity.class)
+                .create().start().resume().visible().get();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        return activity;
+    }
+
     private void setCurrentProcessImportance(int importance) {
         Application application = RuntimeEnvironment.getApplication();
         ActivityManager activityManager =

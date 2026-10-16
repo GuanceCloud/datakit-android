@@ -40,26 +40,59 @@ public class FirstDrawDoneListener implements ViewTreeObserver.OnDrawListener {
      * Registers a post-draw callback for the next draw of a view.
      */
     public static void registerForNextDraw(View view, Runnable drawDoneCallback) {
-        final FirstDrawDoneListener listener = new FirstDrawDoneListener(view, drawDoneCallback);
-        // Handle bug prior to API 26 where OnDrawListener from the floating ViewTreeObserver is not
-        // merged into the real ViewTreeObserver.
-        // https://android.googlesource.com/platform/frameworks/base/+/9f8ec54244a5e0343b9748db3329733f259604f3
-        if (Build.VERSION.SDK_INT < 26 && !isAliveAndAttached(view)) {
-            view.addOnAttachStateChangeListener(
-                    new View.OnAttachStateChangeListener() {
-                        @Override
-                        public void onViewAttachedToWindow(View view) {
-                            view.getViewTreeObserver().addOnDrawListener(listener);
-                            view.removeOnAttachStateChangeListener(this);
-                        }
+        registerForNextDrawCancellable(view, drawDoneCallback);
+    }
 
-                        @Override
-                        public void onViewDetachedFromWindow(View view) {
-                            view.removeOnAttachStateChangeListener(this);
-                        }
-                    });
+    /** Registers a candidate whose pending listener can be released when its Activity leaves. */
+    public static FirstDrawDoneListener registerForNextDrawCancellable(
+            View view, Runnable drawDoneCallback) {
+        final FirstDrawDoneListener listener = new FirstDrawDoneListener(view, drawDoneCallback);
+        // Prior to API 26 the floating ViewTreeObserver is not merged during attachment.
+        if (Build.VERSION.SDK_INT < 26 && !isAliveAndAttached(view)) {
+            listener.attachListener = new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View attachedView) {
+                    if (listener.viewReference.get() != null) {
+                        attachedView.getViewTreeObserver().addOnDrawListener(listener);
+                    }
+                    attachedView.removeOnAttachStateChangeListener(this);
+                    listener.attachListener = null;
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View detachedView) {
+                    detachedView.removeOnAttachStateChangeListener(this);
+                    listener.attachListener = null;
+                }
+            };
+            view.addOnAttachStateChangeListener(listener.attachListener);
         } else {
             view.getViewTreeObserver().addOnDrawListener(listener);
+        }
+        return listener;
+    }
+
+    private View.OnAttachStateChangeListener attachListener;
+
+    /**
+     * Releases an undrawn candidate on the main thread. An already observed draw still delivers
+     * its queued callback; the startup owner decides which observed frame completes the measurement.
+     */
+    public void cancel() {
+        View view = viewReference.getAndSet(null);
+        if (view != null) {
+            removeListeners(view);
+        }
+    }
+
+    private void removeListeners(View view) {
+        if (attachListener != null) {
+            view.removeOnAttachStateChangeListener(attachListener);
+            attachListener = null;
+        }
+        ViewTreeObserver observer = view.getViewTreeObserver();
+        if (observer.isAlive()) {
+            observer.removeOnDrawListener(this);
         }
     }
 
@@ -75,10 +108,8 @@ public class FirstDrawDoneListener implements ViewTreeObserver.OnDrawListener {
         if (view == null) {
             return;
         }
-        // OnDrawListeners cannot be removed within onDraw, so we remove it with a
-        // GlobalLayoutListener
-        view.getViewTreeObserver()
-                .addOnGlobalLayoutListener(() -> view.getViewTreeObserver().removeOnDrawListener(this));
+        // Removing an OnDrawListener inside onDraw is forbidden. Queue removal outside traversal.
+        mainThreadHandler.post(() -> removeListeners(view));
         mainThreadHandler.postAtFrontOfQueue(callback);
     }
 

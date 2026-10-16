@@ -11,6 +11,8 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -43,10 +45,8 @@ class FTAppStartCounter {
      */
     private final AtomicBoolean firstDrawDone = new AtomicBoolean(false);
 
-    /**
-     * Listener registration does not end startup state tracking.
-     */
-    private final AtomicBoolean firstDrawListenerRegistered = new AtomicBoolean(false);
+    /** Pending candidates, confined to the main thread and released on pause/destroy or completion. */
+    private final Map<Activity, FirstDrawDoneListener> firstDrawListeners = new IdentityHashMap<>();
 
     /**
      * Startup start timestamp for duration, unit: nanoseconds
@@ -142,11 +142,30 @@ class FTAppStartCounter {
 
     void checkFirstFrameStart(Activity activity, Runnable drawDoneCallback) {
         onAppForeground();
-        if (!firstDrawDone.get()) {
-            View rootView = activity.findViewById(android.R.id.content);
-            if (rootView != null && firstDrawListenerRegistered.compareAndSet(false, true)) {
-                FirstDrawDoneListener.registerForNextDraw(rootView, drawDoneCallback);
-            }
+        if (firstDrawDone.get() || firstDrawListeners.containsKey(activity)) {
+            return;
+        }
+        View rootView = activity.findViewById(android.R.id.content);
+        if (rootView != null) {
+            firstDrawListeners.put(activity,
+                    FirstDrawDoneListener.registerForNextDrawCancellable(rootView, () -> {
+                        // Registration is only an attempt. Any later Activity may supply the first draw.
+                        if (firstDrawDone.compareAndSet(false, true)) {
+                            for (FirstDrawDoneListener listener : firstDrawListeners.values()) {
+                                listener.cancel();
+                            }
+                            firstDrawListeners.clear();
+                            drawDoneCallback.run();
+                        }
+                    }));
+        }
+    }
+
+    /** Release an Activity that leaves the foreground without drawing; later candidates may retry. */
+    void cancelFirstFrame(Activity activity) {
+        FirstDrawDoneListener listener = firstDrawListeners.remove(activity);
+        if (listener != null) {
+            listener.cancel();
         }
     }
 

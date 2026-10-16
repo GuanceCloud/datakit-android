@@ -169,6 +169,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
      */
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
+        FTAppStartCounter.get().cancelFirstFrame(activity);
         //page close data insertion
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {

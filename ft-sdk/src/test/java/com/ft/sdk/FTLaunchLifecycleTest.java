@@ -1,6 +1,10 @@
 package com.ft.sdk;
 
 import android.app.Activity;
+import android.os.Looper;
+
+import org.robolectric.Shadows;
+import org.robolectric.annotation.LooperMode;
 
 import com.ft.sdk.garble.utils.Constants;
 
@@ -46,6 +50,10 @@ public class FTLaunchLifecycleTest {
 
     @After
     public void restoreStartup() {
+        Map<Activity, ?> pending = Whitebox.getInternalState(counter, "firstDrawListeners");
+        for (Activity activity : new java.util.ArrayList<>(pending.keySet())) {
+            counter.cancelFirstFrame(activity);
+        }
         for (Map.Entry<String, Object> entry : originalState.entrySet()) {
             Whitebox.setInternalState(counter, entry.getKey(), entry.getValue());
         }
@@ -75,4 +83,56 @@ public class FTLaunchLifecycleTest {
                 counter.getColdStartLaunchType());
         callbacks.onActivityStopped(second);
     }
+    @Test
+    @LooperMode(LooperMode.Mode.PAUSED)
+    public void resumedRouterDoesNotPreventLaterActivityFromProvidingFirstDraw() {
+        Activity router = Robolectric.buildActivity(Activity.class).create().get();
+        Activity target = resumedActivity();
+        LifeCircleTraceCallback callbacks = new LifeCircleTraceCallback();
+        callbacks.onPreOnCreate(router);
+        callbacks.onPostResume(router);
+        callbacks.onPreOnCreate(target);
+        callbacks.onPostResume(target);
+        target.findViewById(android.R.id.content).getViewTreeObserver().dispatchOnDraw();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+
+        AtomicBoolean firstDrawDone = Whitebox.getInternalState(counter, "firstDrawDone");
+        Assert.assertTrue(firstDrawDone.get());
+        Assert.assertTrue((long) Whitebox.getInternalState(counter, "coldStartDuration") > 0);
+        callbacks.onPostDestroy(router);
+        callbacks.onPostDestroy(target);
+    }
+
+    @Test
+    @LooperMode(LooperMode.Mode.PAUSED)
+    public void pausedAndDestroyedUndrawnActivitiesReleaseTheirCandidates() {
+        Activity first = resumedActivity();
+        Activity second = resumedActivity();
+        FTActivityLifecycleCallbacks callbacks = new FTActivityLifecycleCallbacks();
+        callbacks.onActivityPostResumed(first);
+        callbacks.onActivityPostResumed(second);
+        callbacks.onActivityPaused(first);
+        callbacks.onActivityPostDestroyed(second);
+        first.findViewById(android.R.id.content).getViewTreeObserver().dispatchOnDraw();
+        second.findViewById(android.R.id.content).getViewTreeObserver().dispatchOnDraw();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        AtomicBoolean firstDrawDone = Whitebox.getInternalState(counter, "firstDrawDone");
+        Assert.assertFalse(firstDrawDone.get());
+        Assert.assertTrue(((Map<?, ?>) Whitebox.getInternalState(
+                counter, "firstDrawListeners")).isEmpty());
+
+        callbacks.onActivityPostResumed(first);
+        first.findViewById(android.R.id.content).getViewTreeObserver().dispatchOnDraw();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        Assert.assertTrue(firstDrawDone.get());
+        callbacks.onActivityPostDestroyed(first);
+    }
+    private Activity resumedActivity() {
+        Activity activity = Robolectric.buildActivity(Activity.class)
+                .create().start().resume().visible().get();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        return activity;
+    }
+
+
 }

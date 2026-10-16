@@ -145,19 +145,18 @@ class LifeCircleTraceCallback {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         FTRUMConfig config = manager.getConfig();
 
-        if (!mInited) {
-            FTAppStartCounter.get().checkFirstFrameStart(activity, new Runnable() {
-                @Override
-                public void run() {
-                    FTAppStartCounter.get().coldStart(System.nanoTime());
-                    if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
-                        // If SDK is not initialized, this data will be supplemented
-                        // after SDK delayed initialization
-                        FTAppStartCounter.get().coldStartUpload();
-                    }
+        FTAppStartCounter.get().checkFirstFrameStart(activity, new Runnable() {
+            @Override
+            public void run() {
+                FTAppStartCounter.get().coldStart(System.nanoTime());
+                // RUM may have been initialized after this Activity resumed.
+                FTRUMConfigManager currentManager = FTRUMConfigManager.get();
+                if (currentManager.isRumEnable()
+                        && currentManager.getConfig().isEnableTraceUserAction()) {
+                    FTAppStartCounter.get().coldStartUpload();
                 }
-            });
-        }
+            }
+        });
 
         // Already sleeping
         if (alreadySleep) {
@@ -202,6 +201,9 @@ class LifeCircleTraceCallback {
      * @param context
      */
     public void onPostDestroy(Context context) {
+        if (context instanceof Activity) {
+            FTAppStartCounter.get().cancelFirstFrame((Activity) context);
+        }
         mCreateMap.remove(context);
         if (mCreateMap.isEmpty()) {
             mInited = false;
