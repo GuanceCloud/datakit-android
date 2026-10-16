@@ -234,8 +234,11 @@ public class SyncTaskManager {
      *
      * @param withSleep Whether to sleep, {@link #SLEEP_TIME}
      */
-    private void executePoll(final boolean withSleep) {
-        DataUploadThreadPool.get().schedule(withSleep ? SLEEP_TIME : 0);
+    private synchronized void executePoll(final boolean withSleep) {
+        // Serialize choosing the first delay with scheduling. A manual immediate upload
+        // also consumes the first opportunity, without adding any delay to it.
+        long delay = FTEarlyCrashTracker.get().consumeInitialUploadDelay(SLEEP_TIME);
+        DataUploadThreadPool.get().schedule(withSleep ? delay : 0);
     }
 
     /**

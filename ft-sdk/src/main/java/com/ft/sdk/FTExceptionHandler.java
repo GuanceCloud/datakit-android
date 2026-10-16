@@ -154,6 +154,10 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
+        long occurredAtNs = System.nanoTime();
+        if (config != null && config.isRumEnable() && config.isEnableTrackAppCrash()) {
+            FTEarlyCrashTracker.get().recordCrash(occurredAtNs);
+        }
         long occurredAtNanoseconds = Utils.getCurrentNanoTime();
         StringWriter writer = new StringWriter();
         PrintWriter printWriter = new PrintWriter(writer);
@@ -241,6 +245,12 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * @param callBack
      */
     public void uploadNativeCrashBackground(File item, AppState state, boolean isPreCrash, RunnerCompleteCallBack callBack) {
+        long occurredAtNs = System.nanoTime();
+        if (!isPreCrash && config != null && config.isRumEnable()
+                && config.isEnableTrackAppCrash() && item.getName().contains(NATIVE_FILE_NAME)) {
+            // Record at the live callback entry, before waiting on the event consumer queue.
+            FTEarlyCrashTracker.get().recordCrash(occurredAtNs);
+        }
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {

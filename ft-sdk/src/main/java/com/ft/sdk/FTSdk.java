@@ -81,6 +81,7 @@ public class FTSdk {
      * @param ftSDKConfig base SDK configuration
      */
     public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig) {
+        long sdkStartTimeNs = System.nanoTime();
         try {
             if (ftSDKConfig == null) {
                 LogUtils.e(TAG, "Parameter ftSDKConfig cannot be null");
@@ -98,6 +99,7 @@ public class FTSdk {
                         return;
                     }
                 }
+                FTEarlyCrashTracker.get().initialize(FTApplication.getApplication(), sdkStartTimeNs);
                 mFtSdk = new FTSdk(ftSDKConfig);
                 ftSDKConfig.isMainProcess = Utils.isMainProcess();
                 mFtSdk.initFTConfig(ftSDKConfig);

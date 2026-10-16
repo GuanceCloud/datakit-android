@@ -67,7 +67,7 @@ public class DataUploadThreadPool extends BaseThreadPool {
         if (executor == null) return;
 
         if (delay > 0) {
-            LogUtils.d(TAG, "******************* Sync Poll Waiting *******************>>>");
+            LogUtils.d(TAG, "******************* Sync Poll Waiting (" + delay + " ms) *******************>>>");
         }
         ((ScheduledThreadPoolExecutor) this.executor).schedule(new Runnable() {
             @Override
