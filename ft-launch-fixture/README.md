@@ -25,7 +25,9 @@ line protocol and writes JSON evidence for each scenario:
 - Headless background startup: `background`, no Activity, no first draw, and no automatic cold Action.
 - An explicit **test-only** background completion to verify `background` serialization and freezing.
 - Background startup, repeated Application hook, then foreground and an automatic first draw:
-  `foreground_and_background`, with the original Application timestamp preserved.
+  `background`, with the original Application timestamp preserved.
+- Background startup, foreground with drawing held, Home/background, foreground,
+  then release: still `background` because the launch originated in the background.
 - Foreground startup with drawing held by an `OnPreDrawListener`, Home/background,
   return to the same Activity, then release: automatic `foreground_and_background`.
 

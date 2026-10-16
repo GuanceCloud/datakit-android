@@ -126,9 +126,24 @@ def main():
         assert repeated["application_ns"] == before["application_ns"]
         assert repeated["launch_type"] == "background"
         start()
-        mixed = completed(MIXED)
-        assert mixed["application_ns"] == before["application_ns"]
-        save("background_repeat_hook_foreground", mixed, "automatic_first_draw")
+        background = completed("background")
+        assert background["application_ns"] == before["application_ns"]
+        save("background_repeat_hook_foreground", background, "automatic_first_draw")
+
+        reset()
+        wait_for(lambda s: s["launch_type"] == "background", "background-origin gated launch")
+        start(gated=True)
+        held = wait_for(lambda s: s["foreground"] and s["listener_registered"],
+                        "background-origin first draw is held")
+        assert held["launch_type"] == "background" and not held["first_draw_done"]
+        run("shell", "input", "keyevent", "KEYCODE_HOME")
+        stopped = wait_for(lambda s: not s["foreground"], "background-origin launch returns to background")
+        assert stopped["launch_type"] == "background" and not stopped["first_draw_done"]
+        start(gated=True)
+        wait_for(lambda s: s["foreground"], "background-origin launch returns to foreground")
+        control("release")
+        save("background_origin_foreground_background_foreground", completed("background"),
+             "automatic_first_draw")
 
         reset()
         start(gated=True)

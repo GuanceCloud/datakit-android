@@ -70,7 +70,7 @@ run_receiver() {
     "${ADB_BIN}" shell am start -W -n "${TARGET_ACTIVITY}" >/dev/null
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "broadcast receiver" "foreground_and_background" "${logs}"
+    assert_final_type "broadcast receiver" "background" "${logs}"
 }
 
 start_caller() {
@@ -85,7 +85,7 @@ run_started_service() {
     start_caller "start_service"
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "started service" "foreground_and_background" "${logs}"
+    assert_final_type "started service" "background" "${logs}"
 }
 
 run_bound_service() {
@@ -93,7 +93,7 @@ run_bound_service() {
     start_caller "bind_service"
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "bound service" "foreground_and_background" "${logs}"
+    assert_final_type "bound service" "background" "${logs}"
 }
 
 run_provider() {
@@ -101,7 +101,7 @@ run_provider() {
     start_caller "provider"
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "content provider" "foreground_and_background" "${logs}"
+    assert_final_type "content provider" "background" "${logs}"
 }
 
 run_job() {
@@ -116,7 +116,7 @@ run_job() {
     "${ADB_BIN}" shell am start -W -n "${TARGET_ACTIVITY}" >/dev/null
     local logs
     logs="$(read_launch_logs)"
-    assert_final_type "job service" "foreground_and_background" "${logs}"
+    assert_final_type "job service" "background" "${logs}"
 }
 
 run_normal_activity

@@ -274,7 +274,7 @@ public class FTAppStartCounterTest {
     }
 
     @Test
-    public void backgroundThenForegroundLaunchUsesMixedTypeAndKeepsDuration() throws Exception {
+    public void backgroundThenForegroundLaunchKeepsBackgroundTypeAndDuration() throws Exception {
         setCurrentProcessImportance(
                 ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND_SERVICE);
         long duration = TimeUnit.HOURS.toNanos(2);
@@ -287,14 +287,14 @@ public class FTAppStartCounterTest {
         counter.onAppForeground();
         counter.coldStart(processStart + duration);
 
-        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND,
+        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_BACKGROUND,
                 counter.getColdStartLaunchType());
         long coldStartDuration = Whitebox.getInternalState(counter, "coldStartDuration");
         Assert.assertEquals(duration, coldStartDuration);
     }
 
     @Test
-    public void noActivityCorrectionDoesNotCountProvisionalImportanceAsForeground()
+    public void noActivityCorrectionKeepsBackgroundTypeAfterForeground()
             throws Exception {
         setCurrentProcessImportance(
                 ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND);
@@ -306,8 +306,30 @@ public class FTAppStartCounterTest {
         Assert.assertEquals(Constants.APP_LAUNCH_TYPE_BACKGROUND,
                 counter.getColdStartLaunchType());
         counter.onAppForeground();
-        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND,
+        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_BACKGROUND,
                 counter.getColdStartLaunchType());
+    }
+
+    @Test
+    public void backgroundOriginRemainsBackgroundAcrossRepeatedLifecycleTransitions()
+            throws Exception {
+        setCurrentProcessImportance(
+                ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND_SERVICE);
+        FTAppStartCounter counter = newCounter();
+        long applicationStart = System.nanoTime();
+        counter.appOnCreate(applicationStart, RuntimeEnvironment.getApplication());
+        counter.onAppForeground();
+        counter.onAppBackground();
+        counter.onAppForeground();
+        setCurrentProcessImportance(
+                ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND);
+        counter.appOnCreate(applicationStart + TimeUnit.HOURS.toNanos(2),
+                RuntimeEnvironment.getApplication());
+
+        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_BACKGROUND,
+                counter.getColdStartLaunchType());
+        long firstApplicationStart = Whitebox.getInternalState(counter, "applicationOnCreateTimeLine");
+        Assert.assertEquals(applicationStart, firstApplicationStart);
     }
 
     @Test
@@ -342,6 +364,32 @@ public class FTAppStartCounterTest {
                 counter.getColdStartLaunchType());
         long firstApplicationStart = Whitebox.getInternalState(counter, "applicationOnCreateTimeLine");
         Assert.assertEquals(applicationStart, firstApplicationStart);
+    }
+
+    @Test
+    public void foregroundLaunchWaitingInBackgroundForFirstDrawIsNotForegroundOnly()
+            throws Exception {
+        setCurrentProcessImportance(
+                ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND);
+        long duration = TimeUnit.MINUTES.toNanos(95);
+        long processStart = System.nanoTime() - duration;
+        long activityOffset = TimeUnit.MILLISECONDS.toNanos(1400);
+        FTApplication.APP_START_TIME = processStart;
+        FTAppStartCounter counter = newCounter();
+        counter.appOnCreate(processStart + TimeUnit.SECONDS.toNanos(1),
+                RuntimeEnvironment.getApplication());
+        counter.checkFirstActivityPreCreate(processStart + activityOffset);
+        counter.onAppForeground();
+        counter.onAppBackground();
+        counter.onAppForeground();
+        counter.coldStart(processStart + duration);
+
+        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND,
+                counter.getColdStartLaunchType());
+        long coldStartDuration = Whitebox.getInternalState(counter, "coldStartDuration");
+        long firstFrameDuration = Whitebox.getInternalState(counter, "firsDrawnDuration");
+        Assert.assertEquals(duration, coldStartDuration);
+        Assert.assertEquals(duration - activityOffset, firstFrameDuration);
     }
 
     @Test

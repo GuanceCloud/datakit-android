@@ -21,9 +21,9 @@ from the initial Application startup hook through completion of the first-draw m
 
 | Value | Startup states |
 | --- | --- |
-| `foreground` | Foreground only |
-| `background` | Background only |
-| `foreground_and_background` | Both foreground and background, in either order |
+| `foreground` | Foreground-origin startup with no observed background transition before the first draw completes |
+| `background` | Background-origin startup, including entering the foreground to complete the first draw |
+| `foreground_and_background` | Foreground-origin startup that enters the background before the first draw completes |
 
 The original total duration is retained. Transitions after cold-start completion do not
 change the recorded type, including when SDK initialization delays reporting. Hot-start

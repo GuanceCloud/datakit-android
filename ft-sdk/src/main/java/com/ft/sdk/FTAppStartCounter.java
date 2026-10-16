@@ -262,14 +262,15 @@ class FTAppStartCounter {
     }
 
     String getColdStartLaunchType() {
-        boolean hasBackground = launchFromBackground || backgroundDuringLaunch;
-        // Foreground importance is provisional until the no-Activity check has run.
-        boolean hasForeground = foregroundDuringLaunch
-                || (applicationOnCreateTimeLine != 0 && !launchFromBackground);
-        if (hasForeground && hasBackground) {
+        // Entering the foreground to draw does not change a background-origin launch.
+        if (launchFromBackground) {
+            return Constants.APP_LAUNCH_TYPE_BACKGROUND;
+        }
+        boolean hasForeground = foregroundDuringLaunch || applicationOnCreateTimeLine != 0;
+        if (hasForeground && backgroundDuringLaunch) {
             return Constants.APP_LAUNCH_TYPE_FOREGROUND_AND_BACKGROUND;
         }
-        return hasBackground ? Constants.APP_LAUNCH_TYPE_BACKGROUND
+        return backgroundDuringLaunch ? Constants.APP_LAUNCH_TYPE_BACKGROUND
                 : Constants.APP_LAUNCH_TYPE_FOREGROUND;
     }
 
