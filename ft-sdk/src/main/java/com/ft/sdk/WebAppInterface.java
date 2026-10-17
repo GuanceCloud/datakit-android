@@ -68,6 +68,19 @@ public class WebAppInterface {
         return Utils.setToJsonString(Arrays.asList(mAllowWebViewHost));
     }
 
+    /**
+     * Synchronous Visitor ID getter for Browser RUM 3.3.16 and later.
+     * The lowercase {@code id} is part of the JavaScript bridge protocol.
+     * Browser RUM checks allowed hosts before calling this method. Older Browser
+     * SDKs ignore it; newer ones fall back to their own ID when it returns null.
+     *
+     * @return current native ID, or null when Visitor ID is disabled or stopped
+     */
+    @JavascriptInterface
+    public String getVisitorid() {
+        return FTVisitorIdManager.get().getId();
+    }
+
 
     @JavascriptInterface
     public String getPrivacyLevel() {

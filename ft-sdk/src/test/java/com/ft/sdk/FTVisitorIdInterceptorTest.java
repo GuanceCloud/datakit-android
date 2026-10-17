@@ -67,6 +67,8 @@ public class FTVisitorIdInterceptorTest {
         try (Response response = client.newCall(original).execute()) { assertEquals(200, response.code()); }
         RecordedRequest sent = server.takeRequest();
         assertEquals(manager.getId(), sent.getHeader("x-visitor-id"));
+        assertEquals(new WebAppInterface(null, null, null, null, null).getVisitorid(),
+                sent.getHeader("x-visitor-id"));
         assertEquals(1, sent.getHeaders("x-visitor-id").size());
         assertEquals("original-trace", sent.getHeader("traceparent"));
         assertEquals("kept", sent.getHeader("X-Business"));
