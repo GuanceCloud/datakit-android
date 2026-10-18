@@ -28,6 +28,7 @@ public class ActiveViewBean extends ViewBean {
      * Close active state
      */
     public void close() {
+        if (isClose) return;
         this.isClose = true;
         timeSpent = System.nanoTime()- startTimeNanoForDuration;
     }
@@ -52,6 +53,10 @@ public class ActiveViewBean extends ViewBean {
         bean.loadTime = this.loadTime;
         bean.timeSpent = this.timeSpent;
         bean.sessionId = this.sessionId;
+        bean.sessionStartReason = this.sessionStartReason;
+        bean.appStateStart = this.appStateStart;
+        bean.appStateProcess = this.appStateProcess;
+        bean.closedAppState = this.closedAppState;
         bean.processName = this.processName;
         bean.processRunId = this.processRunId;
         bean.processStartMs = this.processStartMs;

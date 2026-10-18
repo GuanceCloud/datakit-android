@@ -41,26 +41,27 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
 
     private FTViewFragmentTrackingHandler viewHandler;
 
-    private final Map<Object, Long> fragmentPreAttachedTimeMap = new HashMap<>();
+    private final Map<Object, long[]> fragmentPreAttachedTimeMap = new HashMap<>();
 
     @Override
     public void onFragmentPreAttached(FragmentWrapper wrapper) {
-        fragmentPreAttachedTimeMap.put(wrapper.getRealFragment(), System.nanoTime());
+        fragmentPreAttachedTimeMap.put(wrapper.getRealFragment(), new long[]{System.nanoTime(),
+                com.ft.sdk.garble.utils.Utils.getCurrentNanoTime()});
     }
 
     @Override
     public void onFragmentCreated(FragmentWrapper wrapper) {
-        Long preAttachedStartTime = fragmentPreAttachedTimeMap.remove(wrapper.getRealFragment());
+        long[] preAttachedStartTime = fragmentPreAttachedTimeMap.remove(wrapper.getRealFragment());
         if (preAttachedStartTime != null) {
             // Calculate Fragment pre-attached to pre-created duration
-            long createDuration = System.nanoTime() - preAttachedStartTime;
+            long createDuration = System.nanoTime() - preAttachedStartTime[0];
             if (viewHandler != null) {
                 HandlerView view = viewHandler.resolveHandlerView(wrapper);
                 if (view != null) {
-                    FTRUMInnerManager.get().onCreateView(view.getViewName(), createDuration);
+                    FTRUMInnerManager.get().onCreateView(view.getViewName(), createDuration, preAttachedStartTime[1]);
                 }
             } else {
-                FTRUMInnerManager.get().onCreateView(wrapper.getSimpleClassName(), createDuration);
+                FTRUMInnerManager.get().onCreateView(wrapper.getSimpleClassName(), createDuration, preAttachedStartTime[1]);
             }
         }
     }
@@ -70,10 +71,10 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
         if (viewHandler != null) {
             HandlerView view = viewHandler.resolveHandlerView(wrapper);
             if (view != null) {
-                FTRUMInnerManager.get().startView(view.getViewName(), view.getProperty());
+                FTRUMInnerManager.get().startAutomaticView(wrapper.getRealFragment(), view.getViewName(), view.getProperty());
             }
         } else {
-            FTRUMInnerManager.get().startView(wrapper.getSimpleClassName());
+            FTRUMInnerManager.get().startAutomaticView(wrapper.getRealFragment(), wrapper.getSimpleClassName(), null);
         }
 
     }
@@ -83,10 +84,10 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
         if (viewHandler != null) {
             HandlerView view = viewHandler.resolveHandlerView(wrapper);
             if (view != null) {
-                FTRUMInnerManager.get().stopView();
+                FTRUMInnerManager.get().stopAutomaticView(wrapper.getRealFragment());
             }
         } else {
-            FTRUMInnerManager.get().stopView();
+            FTRUMInnerManager.get().stopAutomaticView(wrapper.getRealFragment());
         }
     }
 

@@ -7,6 +7,7 @@ final class HistoricalRumContext {
     private final String processRunId;
     private final long processStartMs;
     private final String sessionId;
+    private final String sessionStartReason;
     private final String viewId;
     private final String viewName;
     private final long viewStartNs;
@@ -24,6 +25,15 @@ final class HistoricalRumContext {
     HistoricalRumContext(String processName, String processRunId, long processStartMs,
                          String sessionId, String viewId, String viewName, long viewStartNs,
                          long viewTimeSpentNs, boolean viewClosed, CollectType collectType) {
+        this(processName, processRunId, processStartMs, sessionId, viewId, viewName,
+                viewStartNs, viewTimeSpentNs, viewClosed, collectType, "unknown");
+    }
+
+    HistoricalRumContext(String processName, String processRunId, long processStartMs,
+                         String sessionId, String viewId, String viewName, long viewStartNs,
+                         long viewTimeSpentNs, boolean viewClosed, CollectType collectType,
+                         String sessionStartReason) {
+        this.sessionStartReason = sessionStartReason;
         this.processName = processName;
         this.processRunId = processRunId;
         this.processStartMs = processStartMs;
@@ -58,6 +68,8 @@ final class HistoricalRumContext {
     long getProcessStartMs() {
         return processStartMs;
     }
+
+    String getSessionStartReason() { return sessionStartReason; }
 
     String getSessionId() {
         return sessionId;

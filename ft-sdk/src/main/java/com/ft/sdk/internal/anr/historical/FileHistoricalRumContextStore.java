@@ -96,6 +96,7 @@ public final class FileHistoricalRumContextStore implements HistoricalRumContext
                 putNullable(json, KEY_PROCESS_RUN_ID, view.getProcessRunId());
                 json.put(KEY_PROCESS_START_MS, view.getProcessStartMs());
                 putNullable(json, KEY_SESSION_ID, view.getSessionId());
+                json.put("session_start_reason", view.getSessionStartReason());
                 putNullable(json, KEY_VIEW_ID, view.getId());
                 putNullable(json, KEY_VIEW_NAME, view.getViewName());
                 json.put(KEY_VIEW_START_NS, view.getStartTime());
@@ -149,7 +150,8 @@ public final class FileHistoricalRumContextStore implements HistoricalRumContext
                                         json.optLong(KEY_VIEW_TIME_SPENT_NS),
                                         json.optBoolean(KEY_VIEW_CLOSED),
                                         CollectType.fromValue(
-                                                nullableString(json, KEY_COLLECT_TYPE))));
+                                                nullableString(json, KEY_COLLECT_TYPE)),
+                                        json.optString("session_start_reason", "unknown")));
                             } catch (Exception e) {
                                 if (firstFailure == null) {
                                     firstFailure = e;

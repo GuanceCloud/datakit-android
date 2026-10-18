@@ -36,12 +36,13 @@ public class FTUIBlockManager {
             if (x.startsWith(PREFIX_METHOD_DISPATCH_START)) {
                 method = x.substring(PREFIX_METHOD_DISPATCH_START.length());
                 startTime = now;
+                startEpoch = com.ft.sdk.garble.utils.Utils.getCurrentNanoTime();
             } else if (x.startsWith(PREFIX_METHOD_DISPATCH_END)) {
                 long duration = now - startTime;
                 if (duration > blockDurationNS) {
                     if (!FTActivityLifecycleCallbacks.isAppInForeground()) return;
                     // only record data when page is in foreground
-                    FTRUMInnerManager.get().addLongTask(method, duration);
+                    FTRUMInnerManager.get().addLongTask(method, duration, startEpoch, false, null);
                 }
 
             }
@@ -50,6 +51,7 @@ public class FTUIBlockManager {
     };
 
     private long startTime;
+    private long startEpoch;
     private String method;
 
     /**
