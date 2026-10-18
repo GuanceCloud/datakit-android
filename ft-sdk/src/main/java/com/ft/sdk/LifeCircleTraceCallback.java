@@ -51,7 +51,7 @@ class LifeCircleTraceCallback {
     /**
      * Cache creation time point
      */
-    private final LinkedHashMap<Context, Long> mCreateMap = new LinkedHashMap<>();
+    private final LinkedHashMap<Context, long[]> mCreateMap = new LinkedHashMap<>();
 
     /**
      * Used to send delayed messages, execute sleep {@link #alreadySleep} = true operation after 10 seconds
@@ -87,7 +87,7 @@ class LifeCircleTraceCallback {
      * @param context
      */
     public void onPreOnCreate(Context context) {
-        mCreateMap.put(context, System.nanoTime());
+        mCreateMap.put(context, new long[]{System.nanoTime(), Utils.getCurrentNanoTime()});
         FTAppStartCounter.get().checkFirstActivityPreCreate(System.nanoTime());
         if (!mInited) {
 //            FTAutoTrack.startApp();
@@ -108,19 +108,19 @@ class LifeCircleTraceCallback {
 
         if (manager.isRumEnable()) {
             if (config.isEnableTraceUserView()) {
-                Long startTime = mCreateMap.get(context);
+                long[] startTime = mCreateMap.get(context);
                 if (startTime != null) {
-                    long durationNS = System.nanoTime() - startTime;
+                    long durationNS = System.nanoTime() - startTime[0];
                     String viewName = AopUtils.getClassName(context);
                     FTViewActivityTrackingHandler handler = config.getViewActivityTrackingHandler();
                     if (handler != null) {
                         HandlerView handlerView = config.getViewActivityTrackingHandler()
                                 .resolveHandlerView((Activity) context);
                         if (handlerView != null) {
-                            FTRUMInnerManager.get().onCreateView(handlerView.getViewName(), durationNS);
+                            FTRUMInnerManager.get().onCreateView(handlerView.getViewName(), durationNS, startTime[1]);
                         }
                     } else {
-                        FTRUMInnerManager.get().onCreateView(viewName, durationNS);
+                        FTRUMInnerManager.get().onCreateView(viewName, durationNS, startTime[1]);
                     }
 
                 }

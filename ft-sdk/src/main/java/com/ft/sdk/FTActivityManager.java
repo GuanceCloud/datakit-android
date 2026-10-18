@@ -31,6 +31,8 @@ public final class FTActivityManager {
     /**
      * Default is {@link AppState#STARTUP}
      */
+    final AppStateHistory appStateHistory = new AppStateHistory();
+
     private AppState appState = AppState.STARTUP;
 
     private final Object crashFreeLock = new Object();
@@ -59,6 +61,7 @@ public final class FTActivityManager {
      * enter foreground
      */
     void appForeground() {
+        appStateHistory.record(AppStateHistory.FOREGROUND);
         synchronized (crashFreeLock) {
             ensureCrashFreeTrackerInitialized();
             transitionAppState(AppState.RUN, Utils.getCurrentNanoTime());
@@ -68,11 +71,13 @@ public final class FTActivityManager {
     /**
      * enter background
      */
-    void appBackGround() {
+    long appBackGround() {
+        long boundary = appStateHistory.record(AppStateHistory.BACKGROUND);
         synchronized (crashFreeLock) {
             ensureCrashFreeTrackerInitialized();
-            transitionAppState(AppState.BACKGROUND, Utils.getCurrentNanoTime());
+            transitionAppState(AppState.BACKGROUND, boundary);
         }
+        return boundary;
     }
 
     /**

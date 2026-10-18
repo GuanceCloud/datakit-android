@@ -29,9 +29,14 @@ public class FTLaunchLifecycleTest {
     private final Map<String, Object> originalState = new HashMap<>();
     private int originalActivityCount;
     private boolean originalFirstDrawDone;
+    private long originalAppStartTime;
 
     @Before
     public void prepareStartup() {
+        // API 23 uses this process origin. Initialize it before simulating the first draw,
+        // rather than letting lazy class initialization create an origin after that draw.
+        originalAppStartTime = FTApplication.APP_START_TIME;
+        FTApplication.APP_START_TIME = System.nanoTime() - 1_000_000L;
         counter = FTAppStartCounter.get();
         for (String field : new String[]{"applicationOnCreateTimeLine", "launchFromBackground",
                 "foregroundDuringLaunch", "backgroundDuringLaunch"}) {
@@ -50,6 +55,7 @@ public class FTLaunchLifecycleTest {
 
     @After
     public void restoreStartup() {
+        FTApplication.APP_START_TIME = originalAppStartTime;
         Map<Activity, ?> pending = Whitebox.getInternalState(counter, "firstDrawListeners");
         for (Activity activity : new java.util.ArrayList<>(pending.keySet())) {
             counter.cancelFirstFrame(activity);

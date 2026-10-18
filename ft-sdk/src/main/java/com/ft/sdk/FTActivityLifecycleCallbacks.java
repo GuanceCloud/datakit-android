@@ -72,13 +72,13 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
         activityCount++;
-        mFragmentLifecycleHelper.register(activity);
         if (activityCount > 0) {
             FTActivityManager.get().appForeground();
             FTAppStartCounter.get().onAppForeground();
             // Handle FPS monitoring lifecycle
             FpsUtils.onAppForeground();
         }
+        mFragmentLifecycleHelper.register(activity);
     }
 
     /**
@@ -126,10 +126,10 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
             if (handler != null) {
                 HandlerView view = handler.resolveHandlerView(activity);
                 if (view != null) {
-                    FTRUMInnerManager.get().startView(view.getViewName(), view.getProperty());
+                    FTRUMInnerManager.get().startAutomaticView(activity, view.getViewName(), view.getProperty());
                 }
             } else {
-                FTRUMInnerManager.get().startView(activity.getClass().getSimpleName());
+                FTRUMInnerManager.get().startAutomaticView(activity, activity.getClass().getSimpleName(), null);
             }
         }
 
@@ -177,10 +177,10 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
             if (handler != null) {
                 HandlerView view = handler.resolveHandlerView(activity);
                 if (view != null) {
-                    FTRUMInnerManager.get().stopView();
+                    FTRUMInnerManager.get().stopAutomaticView(activity);
                 }
             } else {
-                FTRUMInnerManager.get().stopView();
+                FTRUMInnerManager.get().stopAutomaticView(activity);
             }
         }
 
@@ -199,11 +199,11 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     public void onActivityStopped(@NonNull Activity activity) {
         activityCount--;
         if (activityCount == 0 && !hasForegroundSiblingProcess(activity)) {
+            long boundary = FTActivityManager.get().appBackGround();
             mAppRestartCallback.onEnterBackground();
-            FTActivityManager.get().appBackGround();
             FTAppStartCounter.get().onAppBackground();
             if (FTRUMConfigManager.get().isRumEnable()) {
-                FTRUMInnerManager.get().onAppBackground();
+                FTRUMInnerManager.get().onAppBackground(boundary);
             }
             // Handle FPS monitoring lifecycle
             FpsUtils.onAppBackground();

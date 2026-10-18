@@ -1,3 +1,9 @@
+# Unreleased
+1. Added interval-based `app_state` fields to View, Resource and LongTask events, using bounded process-local foreground/background history and original event timing. Automatic Views close at the background boundary and ignore stops from replaced owners; explicit View load origins are supported by `onCreateView(viewName, loadTime, loadStartTime)`.
+2. Added `session_start_reason` to native RUM events, preserving the owning Session reason through delayed Resource completion, View/Action persistence and historical ANR recovery. Existing cached data without this metadata reports `unknown`.
+3. Added `startView(viewName, property, ViewTrackingType)` and `stopView(viewId, property)` for framework integrations. Automatic Views and their active Actions close at the same boundary; delayed stops for earlier View IDs are ignored. Manual and legacy View APIs retain caller-controlled lifecycles. Load origins require a positive duration and a timestamp before View start.
+
+---
 # agent 1.7.6-alpha09
 1. Fixed Native RUM sampling metadata after remote configuration updates: newly written records report the effective `session_sample_rate`, `session_on_error_sample_rate`, `session_replay_sample_rate`, and `session_replay_on_error_sample_rate` as percentages in 0–100, including fractional values and explicit zero. Replay fields are included when Replay is initialized. Existing serialized records and Browser-owned WebView sampling fields retain their values; internal sampling and legacy configuration APIs continue to use 0–1 probabilities.
 2. Fixed page device metric tasks remaining scheduled after a RUM View ends. Ended and replaced View tasks are cancelled and removed from the metrics queue, in-flight samples cannot schedule again after cancellation, and SDK shutdown cancels all remaining View monitors.

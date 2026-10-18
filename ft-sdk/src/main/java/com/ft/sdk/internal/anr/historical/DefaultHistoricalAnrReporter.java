@@ -75,6 +75,7 @@ final class DefaultHistoricalAnrReporter implements HistoricalAnrReporter {
         fields.put(Constants.KEY_RUM_ERROR_MESSAGE, "android_anr");
         fields.put(Constants.KEY_RUM_ERROR_STACK, stack);
         fields.put("historical", true);
+        fields.put(Constants.KEY_RUM_SESSION_START_REASON, context.getSessionStartReason());
 
         long occurredAtNs = exit.getTimestampMs() * 1_000_000L;
         if (issueFieldsEnricher != null) {

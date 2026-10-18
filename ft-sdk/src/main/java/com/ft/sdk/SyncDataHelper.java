@@ -65,6 +65,8 @@ public class SyncDataHelper {
                 new ConcurrentHashMap<String, Boolean>());
         rumReservedKeys.add(KEY_SDK_DATA_FLAG);
         rumReservedKeys.add(Constants.KEY_RUM_DISPLAY);
+        rumReservedKeys.add(Constants.KEY_RUM_APP_STATE);
+        rumReservedKeys.add(Constants.KEY_RUM_SESSION_START_REASON);
     }
 
     void initBaseConfig(FTSDKConfig config) {
@@ -366,6 +368,8 @@ public class SyncDataHelper {
             if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED) {
                 mergeTags.putAll(rumTags);
                 appendRUMSamplingFields(fields);
+                mergeTags.remove(Constants.KEY_RUM_APP_STATE);
+                mergeTags.remove(Constants.KEY_RUM_SESSION_START_REASON);
             } else {
                 mergeWebViewNativeTags(mergeTags, rumTags);
                 // Browser owns this identity (including its absence). Native global

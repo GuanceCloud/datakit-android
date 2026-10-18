@@ -45,6 +45,7 @@ public class HistoricalAnrReporterTest {
         assertEquals("old-view", sink.tags.get(Constants.KEY_RUM_VIEW_ID));
         assertEquals("Checkout", sink.tags.get(Constants.KEY_RUM_VIEW_NAME));
         assertEquals(true, sink.fields.get("historical"));
+        assertEquals("unknown", sink.fields.get(Constants.KEY_RUM_SESSION_START_REASON));
         assertEquals("blocked main", sink.fields.get(Constants.KEY_RUM_ERROR_STACK));
         assertFalse(sink.tags.containsKey(Constants.KEY_RUM_ACTION_ID));
         assertEquals("old-view", sink.viewId);

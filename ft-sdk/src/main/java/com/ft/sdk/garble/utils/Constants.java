@@ -640,6 +640,11 @@ public class Constants {
      * Background crash-free duration, nanoseconds.
      */
     public static final String KEY_RUM_BACKGROUND_CRASH_FREE_DURATION = "background_crash_free_duration";
+    /** Runtime state across the event's original interval. */
+    public static final String KEY_RUM_APP_STATE = "app_state";
+    /** Creation reason of the event's owning Session. */
+    public static final String KEY_RUM_SESSION_START_REASON = "session_start_reason";
+
     /**
      * Long task duration, nanoseconds, {@link #FT_MEASUREMENT_RUM_LONG_TASK}
      */

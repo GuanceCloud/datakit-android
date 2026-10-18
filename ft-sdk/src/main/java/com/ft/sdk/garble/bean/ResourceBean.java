@@ -215,9 +215,11 @@ public class ResourceBean {
 
     public Integer networkSignalStrength = null;
 
-    /**
-     * Resource request start time
-     */
+    public String sessionStartReason = "unknown";
+    /** Original epoch origin paired with resourceLoad. */
+    public long appStateStartTime;
+
+    /** Resource request start time, epoch nanoseconds. */
     public long startTime = Utils.getCurrentNanoTime();
 
     /**

@@ -99,6 +99,7 @@ public class FTSdk {
                         return;
                     }
                 }
+                FTActivityManager.get();
                 FTEarlyCrashTracker.get().initialize(FTApplication.getApplication(), sdkStartTimeNs);
                 mFtSdk = new FTSdk(ftSDKConfig);
                 ftSDKConfig.isMainProcess = Utils.isMainProcess();

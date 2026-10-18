@@ -33,6 +33,7 @@ public class NetStatusBean {
      * Request start time from call Start
      */
     public long callStartTime = -1;
+    public long callStartEpoch = -1;
 
     /**
      * Request response header start time

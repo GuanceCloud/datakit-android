@@ -5,6 +5,7 @@ import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceParams;
+import com.ft.sdk.garble.bean.ViewTrackingType;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
@@ -168,7 +169,16 @@ public class FTRUMGlobalManager {
      *
      * @param viewName view name
      * @param loadTime load time, nanosecond
+     * @param loadStartTime actual load origin in Unix epoch nanoseconds; used only when
+     *                      positive, before View start, and loadTime is positive
      */
+    public void onCreateView(String viewName, long loadTime, long loadStartTime) {
+        if (innerManager != null) {
+            innerManager.onCreateView(viewName, loadTime, loadStartTime);
+        }
+    }
+
+    /** Records load duration; app_state uses the View start when no origin is supplied. */
     public void onCreateView(String viewName, long loadTime) {
         if (innerManager != null) {
             innerManager.onCreateView(viewName, loadTime);
@@ -207,6 +217,30 @@ public class FTRUMGlobalManager {
         if (innerManager != null) {
             innerManager.startView(viewName, property);
         }
+    }
+
+    /**
+     * Starts a View with explicit lifecycle ownership for framework integrations.
+     * Bridges map Manual = 0 to MANUAL and Automatic = 1 to AUTOMATIC.
+     * Automatic Views close at the native background boundary. On foreground, start a
+     * new View without resubmitting consumed loading data. Existing overloads remain Manual.
+     *
+     * @param trackingType lifecycle ownership; null is treated as Manual
+     * @return the new View ID, or null when RUM is disabled
+     */
+    public String startView(String viewName, HashMap<String, Object> property,
+                            ViewTrackingType trackingType) {
+        return innerManager == null ? null : innerManager.startView(viewName, property, trackingType);
+    }
+
+    /**
+     * Stops only the matching current View. Use the ID returned by the typed startView
+     * overload to ignore duplicate or delayed stops belonging to an earlier View.
+     * Frameworks must cancel extra background stops: an unscoped stop arriving after
+     * a new View starts cannot be attributed to the previous View.
+     */
+    public void stopView(String viewId, HashMap<String, Object> property) {
+        if (innerManager != null) innerManager.stopViewById(viewId, property);
     }
 
 

@@ -32,6 +32,7 @@ public class FileHistoricalRumContextStoreTest {
         FileHistoricalRumContextStore firstStore = new FileHistoricalRumContextStore(paths);
         ViewBean view = view("process-one", "run-one", "view-one");
 
+        view.setSessionStartReason("max_duration");
         firstStore.save(view);
 
         FileHistoricalRumContextStore reopened = new FileHistoricalRumContextStore(paths);
@@ -40,6 +41,7 @@ public class FileHistoricalRumContextStoreTest {
         HistoricalRumContext open = openContexts.get(0);
         assertEquals("run-one", open.getProcessRunId());
         assertEquals("session", open.getSessionId());
+        assertEquals("max_duration", open.getSessionStartReason());
         assertEquals("view-one", open.getViewId());
         assertFalse(open.isViewClosed());
         assertEquals(CollectType.COLLECT_BY_SAMPLE, open.getCollectType());
@@ -51,6 +53,7 @@ public class FileHistoricalRumContextStoreTest {
         HistoricalRumContext closed = new FileHistoricalRumContextStore(paths)
                 .load("process-one").get(0);
         assertTrue(closed.isViewClosed());
+        assertEquals("max_duration", closed.getSessionStartReason());
         assertEquals(12_000L, closed.getViewEndMs());
         assertTrue(new FileHistoricalRumContextStore(paths)
                 .load("another-process").isEmpty());

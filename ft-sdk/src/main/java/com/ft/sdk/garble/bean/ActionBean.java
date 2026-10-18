@@ -69,6 +69,15 @@ public class ActionBean {
      * Session ID, {@link FTRUMInnerManager#sessionId}
      */
     String sessionId;
+    String sessionStartReason = "unknown";
+
+    public String getSessionStartReason() {
+        return sessionStartReason;
+    }
+
+    public void setSessionStartReason(String reason) {
+        sessionStartReason = reason;
+    }
 
     /**
      * Page ID, {@link  ViewBean#id}
@@ -246,6 +255,7 @@ public class ActionBean {
      */
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
+        map.put(Constants.KEY_RUM_SESSION_START_REASON, sessionStartReason);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_PROPERTY, property);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_TAGS, tags);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_COLLECT_TYPE, collectType);
@@ -264,6 +274,7 @@ public class ActionBean {
         try {
 
             JSONObject json = new JSONObject(jsonString);
+            sessionStartReason = json.optString(Constants.KEY_RUM_SESSION_START_REASON, "unknown");
             this.collectType = json.getString(Constants.KEY_RUM_SDK_INNER_KEY_COLLECT_TYPE);
             this.startTimeNanoForDuration= json.optLong(Constants.KEY_RUM_SDK_INNER_KEY_START_TIME_NANO);
             JSONObject jsonProperty = json.optJSONObject(Constants.KEY_RUM_SDK_INNER_KEY_PROPERTY);
