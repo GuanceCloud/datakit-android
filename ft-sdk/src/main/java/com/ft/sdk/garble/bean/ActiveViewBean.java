@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.bean;
 
-import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.metrics.NetworkSettledMetric;
 
 /**
  * Currently active state {@link ViewBean}
@@ -10,6 +10,9 @@ import com.ft.sdk.garble.utils.Utils;
  * @author Brandon
  */
 public class ActiveViewBean extends ViewBean {
+
+    public final NetworkSettledMetric networkSettledMetric =
+            new NetworkSettledMetric(getStartTimeNanoForDuration());
 
     /**
      * @param name
@@ -29,8 +32,15 @@ public class ActiveViewBean extends ViewBean {
      */
     public void close() {
         if (isClose) return;
+        networkSettledMetric.stop();
         this.isClose = true;
         timeSpent = System.nanoTime()- startTimeNanoForDuration;
+    }
+
+    @Override
+    public void setClose(boolean close) {
+        if (close) networkSettledMetric.stop();
+        super.setClose(close);
     }
 
     /**
@@ -40,6 +50,8 @@ public class ActiveViewBean extends ViewBean {
      */
     public ViewBean convertToViewBean() {
         ViewBean bean = new ViewBean();
+        bean.networkSettledTime = networkSettledMetric.resolve();
+        bean.interactionToNextViewTime = this.interactionToNextViewTime;
         bean.id = this.id;
         bean.viewReferrer = this.viewReferrer;
         bean.viewName = this.viewName;

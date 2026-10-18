@@ -80,6 +80,11 @@ public class FTFileDataStore implements FTDataStore, HistoricalRumDataStore {
     }
 
     @Override
+    public void updateActionExtraAttr(String actionId, String attr) {
+        rumStore.updateActionExtraAttr(actionId, attr);
+    }
+
+    @Override
     public void closeAction(String actionId, long duration, boolean force) {
         rumStore.closeAction(actionId, duration, force);
         updateFileSizeCache();

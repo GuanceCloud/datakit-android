@@ -276,6 +276,7 @@ public class FTTrackInner {
         long viewDataGenerateTime = 0;//Due to the view update principle, the start time cannot be used, otherwise it will be discarded
         switch (collectType) {
             case NOT_COLLECT:
+                notifyRUMWriteResult(callBack, false);
                 break;
             case COLLECT_BY_ERROR_SAMPLE:
                 //only view change data time
@@ -313,6 +314,12 @@ public class FTTrackInner {
                 syncRUMDataBackground(collectType == CollectType.COLLECT_BY_ERROR_SAMPLE ?
                         DataType.RUM_WEBVIEW_ERROR_SAMPLED : DataType.RUM_WEBVIEW, time, measurement, tags, fields);
 
+        }
+    }
+
+    private static void notifyRUMWriteResult(RunnerCompleteCallBack callback, boolean stored) {
+        if (callback instanceof RUMWriteResultCallback) {
+            ((RUMWriteResultCallback) callback).onResult(stored);
         }
     }
 
@@ -355,10 +362,13 @@ public class FTTrackInner {
         DataProcessThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
+                boolean outcomeReported = false;
                 try {
                     SyncData recordData = SyncData.getSyncData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time), dataGenerateTime, visitorId);
                     if (recordData == null) {
+                        outcomeReported = true;
+                        notifyRUMWriteResult(callBack, false);
                         if (callBack != null) {
                             callBack.onComplete();
                         }
@@ -367,6 +377,8 @@ public class FTTrackInner {
                     if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
                         boolean update = FTDataStoreManager.get().updateOrInsertSyncData(recordData);
                         if (update) {
+                            outcomeReported = true;
+                            notifyRUMWriteResult(callBack, true);
                             LogUtils.d(TAG, "syncDataBackground:view," + dataType.toString() + " update,"
                                     + " uuid:" + recordData.getUuid());
                             if (callBack != null) {
@@ -401,6 +413,8 @@ public class FTTrackInner {
                         case 0:
                         case 1:
                             boolean result = FTDataStoreManager.get().insertFtOperation(recordData, false);
+                            outcomeReported = true;
+                            notifyRUMWriteResult(callBack, result);
                             if (!result && reservedRumCount) {
                                 synchronized (cachePolicy.getRumLock()) {
                                     cachePolicy.optRUMCount(-1);
@@ -415,11 +429,14 @@ public class FTTrackInner {
                             SyncTaskManager.get().executeSyncPoll();
                             break;
                         case -1:
+                            outcomeReported = true;
+                            notifyRUMWriteResult(callBack, false);
                             LogUtils.e(TAG, "syncDataBackground:" + measurement + errorDec + " " +
                                     dataType.toString() + errorDec + ",uuid:" + recordData.getUuid() + ",drop by Cache limit");
                             break;
                     }
                 } catch (Exception e) {
+                    if (!outcomeReported) notifyRUMWriteResult(callBack, false);
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             }

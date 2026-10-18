@@ -226,6 +226,24 @@ public class FTRumFileAggregateStore {
         updateViewDateTimeByColumn(viewId, FTSQL.RUM_DATA_UPDATE_TIME, dateTime);
     }
 
+    public void updateActionExtraAttr(final String actionId, final String attr) {
+        if (actionId == null) return;
+        try {
+            lock.withLock(new FTFileLock.LockedOperation<Void>() {
+                @Override
+                public Void run() throws Exception {
+                    JSONObject json = readJson(getActionFile(actionId));
+                    if (json == null) return null;
+                    json.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, attr);
+                    writeJson(getActionFile(actionId), json);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
+    }
+
     public void updateViewExtraAttr(final String viewId, final String attr) {
         if (viewId == null) return;
         try {

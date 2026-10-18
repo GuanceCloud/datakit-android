@@ -23,6 +23,8 @@ public interface FTDataStore {
 
     void closeAction(String actionId, long duration, boolean force);
 
+    void updateActionExtraAttr(String actionId, String attr);
+
     void closeView(String viewId, long loadTime, long timeSpent, String attr);
 
     void increaseActionError(String actionId);

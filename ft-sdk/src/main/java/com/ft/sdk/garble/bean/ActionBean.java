@@ -17,6 +17,17 @@ import java.util.Iterator;
  * User behavior operation lifecycle metrics, {@link Constants#FT_MEASUREMENT_RUM_ACTION}
  */
 public class ActionBean {
+    /** Explicit stop only; automatic completion keeps the original interaction start. */
+    public Long interactionStopTimeNano;
+
+    public long getInteractionTimeNano() {
+        return interactionStopTimeNano == null ? startTimeNanoForDuration : interactionStopTimeNano;
+    }
+
+    public void setStartTimeNanoForDuration(long time) {
+        startTimeNanoForDuration = time;
+    }
+
     private static final String TAG = Constants.LOG_TAG_PREFIX + "ActionBean";
     /**
      * Action unique ID, {@link Constants#KEY_RUM_ACTION_ID}
@@ -255,6 +266,7 @@ public class ActionBean {
      */
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
+        if (interactionStopTimeNano != null) map.put("interaction_stop_time_nano", interactionStopTimeNano);
         map.put(Constants.KEY_RUM_SESSION_START_REASON, sessionStartReason);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_PROPERTY, property);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_TAGS, tags);
@@ -274,6 +286,8 @@ public class ActionBean {
         try {
 
             JSONObject json = new JSONObject(jsonString);
+            interactionStopTimeNano = !json.isNull("interaction_stop_time_nano")
+                    ? json.getLong("interaction_stop_time_nano") : null;
             sessionStartReason = json.optString(Constants.KEY_RUM_SESSION_START_REASON, "unknown");
             this.collectType = json.getString(Constants.KEY_RUM_SDK_INNER_KEY_COLLECT_TYPE);
             this.startTimeNanoForDuration= json.optLong(Constants.KEY_RUM_SDK_INNER_KEY_START_TIME_NANO);

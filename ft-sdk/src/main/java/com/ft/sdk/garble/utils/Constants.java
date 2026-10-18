@@ -742,6 +742,8 @@ public class Constants {
     /**
      * Page load time
      */
+    public static final String KEY_RUM_VIEW_NETWORK_SETTLED_TIME = "network_settled_time";
+    public static final String KEY_RUM_VIEW_INTERACTION_TO_NEXT_VIEW_TIME = "interaction_to_next_view_time";
     public static final String KEY_RUM_VIEW_LOAD = "loading_time";
     /**
      * Number of long tasks in page cycle, {@link #FT_MEASUREMENT_RUM_LONG_TASK}
