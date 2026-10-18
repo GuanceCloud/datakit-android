@@ -222,6 +222,17 @@ class FTShadowDataStore implements FTDataStore, HistoricalRumDataStore {
     }
 
     @Override
+    public void updateActionExtraAttr(String actionId, String attr) {
+        primary.updateActionExtraAttr(actionId, attr);
+        mirror(new Runnable() {
+            @Override
+            public void run() {
+                shadow.updateActionExtraAttr(actionId, attr);
+            }
+        });
+    }
+
+    @Override
     public void updateViewExtraAttr(String viewId, String attr) {
         primary.updateViewExtraAttr(viewId, attr);
         mirror(new Runnable() {

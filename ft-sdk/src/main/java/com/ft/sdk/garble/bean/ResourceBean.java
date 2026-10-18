@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.bean;
 
 import com.ft.sdk.FTRUMInnerManager;
+import com.ft.sdk.internal.metrics.NetworkSettledMetric;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ public class ResourceBean {
      * request uuid
      */
     public String id = "";
+    public NetworkSettledMetric networkSettledMetric;
     /** SDK-captured Visitor ID used by this request, independent of user properties. */
     public String visitorId;
     /**
