@@ -5,9 +5,11 @@ import androidx.annotation.NonNull;
 /**
  * Validates the previous View's last accepted interaction for {@code interaction_to_next_view_time}.
  *
- * <p>The SDK first selects the previous View's last successfully stored tap, swipe, click or back,
+ * <p>The SDK first selects the previous page View's last successfully stored click,
  * ordered by accepted write callbacks. It does not search earlier interactions if this rule rejects
- * that candidate. Other Action types cannot be enabled through this rule.</p>
+ * that candidate. Automatic back-key events also use Action type {@code click} (name {@code back}).
+ * Other Action types cannot be enabled through this rule. Synthetic launch/background context
+ * Views do not participate in page navigation history.</p>
  *
  * <p>This rule replaces the default 3 second window; the SDK still requires a positive interval.
  * It runs outside timing locks on the SDK event queue, once for each candidate/next-View pair.

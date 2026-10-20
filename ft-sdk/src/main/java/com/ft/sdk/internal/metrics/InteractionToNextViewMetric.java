@@ -3,6 +3,7 @@ package com.ft.sdk.internal.metrics;
 import com.ft.sdk.FTLastInteractionIdentifier;
 import com.ft.sdk.FTPreviousViewLastInteractionContext;
 import com.ft.sdk.FTTimeBasedInteractionIdentifier;
+import com.ft.sdk.garble.utils.Constants;
 
 import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,8 +42,8 @@ public final class InteractionToNextViewMetric {
     }
 
     public boolean actionStored(String viewId, String type, long timestamp) {
-        if (identifier == null || viewId == null || !("tap".equals(type) || "swipe".equals(type)
-                || "click".equals(type) || "back".equals(type))) return false;
+        // Automatic clicks and the back key both use action_type=click.
+        if (identifier == null || viewId == null || !Constants.EVENT_NAME_CLICK.equals(type)) return false;
         ViewState target = null;
         Interaction candidate = new Interaction(type, timestamp);
         synchronized (this) {

@@ -20,7 +20,7 @@ public final class FTPreviousViewLastInteractionContext {
         this.nextViewStartTimeNanos = nextViewStartTimeNanos;
     }
 
-    /** Returns the selected Action type: tap, swipe, click or back. */
+    /** Returns the selected Action type: click, including automatic back-key events. */
     @NonNull
     public String getActionType() {
         return actionType;

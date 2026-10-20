@@ -67,7 +67,8 @@ public class FTResourceEventListener extends EventListener {
         this.enableResourceHostIP = enableResourceHostIP;
         this.resourceId = resourceId;
         this.originEventListener = originEventListener;
-        FTRUMInnerManager.get().onCreateResource(resourceId);
+        // Creating a Call does not start a request. The interceptor registers it
+        // when OkHttp dispatches it, including after any Dispatcher queue delay.
     }
 
     @Override
@@ -271,7 +272,8 @@ public class FTResourceEventListener extends EventListener {
         netStatusBean.connectionReuse = resourceConnectionReuse;
         netStatusBean.requestBodySize = requestBodySize;
         netStatusBean.responseBodySize = responseBodySize;
-        FTRUMInnerManager.get().setNetState(this.resourceId, netStatusBean);
+        FTRUMInnerManager.get().setOkHttpResourceNetState(this.resourceId, netStatusBean,
+                System.nanoTime());
     }
 
     /**

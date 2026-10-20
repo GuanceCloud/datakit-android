@@ -109,15 +109,33 @@ public class ViewTimingStrategyTest {
         metric.actionStored("one", "click", 0);
         metric.viewCreated("two", 4000 * MS);
         assertEquals(Long.valueOf(4000 * MS), metric.resolve("two"));
-        assertFalse(metric.actionStored("one", "custom", 1));
-        assertFalse(metric.actionStored("one", "scroll", 1));
+        for (String type : new String[]{"tap", "swipe", "back", "custom", "scroll", "Click", null}) {
+            assertFalse(metric.actionStored("one", type, 1));
+            assertEquals(Long.valueOf(4000 * MS), metric.resolve("two"));
+        }
         assertEquals(1, calls.get());
         for (long timestamp : new long[]{4000 * MS, 4000 * MS + 1}) {
             InteractionToNextViewMetric nonPositive = new InteractionToNextViewMetric(context -> true);
             nonPositive.viewCreated("a", 0);
             nonPositive.viewCreated("b", 4000 * MS);
-            nonPositive.actionStored("a", "tap", timestamp);
+            nonPositive.actionStored("a", "click", timestamp);
             assertNull(nonPositive.resolve("b"));
+        }
+    }
+
+    @Test public void nonClickCannotBecomeCandidateBeforeOrAfterNextView() {
+        for (String type : new String[]{"tap", "swipe", "back", "custom"}) {
+            AtomicInteger calls = new AtomicInteger();
+            InteractionToNextViewMetric metric = new InteractionToNextViewMetric(context -> {
+                calls.incrementAndGet();
+                return true;
+            });
+            metric.viewCreated("source", 0);
+            assertFalse(metric.actionStored("source", type, 100));
+            metric.viewCreated("target", 1000);
+            assertFalse(metric.actionStored("source", type, 200));
+            assertNull(metric.resolve("target"));
+            assertEquals(0, calls.get());
         }
     }
 
@@ -137,7 +155,7 @@ public class ViewTimingStrategyTest {
         AtomicInteger calls = new AtomicInteger();
         InteractionToNextViewMetric metric = new InteractionToNextViewMetric(context -> {
             calls.incrementAndGet();
-            return "click".equals(context.getActionType());
+            return context.getInteractionTimeNanos() == 100;
         });
         metric.viewCreated("source", 0);
         metric.actionStored("source", "click", 100);
@@ -146,7 +164,7 @@ public class ViewTimingStrategyTest {
         for (int i = 0; i < 10; i++) assertEquals(Long.valueOf(900), metric.resolve("target"));
         metric.viewCreated("target", 2000); // duplicate notifications do not re-evaluate
         assertEquals(1, calls.get());
-        metric.actionStored("source", "swipe", 200);
+        metric.actionStored("source", "click", 200);
         assertNull(metric.resolve("target"));
         assertEquals(2, calls.get());
         metric.actionStored("source", "custom", 300);
@@ -177,16 +195,16 @@ public class ViewTimingStrategyTest {
 
     @Test public void invFailureRejectsNewCandidateAndKeepsFutureEvaluationsWorking() {
         InteractionToNextViewMetric metric = new InteractionToNextViewMetric(context -> {
-            if ("swipe".equals(context.getActionType())) throw new IllegalArgumentException("callback");
+            if (context.getInteractionTimeNanos() == 200) throw new IllegalArgumentException("callback");
             return true;
         });
         metric.viewCreated("source", 0);
         metric.viewCreated("target", 1000);
         metric.actionStored("source", "click", 100);
         assertEquals(Long.valueOf(900), metric.resolve("target"));
-        metric.actionStored("source", "swipe", 200);
+        metric.actionStored("source", "click", 200);
         assertNull(metric.resolve("target"));
-        metric.actionStored("source", "tap", 300);
+        metric.actionStored("source", "click", 300);
         assertEquals(Long.valueOf(700), metric.resolve("target"));
     }
 

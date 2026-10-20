@@ -130,29 +130,6 @@ public class FTResourceInterceptor implements Interceptor {
         boolean isInTakeUrl = rumConfig.isRumEnable() && rumConfig
                 .getResourceUrlHandler().isInTakeUrl(url);
 
-        final HashMap<String, Object> extraData = (handlerHelper != null) ? new HashMap<>() : null;
-        try {
-            if (handlerHelper != null) {
-                handlerHelper.onRequest(request, extraData);
-            }
-            response = chain.proceed(request);
-
-            if (isInTakeUrl) {
-                LogUtils.d(TAG, url + " , ignore by ResourceUrlHandler");
-                return response;
-            }
-
-            if (handlerHelper != null) {
-                handlerHelper.onResponse(response, extraData);
-            }
-
-        } catch (IOException e) {
-            if (isInTakeUrl) {
-                throw e;
-            } else {
-                exception = e;
-            }
-        }
         String resourceId = Utils.identifyRequest(request);
         boolean reGenerate = false;
         if (request.tag(ResourceID.class) != null) {
@@ -161,78 +138,116 @@ public class FTResourceInterceptor implements Interceptor {
             LogUtils.d(TAG, "intercept id:" + resourceId);
             reGenerate = true;
         }
-        FTRUMInnerManager.get().startResource(resourceId);
-        ResourceParams params = new ResourceParams();
-        FTVisitorIdInterceptor.Snapshot visitor = request.tag(FTVisitorIdInterceptor.Snapshot.class);
-        if (visitor != null) {
-            FTRUMInnerManager.get().setResourceVisitorId(resourceId, visitor.id);
-        }
-        params.url = url;
-        params.requestHeader = request.headers().toString();
-        params.resourceMethod = request.method();
+        // Match the request dispatch boundary, before waiting for headers or body.
+        if (!isInTakeUrl) FTRUMInnerManager.get().startResource(resourceId);
+        boolean stopped = false;
+        boolean completed = false;
+        try {
+            final HashMap<String, Object> extraData = (handlerHelper != null) ? new HashMap<>() : null;
+            try {
+                if (handlerHelper != null) {
+                    handlerHelper.onRequest(request, extraData);
+                }
+                response = chain.proceed(request);
 
-        if (exception == null) {
-            String responseBodyString = "";
-            String responseHeaderString = response.headers().toString();
-            params.resourceProtocol = response.protocol().toString();
-            params.responseHeader = responseHeaderString;
-            params.responseContentType = response.header("Content-Type");
-            params.responseConnection = response.header("Connection");
-            params.responseContentEncoding = response.header("Content-Encoding");
+                if (isInTakeUrl) {
+                    LogUtils.d(TAG, url + " , ignore by ResourceUrlHandler");
+                    return response;
+                }
 
-            params.resourceStatus = response.code();
-            if (params.resourceStatus >= HttpURLConnection.HTTP_BAD_REQUEST) {
-                ResponseBody responseBody = response.body();
-                if (HttpHeaders.hasBody(response)) {
-                    if (responseBody != null) {
-                        byte[] bytes = Utils.toByteArray(responseBody.byteStream());
-                        MediaType contentType = responseBody.contentType();
-                        responseBodyString = new String(bytes, Utils.getCharset(contentType));
-                        ResponseBody copyResponseBody = ResponseBody.create(responseBody.contentType(), bytes);
-                        response.close();
+                if (handlerHelper != null) {
+                    handlerHelper.onResponse(response, extraData);
+                }
 
-                        response = response.newBuilder().body(copyResponseBody).build();
+            } catch (IOException e) {
+                if (isInTakeUrl) {
+                    throw e;
+                } else {
+                    exception = e;
+                }
+            }
+            ResourceParams params = new ResourceParams();
+            FTVisitorIdInterceptor.Snapshot visitor = request.tag(FTVisitorIdInterceptor.Snapshot.class);
+            if (visitor != null) {
+                FTRUMInnerManager.get().setResourceVisitorId(resourceId, visitor.id);
+            }
+            params.url = url;
+            params.requestHeader = request.headers().toString();
+            params.resourceMethod = request.method();
+
+            if (exception == null) {
+                String responseBodyString = "";
+                String responseHeaderString = response.headers().toString();
+                params.resourceProtocol = response.protocol().toString();
+                params.responseHeader = responseHeaderString;
+                params.responseContentType = response.header("Content-Type");
+                params.responseConnection = response.header("Connection");
+                params.responseContentEncoding = response.header("Content-Encoding");
+
+                params.resourceStatus = response.code();
+                if (params.resourceStatus >= HttpURLConnection.HTTP_BAD_REQUEST) {
+                    ResponseBody responseBody = response.body();
+                    if (HttpHeaders.hasBody(response)) {
+                        if (responseBody != null) {
+                            byte[] bytes = Utils.toByteArray(responseBody.byteStream());
+                            MediaType contentType = responseBody.contentType();
+                            responseBodyString = new String(bytes, Utils.getCharset(contentType));
+                            ResponseBody copyResponseBody = ResponseBody.create(responseBody.contentType(), bytes);
+                            response.close();
+
+                            response = response.newBuilder().body(copyResponseBody).build();
+                        }
+                        params.responseBody = responseBodyString;
+                    } else {
+                        LogUtils.d(TAG, "response body empty");
                     }
-                    params.responseBody = responseBodyString;
-                } else {
-                    LogUtils.d(TAG, "response body empty");
+                }
+            } else {
+                boolean override = false;
+                if (handlerHelper != null) {
+                    if (handlerHelper instanceof ContentHandlerHelperEx) {
+                        override = ((ContentHandlerHelperEx) handlerHelper)
+                                .onExceptionWithFilter(exception, extraData);
+                    } else {
+                        handlerHelper.onException(exception, extraData);
+                        override = true;
+                    }
+                }
+
+                if (!override) {
+                    params.requestErrorStack = LogUtils.getStackTraceString(exception);
+                    params.requestErrorMsg = LogUtils.getNetworkExceptionDesc(exception);
                 }
             }
-        } else {
-            boolean override = false;
+
             if (handlerHelper != null) {
-                if (handlerHelper instanceof ContentHandlerHelperEx) {
-                    override = ((ContentHandlerHelperEx) handlerHelper)
-                            .onExceptionWithFilter(exception, extraData);
-                } else {
-                    handlerHelper.onException(exception, extraData);
-                    override = true;
+                if (extraData != null) {
+                    if (params.property == null) {
+                        params.property = new HashMap<>();
+                    }
+                    params.property.putAll(extraData);
                 }
             }
 
-            if (!override) {
-                params.requestErrorStack = LogUtils.getStackTraceString(exception);
-                params.requestErrorMsg = LogUtils.getNetworkExceptionDesc(exception);
+
+            // Timing may already have arrived (empty/error bodies). Store the stop before
+            // content can schedule a Resource/Error write with an unset end timestamp.
+            FTRUMInnerManager.get().stopResource(resourceId);
+            stopped = true;
+            FTRUMInnerManager.get().setTransformContent(resourceId, params, reGenerate);
+            completed = true;
+
+            if (exception != null) {
+                throw exception;
+            }
+            return response;
+        } finally {
+            // Application callbacks and downstream interceptors may throw before a
+            // Resource can be written. Do not leave an initial request pending forever.
+            if (!isInTakeUrl && !completed) {
+                FTRUMInnerManager.get().discardOkHttpResource(resourceId, stopped);
             }
         }
-
-        if (handlerHelper != null) {
-            if (extraData != null) {
-                if (params.property == null) {
-                    params.property = new HashMap<>();
-                }
-                params.property.putAll(extraData);
-            }
-        }
-
-
-        FTRUMInnerManager.get().setTransformContent(resourceId, params, reGenerate);
-        FTRUMInnerManager.get().stopResource(resourceId);
-
-        if (exception != null) {
-            throw exception;
-        }
-        return response;
     }
 
 

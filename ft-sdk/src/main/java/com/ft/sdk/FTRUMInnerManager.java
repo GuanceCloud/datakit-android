@@ -814,6 +814,27 @@ public class FTRUMInnerManager {
         });
     }
 
+    /** Balance a dispatched OkHttp request abandoned before its content could be recorded. */
+    void discardOkHttpResource(String resourceId, boolean stopped) {
+        ResourceBean bean = resourceBeanMap.remove(resourceId);
+        if (bean == null) return;
+        if (bean.networkSettledMetric != null) {
+            bean.networkSettledMetric.resourceFinished(resourceId, null);
+        }
+        EventConsumerThreadPool.get().execute(() -> {
+            // This runs after the queued start (and, if present, stop) bookkeeping.
+            if (!stopped) {
+                FTDataStoreManager.get().reduceViewPendingResource(bean.viewId);
+                FTDataStoreManager.get().reduceActionPendingResource(bean.actionId);
+                ActiveActionBean closingAction = bean.actionId == null ? null : closingActions.get(bean.actionId);
+                if (closingAction != null) closeAction(closingAction, false);
+            }
+            FTTraceManager.get().removeByStopResource(resourceId);
+            FTTraceManager.get().removeByAddResource(resourceId);
+            generateRumData(true);
+        });
+    }
+
     /** URLConnection abandonment: balance pending without counting a completed Resource or error. */
     void discardResource(String resourceId) {
         ResourceBean bean = resourceBeanMap.remove(resourceId);
@@ -1031,7 +1052,7 @@ public class FTRUMInnerManager {
         createNewView(newView, property, true);
     }
 
-    private void createNewView(ActiveViewBean newView, HashMap<String, Object> property, boolean enableMonitor) {
+    private void createNewView(ActiveViewBean newView, HashMap<String, Object> property, boolean isPageView) {
         synchronized (timingViews) {
             timingViews.put(newView.getId(), newView);
             if (timingViews.size() > 4) {
@@ -1054,11 +1075,11 @@ public class FTRUMInnerManager {
         }
         newView.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
         newView.setCollectType(checkSessionWillCollect(newView.getSessionId()));
-        if (enableMonitor) {
+        if (isPageView) {
             FTMonitorManager.get().addMonitor(newView.getId());
             FTMonitorManager.get().attachMonitorData(newView);
         }
-        initViewInCache(newView);
+        initViewInCache(newView, isPageView);
         SessionReplayBridge.appendRumLinkKeysWithView(newView.getId(), property);
     }
 
@@ -1066,8 +1087,9 @@ public class FTRUMInnerManager {
      * Initialize view
      *
      * @param activeViewBean current active page
+     * @param isPageView whether this is a navigation View rather than a synthetic context View
      */
-    private void initViewInCache(ActiveViewBean activeViewBean) {
+    private void initViewInCache(ActiveViewBean activeViewBean, boolean isPageView) {
         final ViewBean bean = activeViewBean.convertToViewBean();
         final Object viewTimingEpoch = timingEpoch;
         final InteractionToNextViewMetric metric = interactionToNextViewMetric;
@@ -1079,7 +1101,8 @@ public class FTRUMInnerManager {
                             FTApplication.getApplication()).save(bean);
                 }
                 FTDataStoreManager.get().initSumView(bean);
-                if (!timingReleased && timingEpoch == viewTimingEpoch) {
+                if (isPageView && !timingReleased && timingEpoch == viewTimingEpoch) {
+                    // Synthetic launch/background contexts must not interrupt page navigation.
                     // Both View registration and accepted Action candidates share the event queue.
                     metric.viewCreated(bean.getId(), bean.getStartTimeNanoForDuration());
                     if (!timingReleased && timingEpoch == viewTimingEpoch) {
@@ -1400,6 +1423,16 @@ public class FTRUMInnerManager {
      */
     void addLongTask(String log, long duration) {
         addLongTask(log, duration, null);
+    }
+
+    /** Accept OkHttp timing only for a request already registered by the interceptor. */
+    void setOkHttpResourceNetState(String resourceId, NetStatusBean netStatusBean, long endTime) {
+        ResourceBean bean = resourceBeanMap.get(resourceId);
+        if (bean == null) return;
+        // Response headers can arrive well before a slow body is consumed. Resolve
+        // network settled time at the completion callback, before accepting the write.
+        bean.endTimeNanoForDuration = Math.max(bean.endTimeNanoForDuration, endTime);
+        setNetState(resourceId, netStatusBean);
     }
 
     /**

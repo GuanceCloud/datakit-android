@@ -50,6 +50,7 @@
         <activity android:name=".ActivityTrackingTestActivity" />
         <activity android:name=".FragmentTrackingTestActivity" />
         <activity android:name=".NetworkTestActivity" />
+        <activity android:name=".NetworkSettledTimingActivity" android:exported="false" />
 
         <service
             android:name=".service.TestService"

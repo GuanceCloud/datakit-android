@@ -17,6 +17,7 @@ import org.robolectric.annotation.Config;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 
 @RunWith(RobolectricTestRunner.class)
@@ -321,18 +322,75 @@ public class RUMViewTimingIntegrationTest {
     }
 
     @Test public void rejectedLateCandidateRemovesInvFromAlreadyClosedTarget() throws Exception {
+        AtomicInteger candidates = new AtomicInteger();
         rum.initParams(new FTRUMConfig().setLastInteractionIdentifier(
-                context -> "click".equals(context.getActionType())));
+                context -> candidates.incrementAndGet() == 1));
         rum.startView("source");
         rum.addAction("first", "click", 0, Utils.getCurrentNanoTime());
         drain();
-        rum.addAction("later", "swipe", 0, Utils.getCurrentNanoTime());
+        rum.addAction("later", "click", 0, Utils.getCurrentNanoTime());
         rum.startView("target");
         ActiveViewBean target = active();
         rum.startView("third");
         drain();
         assertFalse(views.get(target.getId()).containsKey("interaction_to_next_view_time"));
         assertEquals(false, views.get(target.getId()).get("is_active"));
+    }
+
+    @Test public void laterNonClickDoesNotReplaceAcceptedClick() throws Exception {
+        List<FTPreviousViewLastInteractionContext> contexts = new ArrayList<>();
+        rum.initParams(new FTRUMConfig().setLastInteractionIdentifier(context -> {
+            contexts.add(context);
+            return true;
+        }));
+        rum.startView("source");
+        rum.addAction("first", "click", 0, Utils.getCurrentNanoTime());
+        drain();
+        for (String type : new String[]{"tap", "swipe", "back", "custom"}) {
+            rum.addAction("later", type, 0, Utils.getCurrentNanoTime());
+        }
+        rum.startView("target");
+        ActiveViewBean target = active();
+        rum.startView("third");
+        drain();
+        assertEquals(1, contexts.size());
+        assertEquals("click", contexts.get(0).getActionType());
+        assertEquals(target.getStartTimeNanoForDuration() - contexts.get(0).getInteractionTimeNanos(),
+                views.get(target.getId()).get("interaction_to_next_view_time"));
+    }
+
+    @Test public void launchViewDoesNotInterruptFirstClickNavigation() throws Exception {
+        for (boolean delayedWrite : new boolean[]{false, true}) {
+            rum.startView("source", null, ViewTrackingType.AUTOMATIC);
+            rum.startAction("navigate", "click");
+            ActiveActionBean click = action();
+            if (!delayedWrite) {
+                rum.stopAction();
+                drain();
+            }
+            rum.addAction("launch", Constants.ACTION_TYPE_LAUNCH_COLD, 1_000_000,
+                    Utils.getCurrentNanoTime() - 1_000_000);
+            rum.startView("target");
+            ActiveViewBean target = active();
+            drain();
+            assertEquals(target.getStartTimeNanoForDuration() - click.getInteractionTimeNano(),
+                    views.get(target.getId()).get("interaction_to_next_view_time"));
+            Map<String, ActiveViewBean> synthetic = (Map<String, ActiveViewBean>)
+                    field(FTRUMInnerManager.class, "syntheticViewMap").get(rum);
+            ActiveViewBean launch = synthetic.get(Constants.VIEW_NAME_APPLICATION_LAUNCH);
+            assertNotNull(launch);
+            assertNull(views.get(launch.getId()).get("interaction_to_next_view_time"));
+        }
+    }
+
+    @Test public void explicitPageNamedApplicationLaunchStillParticipatesInNavigation() throws Exception {
+        rum.startView(Constants.VIEW_NAME_APPLICATION_LAUNCH);
+        rum.addAction("back", Constants.EVENT_NAME_CLICK, 0, Utils.getCurrentNanoTime());
+        drain();
+        rum.startView("target");
+        ActiveViewBean target = active();
+        drain();
+        assertNotNull(views.get(target.getId()).get("interaction_to_next_view_time"));
     }
 
     @Test public void disabledInvProducesNoMetricEvenWithAcceptedClick() throws Exception {

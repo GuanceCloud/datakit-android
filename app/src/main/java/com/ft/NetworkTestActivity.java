@@ -1,5 +1,6 @@
 package com.ft;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -64,6 +65,9 @@ public class NetworkTestActivity extends NameTitleActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network_test);
         new HttpsURLConnectionSample(this).bind();
+        bindNetworkSettledScenario(R.id.btn_network_settled_initial, NetworkSettledTimingActivity.INITIAL);
+        bindNetworkSettledScenario(R.id.btn_network_settled_late, NetworkSettledTimingActivity.LATE_ONLY);
+        bindNetworkSettledScenario(R.id.btn_network_settled_leave, NetworkSettledTimingActivity.LEAVE_EARLY);
 
         // Normal network request test
         Button normalRequestBtn = findViewById(R.id.btn_normal_request);
@@ -115,6 +119,12 @@ public class NetworkTestActivity extends NameTitleActivity {
         );
         findViewById(R.id.btn_websocket_close).setOnClickListener(v -> closeActiveWebSocket());
         showWebSocketConfiguration();
+    }
+
+    private void bindNetworkSettledScenario(int buttonId, String scenario) {
+        findViewById(buttonId).setOnClickListener(v -> startActivity(
+                new Intent(this, NetworkSettledTimingActivity.class)
+                        .putExtra(NetworkSettledTimingActivity.EXTRA_SCENARIO, scenario)));
     }
 
     private void bindWebSocketTestButton(int buttonId, String scenario, String url,

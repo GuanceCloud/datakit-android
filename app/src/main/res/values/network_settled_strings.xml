@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="network_settled_title">network_settled_time</string>
+    <string name="network_settled_description">Run a scenario, then check the RUM View using its view_id.</string>
+    <string name="network_settled_initial">Initial + late requests</string>
+    <string name="network_settled_late">Late request only</string>
+    <string name="network_settled_leave">Leave before completion</string>
+    <string name="network_settled_expect_initial">Send /fast (250 ms) and /slow (1200 ms) immediately in parallel, then send /late after 350 ms.\nExpected: network_settled_time is about 1.2 seconds once the slow initial request finishes. The late request does not extend the metric. Wait for all requests to finish before returning.\nThis is the expected result, not a collected field value.</string>
+    <string name="network_settled_expect_late">Send /late 350 ms after the View starts.\nExpected: a Resource event is collected, but network_settled_time is omitted from the View.</string>
+    <string name="network_settled_expect_leave">Send fast and slow requests immediately, then return automatically after 450 ms. The slow request continues to completion.\nExpected: network_settled_time is omitted from the original View. Requests completing later still belong to that View.</string>
+    <string name="network_settled_preparing">Preparing local requests…</string>
+    <string name="network_settled_started">Scenario: %1$s\nView: NetworkSettledTimingActivity\nview_id: %2$s\n\nRequest status:</string>
+    <string name="network_settled_start_failed">Failed to start scenario: %1$s</string>
+    <string name="network_settled_collection_disabled">No automatically tracked View is available. Initialize RUM and enable automatic View and Resource collection first.</string>
+    <string name="network_settled_close">Back to Network Test</string>
+</resources>

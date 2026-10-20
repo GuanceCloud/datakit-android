@@ -548,8 +548,9 @@ public class FTRUMConfig {
 
     /**
      * Replaces the last-interaction rule for native View interaction-to-next-View time. The default
-     * requires a positive interval strictly below 3000 ms. Only tap, swipe, click and back are
-     * candidates, and rejection does not search earlier interactions. This strategy is snapshotted
+     * requires a positive interval strictly below 3000 ms. Only click Actions are candidates,
+     * including automatically collected back-key events (type click, name back).
+     * Rejection does not search earlier interactions. This strategy is snapshotted
      * at RUM initialization. See {@link FTLastInteractionIdentifier} for callback requirements.
      *
      * <p>Java example (only clicks, strictly below 5 seconds):</p>

@@ -21,6 +21,33 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/network_settled_title"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/network_settled_description" />
+        <Button
+            android:id="@+id/btn_network_settled_initial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/network_settled_initial" />
+        <Button
+            android:id="@+id/btn_network_settled_late"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/network_settled_late" />
+        <Button
+            android:id="@+id/btn_network_settled_leave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text="@string/network_settled_leave" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="HttpsURLConnection Automatic Collection"
             android:textSize="18sp"
             android:textStyle="bold" />

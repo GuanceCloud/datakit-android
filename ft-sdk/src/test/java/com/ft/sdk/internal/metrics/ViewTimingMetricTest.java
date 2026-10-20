@@ -69,7 +69,7 @@ public class ViewTimingMetricTest {
         assertNull(metric.resolve("one"));
         metric.viewCreated("three", 1400 * MS);
         assertNull(metric.resolve("three"));
-        metric.actionStored("two", "back", 1300 * MS);
+        metric.actionStored("two", "click", 1300 * MS);
         assertEquals(Long.valueOf(100 * MS), metric.resolve("three"));
     }
 
@@ -78,7 +78,7 @@ public class ViewTimingMetricTest {
             InteractionToNextViewMetric metric = new InteractionToNextViewMetric();
             metric.viewCreated("one", 0);
             metric.viewCreated("two", 4000 * MS);
-            metric.actionStored("one", "tap", 4000 * MS - delta);
+            metric.actionStored("one", "click", 4000 * MS - delta);
             assertEquals(delta > 0 && delta < 3000 * MS ? Long.valueOf(delta) : null, metric.resolve("two"));
         }
     }
@@ -87,13 +87,11 @@ public class ViewTimingMetricTest {
         InteractionToNextViewMetric metric = new InteractionToNextViewMetric();
         metric.viewCreated("one", 0);
         metric.viewCreated("two", 1000);
-        for (String type : new String[]{"tap", "swipe", "click", "back"}) {
-            metric.actionStored("one", type, 900);
-            assertEquals(Long.valueOf(100), metric.resolve("two"));
-            metric.actionStored("one", type, 800);
-            assertEquals(Long.valueOf(200), metric.resolve("two"));
-        }
-        for (String type : new String[]{"custom", "scroll", "launch_cold", null}) {
+        metric.actionStored("one", "click", 900);
+        assertEquals(Long.valueOf(100), metric.resolve("two"));
+        metric.actionStored("one", "click", 800);
+        assertEquals(Long.valueOf(200), metric.resolve("two"));
+        for (String type : new String[]{"tap", "swipe", "back", "custom", "scroll", "launch_cold", null}) {
             metric.actionStored("one", type, 950);
             assertEquals(Long.valueOf(200), metric.resolve("two"));
         }
