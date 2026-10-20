@@ -50,6 +50,10 @@ public class FTRUMConfig {
      */
     @Nullable
     private FTIssueDataProvider issueDataProvider;
+    @NonNull
+    private FTInitialResourceIdentifier initialResourceIdentifier = new FTTimeBasedInitialResourceIdentifier();
+    @Nullable
+    private FTLastInteractionIdentifier lastInteractionIdentifier = new FTTimeBasedInteractionIdentifier();
     /**
      * Whether to enable user action tracking
      */
@@ -507,6 +511,72 @@ public class FTRUMConfig {
     @Nullable
     FTIssueDataProvider getIssueDataProvider() {
         return issueDataProvider;
+    }
+
+    /**
+     * Replaces the initial Resource rule for native View network settled time. The default selects
+     * Resources starting strictly before 100 ms from View start. Return false to exclude a Resource
+     * from this metric without dropping its event. This strategy is snapshotted at RUM initialization;
+     * changing this config afterwards does not change the running SDK. See {@link FTInitialResourceIdentifier}
+     * for callback timing and threading requirements.
+     *
+     * <p>Java example (500 millisecond window):</p>
+     * <pre>{@code
+     * new FTRUMConfig().setInitialResourceIdentifier(
+     *         new FTTimeBasedInitialResourceIdentifier(500));
+     * }</pre>
+     * <p>Kotlin example (business-controlled selection at registration time):</p>
+     * <pre>{@code
+     * FTRUMConfig().setInitialResourceIdentifier { context ->
+     *     initialLoading.get() // for example, a thread-safe AtomicBoolean maintained by the app
+     * }
+     * }</pre>
+     *
+     * @param identifier non-null rule; use a rule returning false to disable this metric
+     * @return this config for chaining
+     */
+    public FTRUMConfig setInitialResourceIdentifier(@NonNull FTInitialResourceIdentifier identifier) {
+        if (identifier == null) throw new NullPointerException("identifier");
+        initialResourceIdentifier = identifier;
+        return this;
+    }
+
+    @NonNull
+    FTInitialResourceIdentifier getInitialResourceIdentifier() {
+        return initialResourceIdentifier;
+    }
+
+    /**
+     * Replaces the last-interaction rule for native View interaction-to-next-View time. The default
+     * requires a positive interval strictly below 3000 ms. Only tap, swipe, click and back are
+     * candidates, and rejection does not search earlier interactions. This strategy is snapshotted
+     * at RUM initialization. See {@link FTLastInteractionIdentifier} for callback requirements.
+     *
+     * <p>Java example (only clicks, strictly below 5 seconds):</p>
+     * <pre>{@code
+     * FTLastInteractionIdentifier window = new FTTimeBasedInteractionIdentifier(5000);
+     * new FTRUMConfig().setLastInteractionIdentifier(context ->
+     *         "click".equals(context.getActionType()) && window.validate(context));
+     * }</pre>
+     * <p>Kotlin example:</p>
+     * <pre>{@code
+     * val window = FTTimeBasedInteractionIdentifier(5000)
+     * FTRUMConfig().setLastInteractionIdentifier { context ->
+     *     context.actionType == "click" && window.validate(context)
+     * }
+     * }</pre>
+     *
+     * @param identifier rule to use, or null to disable automatic INV calculation
+     * @return this config for chaining
+     */
+    public FTRUMConfig setLastInteractionIdentifier(@Nullable FTLastInteractionIdentifier identifier) {
+        lastInteractionIdentifier = identifier;
+        return this;
+    }
+
+    @Nullable
+    FTLastInteractionIdentifier getLastInteractionIdentifier() {
+        return lastInteractionIdentifier;
     }
 
     /**

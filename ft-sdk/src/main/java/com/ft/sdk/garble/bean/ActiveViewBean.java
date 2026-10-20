@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import com.ft.sdk.FTInitialResourceIdentifier;
+import com.ft.sdk.FTTimeBasedInitialResourceIdentifier;
 import com.ft.sdk.internal.metrics.NetworkSettledMetric;
 
 /**
@@ -11,8 +13,7 @@ import com.ft.sdk.internal.metrics.NetworkSettledMetric;
  */
 public class ActiveViewBean extends ViewBean {
 
-    public final NetworkSettledMetric networkSettledMetric =
-            new NetworkSettledMetric(getStartTimeNanoForDuration());
+    public final NetworkSettledMetric networkSettledMetric;
 
     /**
      * @param name
@@ -21,6 +22,12 @@ public class ActiveViewBean extends ViewBean {
      * @param sessionId
      */
     public ActiveViewBean(String name, String viewReferrer, long loadTime, String sessionId) {
+        this(name, viewReferrer, loadTime, sessionId, new FTTimeBasedInitialResourceIdentifier());
+    }
+
+    public ActiveViewBean(String name, String viewReferrer, long loadTime, String sessionId,
+                          FTInitialResourceIdentifier identifier) {
+        networkSettledMetric = new NetworkSettledMetric(getStartTimeNanoForDuration(), identifier);
         this.viewName = name;
         this.viewReferrer = viewReferrer;
         this.loadTime = loadTime;

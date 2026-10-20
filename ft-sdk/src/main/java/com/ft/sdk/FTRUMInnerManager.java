@@ -114,7 +114,8 @@ public class FTRUMInnerManager {
      * Current active View
      */
     private volatile ActiveViewBean activeView;
-    private final InteractionToNextViewMetric interactionToNextViewMetric = new InteractionToNextViewMetric();
+    private volatile FTInitialResourceIdentifier initialResourceIdentifier = new FTTimeBasedInitialResourceIdentifier();
+    private volatile InteractionToNextViewMetric interactionToNextViewMetric = new InteractionToNextViewMetric();
     private final LinkedHashMap<String, ActiveViewBean> timingViews = new LinkedHashMap<>();
     private final LinkedHashMap<String, ViewBean> timingViewSummaries = new LinkedHashMap<>();
     private volatile boolean timingReleased;
@@ -186,7 +187,7 @@ public class FTRUMInnerManager {
 
     private ActiveViewBean newSessionView(String name, String referrer, long load) {
         SessionSnapshot session = sessionSnapshot();
-        ActiveViewBean view = new ActiveViewBean(name, referrer, load, session.id);
+        ActiveViewBean view = new ActiveViewBean(name, referrer, load, session.id, initialResourceIdentifier);
         view.setSessionStartReason(session.reason);
         return view;
     }
@@ -714,9 +715,20 @@ public class FTRUMInnerManager {
         bean.networkSignalStrength = networkState.getNetworkSignalStrength();
         attachRUMRelativeForResource(bean);
         ActiveViewBean resourceView = timingView(bean.viewId);
-        if (resourceView != null && !resourceView.isClose()
-                && resourceView.networkSettledMetric.resourceStarted(resourceId, bean.startTimeNanoForDuration)) {
-            bean.networkSettledMetric = resourceView.networkSettledMetric;
+        if (!timingReleased && resourceView != null && !resourceView.isClose()) {
+            boolean register;
+            synchronized (bean) {
+                register = !bean.networkSettledRegistrationStarted;
+                bean.networkSettledRegistrationStarted = true;
+            }
+            Object registrationEpoch = timingEpoch;
+            if (register && resourceView.networkSettledMetric.resourceStarted(resourceId, bean.startTimeNanoForDuration)) {
+                if (!timingReleased && timingEpoch == registrationEpoch && !resourceView.isClose()) {
+                    bean.networkSettledMetric = resourceView.networkSettledMetric;
+                } else {
+                    resourceView.networkSettledMetric.resourceFinished(resourceId, null);
+                }
+            }
         }
         final String actionId = bean.actionId;
         final String viewId = bean.viewId;
@@ -1028,7 +1040,6 @@ public class FTRUMInnerManager {
                 timingViewSummaries.remove(oldest);
             }
         }
-        interactionToNextViewMetric.viewCreated(newView.getId(), newView.getStartTimeNanoForDuration());
         attachViewTiming(newView);
         newView.appStateProcess = appStateHistory().processToken;
         if (newView.appStateStart <= 0) newView.appStateStart = newView.getStartTime();
@@ -1058,6 +1069,8 @@ public class FTRUMInnerManager {
      */
     private void initViewInCache(ActiveViewBean activeViewBean) {
         final ViewBean bean = activeViewBean.convertToViewBean();
+        final Object viewTimingEpoch = timingEpoch;
+        final InteractionToNextViewMetric metric = interactionToNextViewMetric;
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
@@ -1066,6 +1079,14 @@ public class FTRUMInnerManager {
                             FTApplication.getApplication()).save(bean);
                 }
                 FTDataStoreManager.get().initSumView(bean);
+                if (!timingReleased && timingEpoch == viewTimingEpoch) {
+                    // Both View registration and accepted Action candidates share the event queue.
+                    metric.viewCreated(bean.getId(), bean.getStartTimeNanoForDuration());
+                    if (!timingReleased && timingEpoch == viewTimingEpoch) {
+                        attachViewTiming(activeViewBean);
+                        if (metric.resolve(bean.getId()) != null) generateRumData(true);
+                    }
+                }
             }
         });
     }
@@ -2176,19 +2197,23 @@ public class FTRUMInnerManager {
             fields.put(Constants.KEY_HAS_REPLAY, true);
         }
 
+        final Object actionTimingEpoch = timingEpoch;
+        final InteractionToNextViewMetric metric = interactionToNextViewMetric;
         FTTrackInner.getInstance().rum(bean.getStartTime(),
                 Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, new RUMWriteResultCallback() {
                     @Override public void onResult(boolean stored) {
-                        if (!stored || timingReleased || timingView(bean.getViewId()) == null) return;
-                        if (!interactionToNextViewMetric.actionStored(bean.getViewId(), bean.getActionType(),
-                                bean.getInteractionTimeNano())) return;
+                        if (!stored || timingReleased || timingEpoch != actionTimingEpoch) return;
                         EventConsumerThreadPool.get().execute(() -> {
-                            if (timingReleased) return;
+                            if (timingReleased || timingEpoch != actionTimingEpoch
+                                    || timingView(bean.getViewId()) == null) return;
+                            if (!metric.actionStored(bean.getViewId(), bean.getActionType(),
+                                    bean.getInteractionTimeNano())) return;
+                            if (timingReleased || timingEpoch != actionTimingEpoch) return;
                             ArrayList<ViewBean> closedSummaries = new ArrayList<>();
                             synchronized (timingViews) {
                                 for (ViewBean summary : timingViewSummaries.values()) {
                                     if (summary.isClose() && !java.util.Objects.equals(summary.interactionToNextViewTime,
-                                            interactionToNextViewMetric.resolve(summary.getId()))) {
+                                            metric.resolve(summary.getId()))) {
                                         closedSummaries.add(summary);
                                     }
                                 }
@@ -2308,9 +2333,12 @@ public class FTRUMInnerManager {
     }
 
     void initParams(FTRUMConfig config) {
+        timingReleased = true;
         timingEpoch = new Object();
-        timingReleased = false;
         clearViewTiming();
+        initialResourceIdentifier = config.getInitialResourceIdentifier();
+        interactionToNextViewMetric = new InteractionToNextViewMetric(config.getLastInteractionIdentifier());
+        timingReleased = false;
         sampleRate = config.getSamplingRate();
         rumAppId = config.getRumAppId();
         persistHistoricalAnrContext = config.isEnableTrackAppANR()
@@ -2473,7 +2501,11 @@ public class FTRUMInnerManager {
         issueFieldEnricher = new FTIssueFieldEnricher(null);
         Object releasedEpoch = timingEpoch;
         EventConsumerThreadPool.get().execute(() -> {
-            if (timingEpoch == releasedEpoch) clearViewTiming();
+            if (timingEpoch == releasedEpoch) {
+                clearViewTiming();
+                initialResourceIdentifier = new FTTimeBasedInitialResourceIdentifier();
+                interactionToNextViewMetric = new InteractionToNextViewMetric(null);
+            }
         });
     }
 

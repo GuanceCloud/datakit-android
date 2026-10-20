@@ -247,6 +247,166 @@ public class RUMViewTimingIntegrationTest {
         }
     }
 
+    @Test public void networkStrategyIsSnapshottedAndDoesNotDiscardExcludedResourceEvents() throws Exception {
+        List<FTNetworkSettledResourceContext> contexts = new ArrayList<>();
+        FTRUMConfig config = new FTRUMConfig().setInitialResourceIdentifier(context -> {
+            contexts.add(context);
+            return "selected".equals(context.getResourceId());
+        });
+        rum.initParams(config);
+        config.setInitialResourceIdentifier(context -> false);
+        for (String name : new String[]{"first", "second"}) {
+            rum.startView(name);
+            ActiveViewBean view = active();
+            long start = view.getStartTimeNanoForDuration();
+            resource("excluded", start);
+            resource("selected", start + 500_000_000);
+            finish("excluded", start + 900_000_000, 200);
+            finish("selected", start + 800_000_000, 200);
+            drain();
+            assertEquals(800_000_000L, views.get(view.getId()).get("network_settled_time"));
+            assertEquals(2, ((Number) views.get(view.getId()).get(Constants.KEY_RUM_VIEW_RESOURCE_COUNT)).intValue());
+            FTNetworkSettledResourceContext context = contexts.get(contexts.size() - 1);
+            assertEquals(start, context.getViewStartTimeNanos());
+            assertEquals(start + 500_000_000, context.getResourceStartTimeNanos());
+        }
+        assertEquals(4, contexts.size());
+    }
+
+    @Test public void invStrategyRunsOnQueuedInputsAndIsNotRepeatedForViewUpdates() throws Exception {
+        List<FTPreviousViewLastInteractionContext> contexts = new ArrayList<>();
+        FTRUMConfig config = new FTRUMConfig().setLastInteractionIdentifier(context -> {
+            contexts.add(context);
+            return true;
+        });
+        rum.initParams(config);
+        config.setLastInteractionIdentifier(null);
+        rum.startView("source");
+        rum.addAction("navigate", "click", 0, Utils.getCurrentNanoTime());
+        drain();
+        assertTrue(contexts.isEmpty());
+        rum.startView("target");
+        ActiveViewBean target = active();
+        assertTrue(contexts.isEmpty());
+        drain();
+        assertEquals(1, contexts.size());
+        FTPreviousViewLastInteractionContext context = contexts.get(0);
+        assertEquals("click", context.getActionType());
+        assertEquals(target.getStartTimeNanoForDuration(), context.getNextViewStartTimeNanos());
+        assertEquals(target.getStartTimeNanoForDuration() - context.getInteractionTimeNanos(),
+                views.get(target.getId()).get("interaction_to_next_view_time"));
+        drain(); drain();
+        rum.stopView();
+        drain();
+        assertEquals(1, contexts.size());
+    }
+
+    @Test public void invHistoryEvictionAndUnrelatedActionPreserveClosedTargetValue() throws Exception {
+        rum.startView("source");
+        rum.addAction("navigate", "click", 0, Utils.getCurrentNanoTime());
+        drain();
+        rum.startView("target");
+        ActiveViewBean target = active();
+        drain();
+        Object original = views.get(target.getId()).get("interaction_to_next_view_time");
+        assertNotNull(original);
+        for (String name : new String[]{"third", "fourth", "fifth"}) {
+            rum.startView(name);
+            drain();
+        }
+        rum.addAction("unrelated", "click", 0, Utils.getCurrentNanoTime());
+        drain();
+        assertEquals(original, views.get(target.getId()).get("interaction_to_next_view_time"));
+        assertEquals(false, views.get(target.getId()).get("is_active"));
+    }
+
+    @Test public void rejectedLateCandidateRemovesInvFromAlreadyClosedTarget() throws Exception {
+        rum.initParams(new FTRUMConfig().setLastInteractionIdentifier(
+                context -> "click".equals(context.getActionType())));
+        rum.startView("source");
+        rum.addAction("first", "click", 0, Utils.getCurrentNanoTime());
+        drain();
+        rum.addAction("later", "swipe", 0, Utils.getCurrentNanoTime());
+        rum.startView("target");
+        ActiveViewBean target = active();
+        rum.startView("third");
+        drain();
+        assertFalse(views.get(target.getId()).containsKey("interaction_to_next_view_time"));
+        assertEquals(false, views.get(target.getId()).get("is_active"));
+    }
+
+    @Test public void disabledInvProducesNoMetricEvenWithAcceptedClick() throws Exception {
+        rum.initParams(new FTRUMConfig().setLastInteractionIdentifier(null));
+        rum.startView("source");
+        rum.addAction("navigate", "click", 0, Utils.getCurrentNanoTime());
+        drain();
+        rum.startView("target");
+        drain();
+        assertFalse(views.get(active().getId()).containsKey("interaction_to_next_view_time"));
+    }
+
+    @Test public void callbackFailureAffectsMetricOnlyAndDoesNotLeavePendingResource() throws Exception {
+        rum.initParams(new FTRUMConfig().setInitialResourceIdentifier(context -> {
+            if ("failed".equals(context.getResourceId())) throw new IllegalStateException("callback");
+            return true;
+        }).setLastInteractionIdentifier(context -> { throw new IllegalStateException("callback"); }));
+        rum.startView("source");
+        ActiveViewBean source = active();
+        long start = source.getStartTimeNanoForDuration();
+        resource("failed", start);
+        resource("good", start);
+        finish("failed", start + 500, 200);
+        finish("good", start + 300, 200);
+        rum.addAction("navigate", "click", 0, Utils.getCurrentNanoTime());
+        drain();
+        assertEquals(300L, views.get(source.getId()).get("network_settled_time"));
+        assertEquals(2, ((Number) views.get(source.getId()).get(Constants.KEY_RUM_VIEW_RESOURCE_COUNT)).intValue());
+        assertEquals(1, ((Number) views.get(source.getId()).get(Constants.KEY_RUM_VIEW_ACTION_COUNT)).intValue());
+        rum.startView("target");
+        drain();
+        assertFalse(views.get(active().getId()).containsKey("interaction_to_next_view_time"));
+    }
+
+    @Test public void reinitializingDuringInvCallbackCannotRestoreOldResult() throws Exception {
+        int[] calls = {0};
+        rum.initParams(new FTRUMConfig().setLastInteractionIdentifier(context -> {
+            calls[0]++;
+            rum.initParams(new FTRUMConfig());
+            return true;
+        }));
+        rum.startView("source");
+        rum.addAction("navigate", "click", 0, Utils.getCurrentNanoTime());
+        drain();
+        rum.startView("target");
+        ActiveViewBean target = active();
+        drain();
+        assertEquals(1, calls[0]);
+        assertNull(target.interactionToNextViewTime);
+        assertFalse(views.get(target.getId()).containsKey("interaction_to_next_view_time"));
+    }
+
+    @Test public void restoredViewAttributesDoNotInvokeNewStrategiesOrRecomputeMonotonicTime() throws Exception {
+        rum.startView("source");
+        rum.addAction("navigate", "click", 0, Utils.getCurrentNanoTime());
+        drain();
+        rum.startView("target");
+        ActiveViewBean target = active();
+        drain();
+        Object original = views.get(target.getId()).get("interaction_to_next_view_time");
+        assertNotNull(original);
+        int[] calls = {0};
+        rum.initParams(new FTRUMConfig().setInitialResourceIdentifier(context -> {
+            calls[0]++;
+            return false;
+        }).setLastInteractionIdentifier(context -> {
+            calls[0]++;
+            return false;
+        }));
+        drain();
+        assertEquals(0, calls[0]);
+        assertEquals(original, views.get(target.getId()).get("interaction_to_next_view_time"));
+    }
+
     private void resource(String id, long start) {
         rum.onCreateResource(id).startTimeNanoForDuration = start;
         rum.startResource(id);

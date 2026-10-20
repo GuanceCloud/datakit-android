@@ -20,6 +20,8 @@ public class ResourceBean {
      */
     public String id = "";
     public NetworkSettledMetric networkSettledMetric;
+    /** Guarded by this bean; prevents repeated registration from re-invoking the timing rule. */
+    public boolean networkSettledRegistrationStarted;
     /** SDK-captured Visitor ID used by this request, independent of user properties. */
     public String visitorId;
     /**
