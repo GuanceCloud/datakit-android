@@ -1,3 +1,7 @@
+# replay-material 0.1.9-alpha07
+1. Aligned with Session Replay 0.1.9-alpha07 for runtime sampling visibility and percentage sampling metadata; no module-specific changes.
+
+---
 # replay-material 0.1.9-alpha05
 1. Aligned with Session Replay 0.1.9-alpha05 for percentage sampling configuration; no module-specific changes.
 

@@ -1,5 +1,5 @@
 # plugin 1.3.9-alpha02
-1. Pass the original Proxy (including NO_PROXY) to the binary-compatible Agent hook while invoking URL.openConnection exactly once. The Agent observes the original platform connection only; it does not take over redirects or inject URLConnection Visitor ID headers. Repeated transforms and excluded methods remain supported. Requires ft-sdk >= 1.7.6-alpha11.
+1. Pass the original Proxy (including NO_PROXY) to the binary-compatible Agent hook while invoking URL.openConnection exactly once. The Agent observes the original platform connection only; it does not take over redirects or inject URLConnection Visitor ID headers. Repeated transforms and excluded methods remain supported. Requires ft-sdk >= 1.7.6-alpha09.
 
 ---
 # plugin 1.3.9-alpha01
