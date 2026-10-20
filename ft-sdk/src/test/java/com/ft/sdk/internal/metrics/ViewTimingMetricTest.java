@@ -106,7 +106,7 @@ public class ViewTimingMetricTest {
             metric.actionStored("v" + i, "click", i * 1000L + 100);
         }
         assertNull(metric.resolve("v0"));
-        assertNull(metric.resolve("v1"));
+        assertEquals(Long.valueOf(900), metric.resolve("v1"));
         assertEquals(Long.valueOf(900), metric.resolve("v4"));
         metric.clear();
         assertNull(metric.resolve("v4"));
