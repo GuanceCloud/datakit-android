@@ -30,6 +30,7 @@ final class FTURLConnectionRequestState {
     long responseBytes;
     long requestBytes;
     boolean sizeKnown = true;
+    String visitorId;
     String traceId;
     String spanId;
 

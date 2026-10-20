@@ -38,7 +38,9 @@ import javax.net.ssl.SSLSocketFactory;
 final class FTHttpsURLConnection extends HttpsURLConnection {
 
     private final FTURLConnectionDelegate delegate;
-    private final HttpsURLConnection httpsURLConnection;
+    private HttpsURLConnection httpsURLConnection() {
+        return (HttpsURLConnection) delegate.connection;
+    }
 
     /**
      * Instrumented HttpsURLConnection object
@@ -49,7 +51,6 @@ final class FTHttpsURLConnection extends HttpsURLConnection {
     FTHttpsURLConnection(
           HttpsURLConnection connection, FTURLConnectionDelegate delegate) {
         super(connection.getURL());
-        httpsURLConnection = connection;
         this.delegate = delegate;
     }
 
@@ -211,7 +212,7 @@ final class FTHttpsURLConnection extends HttpsURLConnection {
 
     @Override
     public boolean getInstanceFollowRedirects() {
-        return delegate.connection.getInstanceFollowRedirects();
+        return delegate.getInstanceFollowRedirects();
     }
 
     @Override
@@ -291,7 +292,7 @@ final class FTHttpsURLConnection extends HttpsURLConnection {
 
     @Override
     public void setInstanceFollowRedirects(final boolean followRedirects) {
-        delegate.connection.setInstanceFollowRedirects(followRedirects);
+        delegate.setInstanceFollowRedirects(followRedirects);
     }
 
     @Override
@@ -327,46 +328,46 @@ final class FTHttpsURLConnection extends HttpsURLConnection {
     // Unique to HttpsURLConnection
     @Override
     public String getCipherSuite() {
-        return httpsURLConnection.getCipherSuite();
+        return httpsURLConnection().getCipherSuite();
     }
 
     @Override
     public HostnameVerifier getHostnameVerifier() {
-        return httpsURLConnection.getHostnameVerifier();
+        return httpsURLConnection().getHostnameVerifier();
     }
 
     @Override
     public Certificate[] getLocalCertificates() {
-        return httpsURLConnection.getLocalCertificates();
+        return httpsURLConnection().getLocalCertificates();
     }
 
     @Override
     public Principal getLocalPrincipal() {
-        return httpsURLConnection.getLocalPrincipal();
+        return httpsURLConnection().getLocalPrincipal();
     }
 
     @Override
     public Principal getPeerPrincipal() throws SSLPeerUnverifiedException {
-        return httpsURLConnection.getPeerPrincipal();
+        return httpsURLConnection().getPeerPrincipal();
     }
 
     @Override
     public Certificate[] getServerCertificates() throws SSLPeerUnverifiedException {
-        return httpsURLConnection.getServerCertificates();
+        return httpsURLConnection().getServerCertificates();
     }
 
     @Override
     public SSLSocketFactory getSSLSocketFactory() {
-        return httpsURLConnection.getSSLSocketFactory();
+        return httpsURLConnection().getSSLSocketFactory();
     }
 
     @Override
     public void setHostnameVerifier(HostnameVerifier verifier) {
-        httpsURLConnection.setHostnameVerifier(verifier);
+        httpsURLConnection().setHostnameVerifier(verifier);
     }
 
     @Override
     public void setSSLSocketFactory(SSLSocketFactory factory) {
-        httpsURLConnection.setSSLSocketFactory(factory);
+        httpsURLConnection().setSSLSocketFactory(factory);
     }
 }

@@ -5,14 +5,14 @@ buildscript {
         mavenPublishUrl = 'https://mvnrepo.guance.com/repository'
         getDefaultProperties = this.&getDefaultProperties
         sdkVersions = [
-                ftSdk                     : "1.7.6-alpha08",
+                ftSdk                     : "1.7.6-alpha11",
                 ftDiagnostics             : "0.1.0-alpha01",
                 ftSdkMiniReplaySupport    : "0.1.3",
                 ftSessionReplay           : "0.1.9-alpha06",
                 replayMiniAgentSupport    : "1.7.0",
-                ftPlugin                  : "1.3.9-alpha01",
+                ftPlugin                  : "1.3.9-alpha02",
                 ftPluginBuildscript       : "1.3.9-alpha01",
-                pluginMinAgentSupport     : "1.7.6-alpha03",
+                pluginMinAgentSupport     : "1.7.6-alpha11",
                 ftNative                  : "1.1.3"
         ]
     }

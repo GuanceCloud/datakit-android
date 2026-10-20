@@ -96,4 +96,40 @@ public class FTURLConnectionInstrumentationTest {
         assertEquals(0, count(transform(first, true, false), FTURLConnectionMethodAdapter.HOOK, "wrap"));
     }
 
+    @Test public void transformedCallsPreserveProxyAndOriginalConnectionAtRuntime() throws Exception {
+        for (boolean explicit : new boolean[]{false, true}) {
+            for (java.net.Proxy proxy : new java.net.Proxy[]{java.net.Proxy.NO_PROXY,
+                    new java.net.Proxy(java.net.Proxy.Type.HTTP, new java.net.InetSocketAddress("localhost", 1234))}) {
+                final int[] opens = {0};
+                java.net.URL url = new java.net.URL(null, "http://example.test/", new java.net.URLStreamHandler() {
+                    @Override protected java.net.URLConnection openConnection(java.net.URL u) {
+                        assertFalse(explicit);
+                        opens[0]++;
+                        return new java.net.URLConnection(u) { public void connect() { } };
+                    }
+                    @Override protected java.net.URLConnection openConnection(java.net.URL u, java.net.Proxy selected) {
+                        assertTrue(explicit);
+                        assertEquals(proxy, selected);
+                        opens[0]++;
+                        return new java.net.URLConnection(u) { public void connect() { } };
+                    }
+                });
+                byte[] code = transform(fixture("java/net/URL", "openConnection", explicit
+                        ? "(Ljava/net/Proxy;)Ljava/net/URLConnection;" : "()Ljava/net/URLConnection;"), true, false);
+                byte[] twice = transform(code, true, false);
+                class Loader extends ClassLoader {
+                    Class<?> define(byte[] bytes) { return defineClass("sample.Calls", bytes, 0, bytes.length); }
+                }
+                Class<?> caller = new Loader().define(twice);
+                com.ft.sdk.FTURLConnectionInstrumentation.calls = 0;
+                java.net.URLConnection result = (java.net.URLConnection) caller.getMethod("call", java.net.URL.class,
+                        java.net.Proxy.class).invoke(null, url, proxy);
+                assertEquals(url, result.getURL());
+                assertEquals(1, opens[0]);
+                assertEquals(1, com.ft.sdk.FTURLConnectionInstrumentation.calls);
+                assertSame(explicit ? proxy : null, com.ft.sdk.FTURLConnectionInstrumentation.proxy);
+            }
+        }
+    }
+
 }

@@ -18,6 +18,9 @@ final class LoopbackServer implements Closeable {
     final BlockingQueue<Map<String, String>> requestHeaders = new LinkedBlockingQueue<>();
     final ExecutorService workers = Executors.newCachedThreadPool();
     final List<Socket> sockets = Collections.synchronizedList(new ArrayList<>());
+    final Map<String, String> redirects = new ConcurrentHashMap<>();
+    final Map<String, Integer> redirectCodes = new ConcurrentHashMap<>();
+    final Map<String, String> extraHeaders = new ConcurrentHashMap<>();
     volatile boolean closed;
 
     LoopbackServer(Context context, boolean secure, boolean mutual) throws Exception {
@@ -67,12 +70,19 @@ final class LoopbackServer implements Closeable {
             } else copy(in,body,Integer.parseInt(headers.containsKey("Content-Length")?headers.get("Content-Length"):"0"));
             String[] parts=start.split(" "); String path=parts[1];
             if(path.startsWith("http"))path=new URL(path).getFile();
-            requestHeaders.add(new TreeMap<>(headers));
+            Map<String,String> recordedHeaders=new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            recordedHeaders.putAll(headers);
+            requestHeaders.add(recordedHeaders);
             requests.add(parts[0]+" "+path+"\n"+headers.toString()+"\n"+Arrays.toString(body.toByteArray()));
             int status=path.equals("/slow-error")?500:path.startsWith("/status/")?Integer.parseInt(path.substring(8)):200;
             byte[] response="response-body".getBytes(StandardCharsets.UTF_8);
             String extra="";
             if(path.equals("/redirect")){status=302;extra="Location: /data\r\n";}
+            if(redirects.containsKey(path)) {
+                status=redirectCodes.containsKey(path)?redirectCodes.get(path):302;
+                extra="Location: "+redirects.get(path)+"\r\n";
+            }
+            if(extraHeaders.containsKey(path))extra+=extraHeaders.get(path);
             if(path.equals("/gzip")){
                 ByteArrayOutputStream compressed=new ByteArrayOutputStream();
                 try(GZIPOutputStream gzip=new GZIPOutputStream(compressed)){gzip.write(response);}
@@ -81,7 +91,7 @@ final class LoopbackServer implements Closeable {
             if(path.equals("/cache"))extra="Cache-Control: max-age=3600\r\n";
             if(path.equals("/cookie"))extra="Set-Cookie: fixture=value; Path=/\r\n";
             if(path.equals("/echo-cookie"))response=String.valueOf(headers.get("Cookie")).getBytes(StandardCharsets.UTF_8);
-            if(path.equals("/auth")&&!headers.containsKey("Authorization")){status=401;extra="WWW-Authenticate: Basic realm=fixture\r\n";}
+            if(path.equals("/auth")&&!headers.containsKey("Authorization")){status=401;extra="WWW-Authenticate: Basic realm=\"fixture\"\r\n";}
             if(path.equals("/stall") || path.equals("/slow-error"))Thread.sleep(400);
             boolean noBody=parts[0].equals("HEAD")||status==204||status==304;
             int length=status==204||status==304?0:path.equals("/large")?2*1024*1024:response.length;

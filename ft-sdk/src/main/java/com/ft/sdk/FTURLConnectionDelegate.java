@@ -14,18 +14,30 @@ import java.util.Map;
 
 /** Observes calls made by the application without performing I/O to complete missing metrics. */
 final class FTURLConnectionDelegate {
-    final HttpURLConnection connection;
+    HttpURLConnection connection;
+    private final FTURLConnectionRedirects redirects;
+    private boolean visitorPrepared;
     final FTURLConnectionRequestState state;
     private final IdentityHashMap<InputStream, FTURLConnectionInputStream> inputs = new IdentityHashMap<>();
     private OutputStream originalOutput;
     private FTURLConnectionOutputStream output;
 
     FTURLConnectionDelegate(HttpURLConnection connection, FTURLConnectionRequestState state) {
+        this(connection, state, null);
+    }
+
+    FTURLConnectionDelegate(HttpURLConnection connection, FTURLConnectionRequestState state,
+                            FTURLConnectionRedirects redirects) {
         this.connection = connection;
         this.state = state;
+        this.redirects = redirects;
     }
 
     private StartSnapshot prepareStart() {
+        if (!visitorPrepared) {
+            visitorPrepared = true;
+            if (redirects != null) state.visitorId = redirects.prepare();
+        }
         try {
             synchronized (FTURLConnectionResourceReporter.LOCK) {
                 if (state.started || state.terminal) return null;
@@ -40,6 +52,7 @@ final class FTURLConnectionDelegate {
 
     private void begin() {
         begin(prepareStart());
+        captureRedirectHeaders();
         state.progress(0, 0);
     }
 
@@ -52,6 +65,34 @@ final class FTURLConnectionDelegate {
             try { state.params.requestHeaderMap = snapshot(connection.getRequestProperties()); }
             catch (Exception ignored) { }
         }
+    }
+
+    private boolean headersCaptured;
+
+    private void captureRedirectHeaders() {
+        if (headersCaptured || redirects == null) return;
+        headersCaptured = true;
+        try { redirects.captureHeaders(); } catch (RuntimeException ignored) { }
+    }
+
+    private void resolveRedirects() throws IOException {
+        if (redirects == null) return;
+        try { redirects.resolve(); } finally { connection = redirects.connection; }
+    }
+
+    private boolean responseReady() {
+        begin();
+        try { resolveRedirects(); return true; }
+        catch (IOException error) { failure(error); return false; }
+    }
+
+    boolean getInstanceFollowRedirects() {
+        return redirects == null ? connection.getInstanceFollowRedirects() : redirects.getFollowRedirects();
+    }
+
+    void setInstanceFollowRedirects(boolean value) {
+        if (redirects == null) connection.setInstanceFollowRedirects(value);
+        else redirects.setFollowRedirects(value);
     }
 
     /** Runs once per accepted request, before the original connection can send its headers. */
@@ -129,6 +170,7 @@ final class FTURLConnectionDelegate {
         if (!connection.getDoInput()) return connection.getInputStream();
         begin();
         try {
+            resolveRedirects();
             InputStream stream = connection.getInputStream();
             responseAvailable();
             return input(stream);
@@ -149,6 +191,8 @@ final class FTURLConnectionDelegate {
             state.progress(0, 0);
             version = state.activityVersion;
         }
+        captureRedirectHeaders();
+        try { resolveRedirects(); } catch (IOException error) { failure(error); return null; }
         InputStream stream = connection.getErrorStream();
         if (stream != null) responseAvailable();
         else if (start != null) state.cancelUnobservedProbe(version);
@@ -158,6 +202,7 @@ final class FTURLConnectionDelegate {
     int getResponseCode() throws IOException {
         begin();
         try {
+            resolveRedirects();
             int code = connection.getResponseCode();
             method();
             if (code > 0) {
@@ -170,6 +215,7 @@ final class FTURLConnectionDelegate {
     String getResponseMessage() throws IOException {
         begin();
         try {
+            resolveRedirects();
             String message = connection.getResponseMessage();
             if (message != null) responseAvailable();
             return message;
@@ -178,14 +224,14 @@ final class FTURLConnectionDelegate {
 
     Object getContent() throws IOException {
         begin();
-        try { return content(connection.getContent()); }
+        try { resolveRedirects(); return content(connection.getContent()); }
         catch (IOException e) { inputFailure(e); throw e; }
     }
 
     @SuppressWarnings("rawtypes")
     Object getContent(Class[] classes) throws IOException {
         begin();
-        try { return content(connection.getContent(classes)); }
+        try { resolveRedirects(); return content(connection.getContent(classes)); }
         catch (IOException e) { inputFailure(e); throw e; }
     }
 
@@ -304,77 +350,77 @@ final class FTURLConnectionDelegate {
     }
 
     long getLastModified() {
-        begin();
+        if (!responseReady()) return 0;
         long value = connection.getLastModified();
         if (value != 0) headerAvailable(value);
         return value;
     }
 
     long getExpiration() {
-        begin();
+        if (!responseReady()) return 0;
         long value = connection.getExpiration();
         if (value != 0) headerAvailable(value);
         return value;
     }
 
     String getHeaderField(int n) {
-        begin();
+        if (!responseReady()) return null;
         String value = connection.getHeaderField(n);
         if (value != null) headerAvailable(value);
         return value;
     }
 
     String getHeaderField(String name) {
-        begin();
+        if (!responseReady()) return null;
         String value = connection.getHeaderField(name);
         if (value != null) headerAvailable(value);
         return value;
     }
 
     long getHeaderFieldDate(String name, long defaultDate) {
-        begin();
+        if (!responseReady()) return defaultDate;
         long value = connection.getHeaderFieldDate(name, defaultDate);
         if (value != defaultDate) headerAvailable(value);
         return value;
     }
 
     int getHeaderFieldInt(String name, int defaultInt) {
-        begin();
+        if (!responseReady()) return defaultInt;
         int value = connection.getHeaderFieldInt(name, defaultInt);
         if (value != defaultInt) headerAvailable(value);
         return value;
     }
 
     long getHeaderFieldLong(String name, long defaultLong) {
-        begin();
+        if (!responseReady()) return defaultLong;
         long value = headerLong(name, defaultLong);
         if (value != defaultLong) headerAvailable(value);
         return value;
     }
 
     String getHeaderFieldKey(int n) {
-        begin();
+        if (!responseReady()) return null;
         String value = connection.getHeaderFieldKey(n);
         if (value != null) headerAvailable(value);
         return value;
     }
 
     String getContentEncoding() {
-        begin();
+        if (!responseReady()) return null;
         String value = connection.getContentEncoding();
         if (value != null) headerAvailable(value);
         return value;
     }
 
     int getContentLength() {
-        begin();
+        if (!responseReady()) return -1;
         int value = connection.getContentLength();
         if (value != -1) headerAvailable(value);
         return value;
     }
 
     long getContentLengthLong() {
-        begin();
+        if (!responseReady()) return -1;
         long value = android.os.Build.VERSION.SDK_INT >= 24
                 ? connection.getContentLengthLong() : headerLong("Content-Length", -1);
         if (value != -1) headerAvailable(value);
@@ -382,14 +428,14 @@ final class FTURLConnectionDelegate {
     }
 
     String getContentType() {
-        begin();
+        if (!responseReady()) return null;
         String value = connection.getContentType();
         if (value != null) headerAvailable(value);
         return value;
     }
 
     long getDate() {
-        begin();
+        if (!responseReady()) return 0;
         long value = connection.getDate();
         if (value != 0) headerAvailable(value);
         return value;
@@ -404,7 +450,7 @@ final class FTURLConnectionDelegate {
     }
 
     Map<String, List<String>> getHeaderFields() {
-        begin();
+        if (!responseReady()) return java.util.Collections.emptyMap();
         Map<String, List<String>> headers = connection.getHeaderFields();
         headersAvailable(headers);
         return headers;

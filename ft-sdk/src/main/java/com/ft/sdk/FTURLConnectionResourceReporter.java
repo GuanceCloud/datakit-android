@@ -41,6 +41,7 @@ final class FTURLConnectionResourceReporter {
                 ACTIVE.put(state.id, state);
                 PENDING_STARTS.add(state.id);
                 FTRUMInnerManager.get().startURLConnectionResource(state.id, state.startedAt, state.startedWallTime);
+                if (state.visitorId != null) FTRUMInnerManager.get().setResourceVisitorId(state.id, state.visitorId);
                 return true;
             } catch (Throwable ignored) {
                 PENDING_STARTS.remove(state.id);

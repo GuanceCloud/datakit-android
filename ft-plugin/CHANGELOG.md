@@ -1,3 +1,7 @@
+# plugin 1.3.9-alpha02
+1. Preserve the explicit Proxy (including NO_PROXY) from URL.openConnection(Proxy) in the Agent hook so Visitor ID redirects use the same proxy policy. Both overloads still invoke the original URL method exactly once; repeated transforms and excluded methods remain supported. Requires ft-sdk >= 1.7.6-alpha11.
+
+---
 # plugin 1.3.9-alpha01
 1. Added automatic return-value wrapping for exactly `URL.openConnection()` and `URL.openConnection(Proxy)`, retaining each original call and argument evaluation. Requires `ft-sdk >= 1.7.6-alpha03`; older Agents are rejected at build time.
 2. Added `FTExt.instrumentHttpURLConnection` (default true) as a Gradle instrumentation cache input. Existing package/class/method exclusions apply; repeated transforms do not add duplicate URLConnection hooks.

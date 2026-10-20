@@ -612,4 +612,164 @@ public class URLConnectionDeviceTest {
         }
     }
 
+    private void enableVisitor(String prefix) throws Exception {
+        FTVisitorIdConfig visitor = new FTVisitorIdConfig().setHeader("x-visitor-id");
+        if (prefix == null) visitor.addMatch(java.util.regex.Pattern.compile("^https?://localhost:[0-9]+/api/"));
+        else visitor.addMatch(prefix);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            FTSdk.initRUMWithConfig(config.setVisitorIdConfig(visitor));
+            FTRUMGlobalManager.get().startView("visitor-urlconnection");
+        });
+        drain();
+    }
+
+    @Test public void visitorHttpHttpsRedirectsAndRumUseRequestSnapshotAcrossReset() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        int count = 0;
+        enableVisitor(null);
+        for (boolean secure : new boolean[]{false, true}) {
+            try (LoopbackServer server = new LoopbackServer(tests, secure, false)) {
+                server.redirects.put("/api/start", "/outside");
+                server.redirects.put("/outside", "/api/final");
+                HttpURLConnection c = connection(server, "/api/start", true);
+                String id = FTVisitorIdManager.get().getId();
+                FTURLConnectionRequestState state = requestState(c);
+                c.connect();
+                FTSdk.resetVisitorId();
+                assertNotEquals(id, FTVisitorIdManager.get().getId());
+                assertEquals(200, c.getResponseCode());
+                if (secure) assertNotNull(((HttpsURLConnection)c).getServerCertificates());
+                consume(c);
+                assertEquals(id, server.requestHeaders.poll(3, TimeUnit.SECONDS).get("x-visitor-id"));
+                assertNull(server.requestHeaders.poll(3, TimeUnit.SECONDS).get("x-visitor-id"));
+                assertEquals(id, server.requestHeaders.poll(3, TimeUnit.SECONDS).get("x-visitor-id"));
+                assertTrue(c.getInstanceFollowRedirects());
+                assertEquals(server.url("/api/final"), c.getURL());
+                assertCounts(++count);
+                boolean stored = false;
+                for (String record : resources()) if (hasTag(record, "resource_id", state.id)) {
+                    assertTrue(hasTag(record, "visitor_id", id)); stored = true;
+                }
+                assertTrue(stored);
+            }
+        }
+    }
+
+    @Test public void visitorRedirectsRetainHttpsProxyTlsCookiesAndAuthentication() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        CookieHandler previous = CookieHandler.getDefault();
+        CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+        Authenticator.setDefault(new Authenticator() {
+            @Override protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("fixture", "test".toCharArray());
+            }
+        });
+        try (LoopbackServer server = new LoopbackServer(tests, true, true);
+             LoopbackProxy proxy = new LoopbackProxy(server.listener.getLocalPort(), true)) {
+            enableVisitor(server.url("/").toString());
+            server.redirects.put("/api/start", "/auth");
+            server.extraHeaders.put("/api/start", "Set-Cookie: visitor-fixture=kept; Path=/\r\n");
+            HttpURLConnection c = (HttpURLConnection) Calls.open(server.url("/api/start"), proxy.proxy());
+            server.configure(c);
+            assertEquals("Redirect and server authentication must complete", 200, c.getResponseCode());
+            consume(c);
+            Map<String, String> first = server.requestHeaders.poll(3, TimeUnit.SECONDS);
+            Map<String, String> challenge = server.requestHeaders.poll(3, TimeUnit.SECONDS);
+            // Platform authentication caches can answer preemptively, without another 401.
+            Map<String, String> authenticated = challenge;
+            if (authenticated == null || !authenticated.containsKey("Authorization")) {
+                authenticated = server.requestHeaders.poll(3, TimeUnit.SECONDS);
+            }
+            assertNotNull(authenticated);
+            String id = FTVisitorIdManager.get().getId();
+            assertEquals(id, first.get("x-visitor-id"));
+            assertEquals(id, challenge.get("x-visitor-id"));
+            assertEquals(id, authenticated.get("x-visitor-id"));
+            assertTrue(authenticated.get("Authorization").startsWith("Basic "));
+            assertTrue(authenticated.get("Cookie").contains("visitor-fixture=kept"));
+            assertNotNull(proxy.connects.poll(3, TimeUnit.SECONDS));
+            assertNotNull(proxy.connects.poll(3, TimeUnit.SECONDS));
+            int authenticatedTunnels = 0;
+            for (Map<String, String> headers : proxy.requestHeaders) {
+                if (headers.containsKey("Proxy-Authorization")) {
+                    assertTrue(headers.get("Proxy-Authorization").startsWith("Basic "));
+                    authenticatedTunnels++;
+                }
+            }
+            assertTrue("Every redirected connection must retain proxy authentication", authenticatedTunnels >= 2);
+            assertCounts(1);
+        } finally { CookieHandler.setDefault(previous); Authenticator.setDefault(null); }
+    }
+
+    @Test public void visitorUploadRedirectsMatchPlatformForBufferedFixedAndChunkedBodies() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        int count = 0;
+        try (LoopbackServer server = new LoopbackServer(tests, false, false)) {
+            enableVisitor(server.url("/api/").toString());
+            for (int status : new int[]{301,302,303,307,308}) for (int mode=0;mode<3;mode++) {
+                server.redirects.put("/api/upload", "/api/final");
+                server.redirectCodes.put("/api/upload", status);
+                for (boolean wrapped : new boolean[]{false,true}) {
+                    HttpURLConnection c=connection(server,"/api/upload",wrapped);
+                    c.setDoOutput(true);
+                    if(mode==1)c.setFixedLengthStreamingMode(4);
+                    if(mode==2)c.setChunkedStreamingMode(2);
+                    try(OutputStream output=c.getOutputStream()){output.write(new byte[]{1,2,3,4});}
+                    assertEquals(status<307?200:status,c.getResponseCode());
+                    consume(c);
+                    assertTrue(server.requests.poll(3,TimeUnit.SECONDS).startsWith("POST /api/upload"));
+                    Map<String,String> first=server.requestHeaders.poll(3,TimeUnit.SECONDS);
+                    assertEquals(wrapped,first.containsKey("x-visitor-id"));
+                    if(status<307) {
+                        assertTrue(server.requests.poll(3,TimeUnit.SECONDS).startsWith("GET /api/final"));
+                        assertEquals(wrapped,server.requestHeaders.poll(3,TimeUnit.SECONDS).containsKey("x-visitor-id"));
+                    }
+                }
+                count++;
+            }
+        }
+        assertCounts(count);
+    }
+
+    @Test public void visitorWorksWithResourceDisabledAndZeroSampling() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        try (LoopbackServer server=new LoopbackServer(tests,false,false)) {
+            config.setEnableTraceUserResource(false).setEnableHttpURLConnectionResource(false).setSamplingRate(0);
+            enableVisitor(server.url("/api/").toString());
+            server.redirects.put("/outside","/api/final");
+            HttpURLConnection c=connection(server,"/outside",true);
+            assertTrue(c instanceof FTHttpURLConnection);
+            consume(c);
+            assertNull(server.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
+            assertEquals(FTVisitorIdManager.get().getId(),server.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
+            assertEquals(0,resources().size());
+            assertEquals(0,FTURLConnectionResourceReporter.activeCount());
+            // Older Plugin/manual hooks cannot infer an explicit proxy, and do not inject.
+            HttpURLConnection legacy=(HttpURLConnection)FTURLConnectionInstrumentation.wrap(RawCalls.open(server.url("/api/legacy")));
+            consume(legacy);
+            assertNull(server.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
+        }
+    }
+
+    @Test public void visitorCrossOriginAndTlsRejectionRemainEnforced() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        try(LoopbackServer first=new LoopbackServer(tests,true,false);
+            LoopbackServer other=new LoopbackServer(tests,true,false)) {
+            enableVisitor(first.url("/api/").toString());
+            first.redirects.put("/api/start",other.url("/api/final").toString());
+            HttpURLConnection c=connection(first,"/api/start",true);
+            c.setRequestProperty("Authorization","Bearer fixture-only");
+            consume(c);
+            assertNotNull(first.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
+            Map<String,String> last=other.requestHeaders.poll(3,TimeUnit.SECONDS);
+            assertNull(last.get("x-visitor-id")); assertNull(last.get("Authorization"));
+            first.redirects.put("/api/start","https://127.0.0.1:"+other.listener.getLocalPort()+"/api/final");
+            c=connection(first,"/api/start",true);
+            try {consume(c);fail("Redirected TLS hostname must still be verified");}
+            catch(SSLException expected){}finally{c.disconnect();}
+            assertNull(other.requestHeaders.poll());
+            assertCounts(2);
+        }
+    }
+
 }

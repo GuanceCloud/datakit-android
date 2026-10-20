@@ -1,3 +1,8 @@
+# agent 1.7.6-alpha11
+1. Added Visitor ID header injection for HTTP/HTTPS URLConnection, independent of Resource collection and RUM/Trace sampling. Use `ft-plugin >= 1.3.9-alpha02` or `FTURLConnectionInstrumentation.openConnection(URL[, Proxy])`; legacy Plugin wrapping retains Resource behavior without enabling Visitor ID. IDs are captured before I/O and retained by Resource/network Error events across reset.
+2. Added per-hop URL matching for platform-owned connections, preserving explicit/default proxies, TLS configuration, authentication and cookies. Android redirect semantics are retained: same-scheme redirects only, 300/301/302/303 body methods become GET, 307/308 follow only GET/HEAD, and at most 20 redirects. Redirects to excluded destinations omit the SDK Visitor ID, cross-origin redirects remove Authorization, and disabled auto-follow returns the original response. Upload bodies are not buffered or replayed by the SDK.
+
+---
 # Unreleased
 1. Added interval-based `app_state` fields to View, Resource and LongTask events, using bounded process-local foreground/background history and original event timing. Automatic Views close at the background boundary and ignore stops from replaced owners; explicit View load origins are supported by `onCreateView(viewName, loadTime, loadStartTime)`.
 2. Added `session_start_reason` to native RUM events, preserving the owning Session reason through delayed Resource completion, View/Action persistence and historical ANR recovery. Existing cached data without this metadata reports `unknown`.
