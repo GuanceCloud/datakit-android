@@ -204,7 +204,7 @@ final class FTHttpURLConnection extends HttpURLConnection {
 
     @Override
     public boolean getInstanceFollowRedirects() {
-        return delegate.getInstanceFollowRedirects();
+        return delegate.connection.getInstanceFollowRedirects();
     }
 
     @Override
@@ -284,7 +284,7 @@ final class FTHttpURLConnection extends HttpURLConnection {
 
     @Override
     public void setInstanceFollowRedirects(final boolean followRedirects) {
-        delegate.setInstanceFollowRedirects(followRedirects);
+        delegate.connection.setInstanceFollowRedirects(followRedirects);
     }
 
     @Override

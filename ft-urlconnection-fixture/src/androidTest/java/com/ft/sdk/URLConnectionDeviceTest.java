@@ -623,7 +623,7 @@ public class URLConnectionDeviceTest {
         drain();
     }
 
-    @Test public void visitorHttpHttpsRedirectsAndRumUseRequestSnapshotAcrossReset() throws Exception {
+    @Test public void visitorConfigLeavesNativeRedirectsAndResourceCollectionIntact() throws Exception {
         Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
         int count = 0;
         enableVisitor(null);
@@ -640,15 +640,19 @@ public class URLConnectionDeviceTest {
                 assertEquals(200, c.getResponseCode());
                 if (secure) assertNotNull(((HttpsURLConnection)c).getServerCertificates());
                 consume(c);
-                assertEquals(id, server.requestHeaders.poll(3, TimeUnit.SECONDS).get("x-visitor-id"));
                 assertNull(server.requestHeaders.poll(3, TimeUnit.SECONDS).get("x-visitor-id"));
-                assertEquals(id, server.requestHeaders.poll(3, TimeUnit.SECONDS).get("x-visitor-id"));
+                assertNull(server.requestHeaders.poll(3, TimeUnit.SECONDS).get("x-visitor-id"));
+                assertNull(server.requestHeaders.poll(3, TimeUnit.SECONDS).get("x-visitor-id"));
                 assertTrue(c.getInstanceFollowRedirects());
                 assertEquals(server.url("/api/final"), c.getURL());
                 assertCounts(++count);
                 boolean stored = false;
                 for (String record : resources()) if (hasTag(record, "resource_id", state.id)) {
-                    assertTrue(hasTag(record, "visitor_id", id)); stored = true;
+                    // Preserve the pre-existing native RUM event-time ID, without claiming
+                    // that an ID was injected into or frozen for this network request.
+                    assertFalse(hasTag(record, "visitor_id", id));
+                    assertTrue(hasTag(record, "visitor_id", FTVisitorIdManager.get().getId()));
+                    stored = true;
                 }
                 assertTrue(stored);
             }
@@ -681,10 +685,9 @@ public class URLConnectionDeviceTest {
                 authenticated = server.requestHeaders.poll(3, TimeUnit.SECONDS);
             }
             assertNotNull(authenticated);
-            String id = FTVisitorIdManager.get().getId();
-            assertEquals(id, first.get("x-visitor-id"));
-            assertEquals(id, challenge.get("x-visitor-id"));
-            assertEquals(id, authenticated.get("x-visitor-id"));
+            assertNull(first.get("x-visitor-id"));
+            assertNull(challenge.get("x-visitor-id"));
+            assertNull(authenticated.get("x-visitor-id"));
             assertTrue(authenticated.get("Authorization").startsWith("Basic "));
             assertTrue(authenticated.get("Cookie").contains("visitor-fixture=kept"));
             assertNotNull(proxy.connects.poll(3, TimeUnit.SECONDS));
@@ -719,10 +722,10 @@ public class URLConnectionDeviceTest {
                     consume(c);
                     assertTrue(server.requests.poll(3,TimeUnit.SECONDS).startsWith("POST /api/upload"));
                     Map<String,String> first=server.requestHeaders.poll(3,TimeUnit.SECONDS);
-                    assertEquals(wrapped,first.containsKey("x-visitor-id"));
+                    assertFalse(first.containsKey("x-visitor-id"));
                     if(status<307) {
                         assertTrue(server.requests.poll(3,TimeUnit.SECONDS).startsWith("GET /api/final"));
-                        assertEquals(wrapped,server.requestHeaders.poll(3,TimeUnit.SECONDS).containsKey("x-visitor-id"));
+                        assertFalse(server.requestHeaders.poll(3,TimeUnit.SECONDS).containsKey("x-visitor-id"));
                     }
                 }
                 count++;
@@ -731,20 +734,20 @@ public class URLConnectionDeviceTest {
         assertCounts(count);
     }
 
-    @Test public void visitorWorksWithResourceDisabledAndZeroSampling() throws Exception {
+    @Test public void visitorOnlyDoesNotWrapConnectionsOrInjectHeaders() throws Exception {
         Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
         try (LoopbackServer server=new LoopbackServer(tests,false,false)) {
             config.setEnableTraceUserResource(false).setEnableHttpURLConnectionResource(false).setSamplingRate(0);
             enableVisitor(server.url("/api/").toString());
             server.redirects.put("/outside","/api/final");
             HttpURLConnection c=connection(server,"/outside",true);
-            assertTrue(c instanceof FTHttpURLConnection);
+            assertFalse(c instanceof FTHttpURLConnection);
             consume(c);
             assertNull(server.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
-            assertEquals(FTVisitorIdManager.get().getId(),server.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
+            assertNull(server.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
             assertEquals(0,resources().size());
             assertEquals(0,FTURLConnectionResourceReporter.activeCount());
-            // Older Plugin/manual hooks cannot infer an explicit proxy, and do not inject.
+            // Both old and new hooks leave Visitor-only connections untouched.
             HttpURLConnection legacy=(HttpURLConnection)FTURLConnectionInstrumentation.wrap(RawCalls.open(server.url("/api/legacy")));
             consume(legacy);
             assertNull(server.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
@@ -760,7 +763,7 @@ public class URLConnectionDeviceTest {
             HttpURLConnection c=connection(first,"/api/start",true);
             c.setRequestProperty("Authorization","Bearer fixture-only");
             consume(c);
-            assertNotNull(first.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
+            assertNull(first.requestHeaders.poll(3,TimeUnit.SECONDS).get("x-visitor-id"));
             Map<String,String> last=other.requestHeaders.poll(3,TimeUnit.SECONDS);
             assertNull(last.get("x-visitor-id")); assertNull(last.get("Authorization"));
             first.redirects.put("/api/start","https://127.0.0.1:"+other.listener.getLocalPort()+"/api/final");
@@ -770,6 +773,69 @@ public class URLConnectionDeviceTest {
             assertNull(other.requestHeaders.poll());
             assertCounts(2);
         }
+    }
+
+    @Test public void visitorConfigPreservesKeepAliveAcrossNativeRedirects() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        enableVisitor(null);
+        for (boolean secure : new boolean[]{false, true}) {
+            for (boolean wrapped : new boolean[]{false, true}) {
+                try (LoopbackServer server = new LoopbackServer(tests, secure, false)) {
+                    server.keepAlive = true;
+                    server.redirects.put("/api/start", "/outside");
+                    server.redirects.put("/outside", "/api/final");
+                    HttpURLConnection c = connection(server, "/api/start", wrapped);
+                    assertArrayEquals("response-body".getBytes("UTF-8"), consume(c));
+                    Integer first = server.requestConnectionIds.poll(3, TimeUnit.SECONDS);
+                    assertNotNull(first);
+                    assertEquals("First redirect must reuse the socket", first,
+                            server.requestConnectionIds.poll(3, TimeUnit.SECONDS));
+                    assertEquals("Second redirect must reuse the socket", first,
+                            server.requestConnectionIds.poll(3, TimeUnit.SECONDS));
+                    assertEquals("No additional TCP/TLS connection", 1, server.acceptedConnections.get());
+                    for (int hop = 0; hop < 3; hop++) {
+                        assertNull(server.requestHeaders.poll(3, TimeUnit.SECONDS).get("x-visitor-id"));
+                    }
+                }
+            }
+        }
+        assertCounts(2);
+    }
+
+    @Test public void visitorConfigPreservesCancellationDuringRedirectedResponse() throws Exception {
+        Assume.assumeTrue(com.ft.fixture.BuildConfig.HOOK_ENABLED);
+        enableVisitor(null);
+        for (boolean secure : new boolean[]{false, true}) {
+            for (boolean wrapped : new boolean[]{false, true}) {
+                try (LoopbackServer server = new LoopbackServer(tests, secure, false)) {
+                    server.keepAlive = true;
+                    server.redirects.put("/api/start", "/api/blocked");
+                    server.blockedPath = "/api/blocked";
+                    HttpURLConnection c = connection(server, "/api/start", wrapped);
+                    c.setReadTimeout(15000);
+                    ExecutorService executor = Executors.newSingleThreadExecutor();
+                    try {
+                        Future<IOException> response = executor.submit(() -> {
+                            try { consume(c); return null; }
+                            catch (IOException error) { return error; }
+                        });
+                        assertTrue("Second hop must be in flight",
+                                server.blockedRequest.await(3, TimeUnit.SECONDS));
+                        c.disconnect();
+                        IOException error = response.get(3, TimeUnit.SECONDS);
+                        assertNotNull("Cancellation must interrupt the active response", error);
+                        assertFalse("Must cancel before the read timeout", error instanceof SocketTimeoutException);
+                        assertEquals(1, server.acceptedConnections.get());
+                    } finally {
+                        c.disconnect();
+                        server.releaseBlockedResponse.countDown();
+                        executor.shutdownNow();
+                        assertTrue(executor.awaitTermination(3, TimeUnit.SECONDS));
+                    }
+                }
+            }
+        }
+        assertCounts(2);
     }
 
 }

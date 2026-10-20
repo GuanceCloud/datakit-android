@@ -4,8 +4,8 @@ import com.ft.sdk.garble.FTHttpConfigManager;
 
 import java.lang.ref.WeakReference;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.Proxy;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Binary entry point used by ft-plugin for URL.openConnection() and openConnection(Proxy).
- * I/O uses platform connections; Visitor ID redirects preserve the captured proxy policy.
+ * Real I/O always belongs to the original connection. Trace propagation follows FTTraceConfig.
  */
 public final class FTURLConnectionInstrumentation {
     // Both sides are weak: a live original connection must not retain its wrapper through this table.
@@ -22,27 +22,25 @@ public final class FTURLConnectionInstrumentation {
 
     private FTURLConnectionInstrumentation() { }
 
-    /** Opens a connection with the system proxy policy and installs SDK instrumentation. */
+    /** Opens the platform connection and observes Resource/Trace when configured.
+     * URLConnection Visitor ID headers are deliberately unsupported: the public API
+     * cannot filter every redirect without taking over the application's transport.
+     */
     public static URLConnection openConnection(URL url) throws IOException {
-        return wrap(url.openConnection(), null);
+        return wrap(url.openConnection());
     }
 
-    /** Opens a connection with an explicit proxy, preserved on all redirected requests. */
+    /** The platform retains the original explicit proxy, redirects and cancellation. */
     public static URLConnection openConnection(URL url, Proxy proxy) throws IOException {
-        return wrap(url.openConnection(proxy), proxy);
+        return wrap(url.openConnection(proxy));
     }
 
-    /** Legacy Plugin hook: the original proxy policy is unknown, so only Resource is observed. */
-    public static URLConnection wrap(URLConnection connection) {
-        return wrap(connection, null, false);
-    }
-
-    /** Plugin hook. null means URL.openConnection(); NO_PROXY means explicit direct access. */
+    /** Binary-compatible Plugin hook; the SDK never reopens a redirected connection. */
     public static URLConnection wrap(URLConnection connection, Proxy proxy) {
-        return wrap(connection, proxy, true);
+        return wrap(connection);
     }
 
-    private static URLConnection wrap(URLConnection connection, Proxy proxy, boolean knownProxy) {
+    public static URLConnection wrap(URLConnection connection) {
         if (!(connection instanceof HttpURLConnection)
                 || connection instanceof FTHttpURLConnection
                 || connection instanceof FTHttpsURLConnection) {
@@ -50,8 +48,7 @@ public final class FTURLConnectionInstrumentation {
         }
         try {
             synchronized (FTURLConnectionResourceReporter.LOCK) {
-                if ((!enabled(connection.getURL()) && !(knownProxy && FTVisitorIdManager.get().isEnabled()))
-                        || isExcludedAdapter(connection.getClass())) {
+                if (!enabled(connection.getURL()) || isExcludedAdapter(connection.getClass())) {
                     return connection;
                 }
                 Iterator<Entry> iterator = CONNECTIONS.iterator();
@@ -65,8 +62,7 @@ public final class FTURLConnectionInstrumentation {
                         if (wrapper != null) return wrapper;
                         FTURLConnectionDelegate delegate = entry.delegate.get();
                         if (delegate == null) {
-                            delegate = new FTURLConnectionDelegate((HttpURLConnection) connection, entry.state,
-                                    entry.knownProxy ? new FTURLConnectionRedirects((HttpURLConnection) connection, entry.proxy) : null);
+                            delegate = new FTURLConnectionDelegate((HttpURLConnection) connection, entry.state);
                             entry.delegate = new WeakReference<>(delegate);
                         }
                         wrapper = proxy((HttpURLConnection) connection, delegate);
@@ -77,10 +73,9 @@ public final class FTURLConnectionInstrumentation {
                 if (CONNECTIONS.size() >= FTURLConnectionResourceReporter.MAX_REQUESTS) return connection;
                 FTURLConnectionRequestState state = new FTURLConnectionRequestState(connection.getURL().toString(),
                         FTURLConnectionResourceReporter.generation());
-                FTURLConnectionDelegate delegate = new FTURLConnectionDelegate((HttpURLConnection) connection, state,
-                        knownProxy ? new FTURLConnectionRedirects((HttpURLConnection) connection, proxy) : null);
+                FTURLConnectionDelegate delegate = new FTURLConnectionDelegate((HttpURLConnection) connection, state);
                 URLConnection wrapper = proxy((HttpURLConnection) connection, delegate);
-                CONNECTIONS.add(new Entry(connection, wrapper, delegate, state, proxy, knownProxy));
+                CONNECTIONS.add(new Entry(connection, wrapper, delegate, state));
                 return wrapper;
             }
         } catch (Throwable ignored) {
@@ -138,12 +133,8 @@ public final class FTURLConnectionInstrumentation {
         WeakReference<URLConnection> wrapper;
         WeakReference<FTURLConnectionDelegate> delegate;
         final FTURLConnectionRequestState state;
-        final Proxy proxy;
-        final boolean knownProxy;
         Entry(URLConnection original, URLConnection wrapper, FTURLConnectionDelegate delegate,
-              FTURLConnectionRequestState state, Proxy proxy, boolean knownProxy) {
-            this.proxy = proxy;
-            this.knownProxy = knownProxy;
+              FTURLConnectionRequestState state) {
             this.original = new WeakReference<>(original);
             this.wrapper = new WeakReference<>(wrapper);
             this.delegate = new WeakReference<>(delegate);

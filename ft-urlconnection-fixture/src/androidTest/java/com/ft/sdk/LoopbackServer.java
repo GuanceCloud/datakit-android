@@ -16,12 +16,18 @@ final class LoopbackServer implements Closeable {
     final SSLContext tls;
     final BlockingQueue<String> requests = new LinkedBlockingQueue<>();
     final BlockingQueue<Map<String, String>> requestHeaders = new LinkedBlockingQueue<>();
+    final BlockingQueue<Integer> requestConnectionIds = new LinkedBlockingQueue<>();
+    final java.util.concurrent.atomic.AtomicInteger acceptedConnections = new java.util.concurrent.atomic.AtomicInteger();
+    final CountDownLatch blockedRequest = new CountDownLatch(1);
+    final CountDownLatch releaseBlockedResponse = new CountDownLatch(1);
     final ExecutorService workers = Executors.newCachedThreadPool();
     final List<Socket> sockets = Collections.synchronizedList(new ArrayList<>());
     final Map<String, String> redirects = new ConcurrentHashMap<>();
     final Map<String, Integer> redirectCodes = new ConcurrentHashMap<>();
     final Map<String, String> extraHeaders = new ConcurrentHashMap<>();
     volatile boolean closed;
+    volatile boolean keepAlive;
+    volatile String blockedPath;
 
     LoopbackServer(Context context, boolean secure, boolean mutual) throws Exception {
         KeyStore keys = KeyStore.getInstance("PKCS12");
@@ -34,7 +40,7 @@ final class LoopbackServer implements Closeable {
                 :new ServerSocket(0,50,InetAddress.getByName("127.0.0.1"));
         if(mutual)((SSLServerSocket)listener).setNeedClientAuth(true);
         workers.execute(()->{
-            while(!closed)try { Socket socket=listener.accept(); sockets.add(socket); workers.execute(()->serve(socket)); }
+            while(!closed)try { Socket socket=listener.accept(); acceptedConnections.incrementAndGet(); sockets.add(socket); workers.execute(()->serve(socket)); }
             catch(IOException e){ if(!closed)throw new RuntimeException(e); }
         });
     }
@@ -58,6 +64,7 @@ final class LoopbackServer implements Closeable {
         try {
             socket.setSoTimeout(4000);
             InputStream in=socket.getInputStream(); OutputStream out=socket.getOutputStream();
+            do {
             String start=line(in); if(start.isEmpty())return;
             Map<String,String> headers=new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             for(String h=line(in); !h.isEmpty(); h=line(in)) {int i=h.indexOf(':');if(i>0)headers.put(h.substring(0,i),h.substring(i+1).trim());}
@@ -73,7 +80,12 @@ final class LoopbackServer implements Closeable {
             Map<String,String> recordedHeaders=new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             recordedHeaders.putAll(headers);
             requestHeaders.add(recordedHeaders);
+            requestConnectionIds.add(socket.getPort());
             requests.add(parts[0]+" "+path+"\n"+headers.toString()+"\n"+Arrays.toString(body.toByteArray()));
+            if(path.equals(blockedPath)) {
+                blockedRequest.countDown();
+                if(!releaseBlockedResponse.await(20,TimeUnit.SECONDS))return;
+            }
             int status=path.equals("/slow-error")?500:path.startsWith("/status/")?Integer.parseInt(path.substring(8)):200;
             byte[] response="response-body".getBytes(StandardCharsets.UTF_8);
             String extra="";
@@ -95,13 +107,14 @@ final class LoopbackServer implements Closeable {
             if(path.equals("/stall") || path.equals("/slow-error"))Thread.sleep(400);
             boolean noBody=parts[0].equals("HEAD")||status==204||status==304;
             int length=status==204||status==304?0:path.equals("/large")?2*1024*1024:response.length;
-            out.write(("HTTP/1.1 "+status+" Status\r\nContent-Type: text/plain\r\nContent-Length: "+length+"\r\n"+extra+"Connection: close\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+            out.write(("HTTP/1.1 "+status+" Status\r\nContent-Type: text/plain\r\nContent-Length: "+length+"\r\n"+extra+"Connection: "+(keepAlive?"keep-alive":"close")+"\r\n\r\n").getBytes(StandardCharsets.UTF_8));
             if(!noBody) {
                 if(path.equals("/large")){byte[] buffer=new byte[8192];for(int i=0;i<length;i+=buffer.length)out.write(buffer);}
                 else if(path.equals("/broken"))out.write(response,0,2);
                 else out.write(response);
             }
             out.flush();
+            } while(keepAlive && !closed);
         } catch(Exception ignored) { /* TLS rejection and timeout are intentional test cases. */ }
         finally {try{socket.close();}catch(IOException ignored){} sockets.remove(socket);}
     }
@@ -111,6 +124,7 @@ final class LoopbackServer implements Closeable {
     }
 
     @Override public void close() throws IOException {
+        releaseBlockedResponse.countDown();
         closed=true;listener.close();
         synchronized(sockets){for(Socket socket:sockets)socket.close();}
         workers.shutdownNow();
