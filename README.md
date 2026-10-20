@@ -29,15 +29,6 @@ The original total duration is retained. Transitions after cold-start completion
 change the recorded type, including when SDK initialization delays reporting. Hot-start
 Actions do not include this field.
 
-### Native RUM View timing metrics
-
-Native View events include the following optional fields, in **nanoseconds**:
-
-- `network_settled_time`: time from View start to the last completion among Resources starting strictly less than 100 ms after View start. All qualifying Resources must finish. Accepted Resource or network Error writes contribute their original end time; discarded Resources release pending state without contributing a duration. No qualifying completions or unfinished Resources means the field is omitted. Closing the View freezes the result, including an absent result.
-- `interaction_to_next_view_time`: time from the preceding View's last accepted `tap`, `swipe`, `click`, or `back` Action to the **new View's start**. The interval must be greater than zero and strictly less than 3 seconds. Ordinary automatic and immediate Actions use their start timestamp; a waiting Action explicitly stopped by the SDK uses its stop timestamp. Custom and scroll Actions do not qualify.
-
-Collection is automatic with native RUM View/Resource/Action tracking. The defaults are fixed at 100 ms and 3 seconds; this implementation does not expose Datadog's custom identifier interfaces. Native fields use the SDK's flat event format. Browser-owned WebView events retain their existing fields. Network settled time is not a network-idle timer, and interaction time ends at `startView`, not first draw or full page readiness. The history is process-local and bounded to four Views/interactions; unresolved values are never reconstructed across process restarts.
-
 ## Open Source Code Usage
 * [ft-session-replay](ft-session-replay) is a secondary development based on datadog [dd-sdk-android-session-replay](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay)
 * [ft-session-replay-material](ft-session-replay-material) is a secondary development based on datadog [dd-sdk-android-session-replay-material](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay-material)
