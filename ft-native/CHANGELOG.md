@@ -1,3 +1,8 @@
+# native 1.1.4-beta01
+1. Fixed custom logcat settings being applied under the wrong collection switch: Native Crash settings now follow Native Crash enablement, and ANR settings follow native ANR enablement. This restores custom logcat line limits when only one collector is enabled, including Native Crash on Android 11+ where the Agent disables native ANR collection.
+2. Improved public API Javadocs. Public method signatures and bundled native `.so` libraries are unchanged from 1.1.3.
+
+---
 # native 1.1.3
 1. Added null address detection for native crashes, and made libft_native_exp_lib.so use stricter null and wild pointer checks when performing backtraces with libunwind.so.
 2. Prevented secondary crashes in libunwind.so during native crash handling.

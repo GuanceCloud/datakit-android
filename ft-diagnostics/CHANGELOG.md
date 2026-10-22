@@ -1,3 +1,7 @@
+# diagnostics 0.1.0-beta01
+1. Same as version 0.1.0-alpha01.
+
+---
 # diagnostics 0.1.0-alpha01
 1. Initial release of the optional, local-only SDK self-monitoring collector, independent from SDK business configuration and initialization. Collection starts explicitly and does not upload diagnostics automatically.
 2. Added session start/stop, status and summary queries, paginated detail records, session listing/deletion, retention cleanup, and export of `summary.json` and `events.jsonl`.

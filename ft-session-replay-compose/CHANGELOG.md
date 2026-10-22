@@ -1,3 +1,7 @@
+# replay-compose 0.1.9-beta01
+1. Same as version 0.1.9-alpha07.
+
+---
 # replay-compose 0.1.9-alpha07
 1. Aligned with Session Replay 0.1.9-alpha07 for runtime sampling visibility and percentage sampling metadata; no module-specific changes.
 

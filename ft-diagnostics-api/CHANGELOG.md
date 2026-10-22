@@ -1,3 +1,7 @@
+# diagnostics-api 0.1.0-beta01
+1. Same as version 0.1.0-alpha01.
+
+---
 # diagnostics-api 0.1.0-alpha01
 1. Initial release of the shared internal observation bridge used by the core SDK, Replay, and the optional diagnostics collector. Application integrations should use `FTDiagnostics` rather than the internal bridge.
 2. Added default-disabled observation hooks for storage writes/removals, discard observations, backlog, batch selection, retries, and HTTP upload attempts, with bounded channel attribution and stream byte counters.

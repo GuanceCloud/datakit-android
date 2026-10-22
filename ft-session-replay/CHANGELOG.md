@@ -1,3 +1,7 @@
+# replay 0.1.9-beta01
+1. Same as version 0.1.9-alpha07.
+
+---
 # replay 0.1.9-alpha07
 1. Made runtime Replay sampler updates visible across threads so Native RUM sampling metadata can read the effective rates while remote configuration is being updated. Replay feature context sampling fields now use 0–100 percentages; internal samplers and legacy APIs retain 0–1 probabilities.
 
