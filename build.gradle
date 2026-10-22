@@ -11,8 +11,7 @@ buildscript {
                 ftSessionReplay           : "0.1.9-beta01",
                 replayMiniAgentSupport    : "1.7.0",
                 ftPlugin                  : "1.3.9-beta01",
-                // Keep the published Plugin until 1.3.9-beta01 is available in Maven.
-                ftPluginBuildscript       : "1.3.9-alpha02",
+                ftPluginBuildscript       : "1.3.9-beta01",
                 pluginMinAgentSupport     : "1.7.6-beta01",
                 ftNative                  : "1.1.4-beta01"
         ]
