@@ -1,3 +1,11 @@
+# diagnostics 0.1.0
+1. Initial stable release of the optional, local-only SDK self-monitoring collector. Collection starts explicitly, independently of SDK business configuration and initialization, and does not upload diagnostics automatically.
+2. Added session start/stop, status and summary queries, paginated detail records, session listing/deletion, retention cleanup, and export of `summary.json` and `events.jsonl`.
+3. Added per-channel aggregates for storage writes/removals, observed backlog, batches, retries, discard observations and HTTP upload attempts, including available body byte counts and monotonic durations. These observations do not prove per-event delivery or exact data loss.
+4. Added bounded queues and storage limits, directory ownership locking, interrupted-session recovery, IO failure reporting and isolation from late completions in prior sessions. Defaults are 20 MiB per session, 100 MiB per process directory and seven-day retention.
+5. Depends on `ft-diagnostics-api:0.1.0`. Use `ft-sdk >= 1.7.6` and, for Replay storage monitoring, `ft-session-replay >= 0.1.9`. Maven resolves the API dependency transitively; direct AAR integrations must include it explicitly.
+
+---
 # diagnostics 0.1.0-beta01
 1. Same as version 0.1.0-alpha01.
 

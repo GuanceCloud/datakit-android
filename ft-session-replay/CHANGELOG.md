@@ -1,3 +1,12 @@
+# replay 0.1.9
+1. Added reusable external recorder ownership control and publicly configurable external-only mode for framework/engine integrations. Native recording pauses while external owners are active and resumes with a full snapshot after the final owner releases control. Fixed recorder handoffs so queued records retain their original active RUM View and closed Views reject new records.
+2. Added budgeted WebP encoding for external recorder images, reducing quality and dimensions before rejecting frames that exceed the byte limit.
+3. Fixed Replay segment compression to use a single SYNC_FLUSH-aligned zlib stream, restoring playback when multiple native or external-recorder segments are joined.
+4. Added `FTSessionReplayConfig.setSessionReplaySamplingRate(float)` and `setSessionReplayOnErrorSamplingRate(float)`, matching getters and runtime updates, using 0–100 percentages with fractional and zero values. Deprecated 0–1 APIs retain their behavior. Runtime updates are visible across threads and feature sampling metadata uses percentages. Pair with `ft-sdk >= 1.7.6` to retain remote-over-local priority with the new configuration APIs.
+5. Native Replay follows the Agent's opt-in Heatmap setting, skipping permanent ID resolution and transparent Heatmap binding nodes when disabled while preserving ordinary wireframes and touch visualization. Use `ft-sdk >= 1.7.6` and `FTRUMConfig.setEnableHeatMap(true)` to enable Heatmap; older Agents default to disabled.
+6. Added default-off self-monitoring hooks for serialized event writes, failures, size rejection, file backlog, selected batches, retries and cleanup. Added the `ft-diagnostics-api:0.1.0` runtime dependency; optional `ft-diagnostics:0.1.0` provides local collection. Direct AAR integrations must include the API AAR. Pair with `ft-sdk >= 1.7.6` to also observe SDK HTTP uploads and body bytes. Recording and upload behavior are preserved; observed write bytes describe serialized events rather than physical disk IO.
+
+---
 # replay 0.1.9-beta01
 1. Same as version 0.1.9-alpha07.
 

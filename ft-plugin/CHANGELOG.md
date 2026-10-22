@@ -1,3 +1,9 @@
+# plugin 1.3.9
+1. Added automatic return-value wrapping for `URL.openConnection()` and `URL.openConnection(Proxy)`, preserving each original call and argument evaluation and passing the original Proxy (including `NO_PROXY`) to the Agent hook. Requires `ft-sdk >= 1.7.6`; older Agents are rejected at build time.
+2. Added `FTExt.instrumentHttpURLConnection` (default true) as a Gradle instrumentation cache input. Existing package/class/method exclusions apply, and repeated transforms do not add duplicate hooks.
+3. URLConnection instrumentation observes the original platform connection without taking over redirects or injecting Visitor ID headers.
+
+---
 # plugin 1.3.9-beta01
 1. Same as version 1.3.9-alpha02.
 
