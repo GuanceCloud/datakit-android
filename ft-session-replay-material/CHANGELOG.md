@@ -1,3 +1,7 @@
+# replay-material 0.1.10-alpha01
+1. Aligned with Session Replay 0.1.10-alpha01 for Window focus forwarding and recorder ownership handoff fixes. No module-specific API or behavior changes.
+
+---
 # replay-material 0.1.9
 1. Aligned with Session Replay 0.1.9 for external recorder support, segment compression fixes, percentage sampling configuration and opt-in Heatmap behavior. No module-specific API or behavior changes.
 

@@ -8,7 +8,7 @@ buildscript {
                 ftSdk                     : "1.7.6",
                 ftDiagnostics             : "0.1.0",
                 ftSdkMiniReplaySupport    : "0.1.3",
-                ftSessionReplay           : "0.1.9",
+                ftSessionReplay           : "0.1.10-alpha01",
                 replayMiniAgentSupport    : "1.7.0",
                 ftPlugin                  : "1.3.9",
                 ftPluginBuildscript       : "1.3.9",

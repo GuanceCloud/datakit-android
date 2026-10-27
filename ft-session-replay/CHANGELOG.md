@@ -1,4 +1,4 @@
-# Unreleased
+# replay 0.1.10-alpha01
 1. Fixed native Replay swallowing Window focus changes, which could leave Cocos and other focus-dependent hosts unable to resume rendering after returning from a native Activity.
 2. Stopped Replay callbacks retained inside another Window callback from restarting native recording after an ownership handoff. Existing outer callbacks and host event delivery are preserved.
 
