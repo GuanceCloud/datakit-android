@@ -17,6 +17,7 @@ import com.ft.sdk.sessionreplay.internal.recorder.callback.RecorderWindowCallbac
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.TimeProvider;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -30,7 +31,8 @@ public class WindowCallbackInterceptor {
     private final TextAndInputPrivacy textAndInputPrivacy;
     private final TouchPrivacyManager touchPrivacyManager;
 
-    private final WeakHashMap<Window, Object> wrappedWindows = new WeakHashMap<>();
+    // Weak values avoid retaining a Window through its callback (usually an Activity).
+    private final WeakHashMap<Window, WeakReference<RecorderWindowCallback>> wrappedWindows = new WeakHashMap<>();
 
     public WindowCallbackInterceptor(@NonNull RecordedDataQueueHandler recordedDataQueueHandler,
                                      @NonNull ViewOnDrawInterceptor viewOnDrawInterceptor,
@@ -52,7 +54,6 @@ public class WindowCallbackInterceptor {
     public void intercept(@NonNull List<Window> windows, @NonNull Context appContext) {
         for (Window window : windows) {
             wrapWindowCallback(window, appContext);
-            wrappedWindows.put(window, null);
         }
     }
 
@@ -72,10 +73,18 @@ public class WindowCallbackInterceptor {
 
     private void wrapWindowCallback(@NonNull Window window, @NonNull Context appContext) {
         Window.Callback toWrap = window.getCallback();
+        WeakReference<RecorderWindowCallback> reference = wrappedWindows.get(window);
+        RecorderWindowCallback previous = reference == null ? null : reference.get();
+        if (previous != null) {
+            if (toWrap == previous) {
+                return;
+            }
+            previous.stopRecording();
+        }
         if (toWrap == null) {
             toWrap = new NoOpWindowCallback();
         }
-        window.setCallback(new RecorderWindowCallback(
+        RecorderWindowCallback callback = new RecorderWindowCallback(
                 appContext,
                 recordedDataQueueHandler,
                 toWrap,
@@ -88,18 +97,22 @@ public class WindowCallbackInterceptor {
                 MOTION_UPDATE_DELAY_THRESHOLD_NS,
                 FLUSH_BUFFER_THRESHOLD_NS,
                 null
-        ));
+        );
+        window.setCallback(callback);
+        wrappedWindows.put(window, new WeakReference<>(callback));
     }
 
     private void unwrapWindowCallback(@NonNull Window window) {
-        Window.Callback callback = window.getCallback();
-        if (callback instanceof RecorderWindowCallback) {
-            Window.Callback wrappedCallback = ((RecorderWindowCallback) callback).getWrappedCallback();
-            if (wrappedCallback instanceof NoOpWindowCallback) {
-                window.setCallback(null);
-            } else {
-                window.setCallback(wrappedCallback);
-            }
+        WeakReference<RecorderWindowCallback> reference = wrappedWindows.get(window);
+        RecorderWindowCallback callback = reference == null ? null : reference.get();
+        if (callback == null) {
+            return;
+        }
+        callback.stopRecording();
+        // Never overwrite an outer callback owned by Action, AppCompat or the host.
+        if (window.getCallback() == callback) {
+            Window.Callback wrappedCallback = callback.getWrappedCallback();
+            window.setCallback(wrappedCallback instanceof NoOpWindowCallback ? null : wrappedCallback);
         }
     }
 }

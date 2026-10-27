@@ -1,3 +1,8 @@
+# Unreleased
+1. Fixed native Replay swallowing Window focus changes, which could leave Cocos and other focus-dependent hosts unable to resume rendering after returning from a native Activity.
+2. Stopped Replay callbacks retained inside another Window callback from restarting native recording after an ownership handoff. Existing outer callbacks and host event delivery are preserved.
+
+---
 # replay 0.1.9
 1. Added reusable external recorder ownership control and publicly configurable external-only mode for framework/engine integrations. Native recording pauses while external owners are active and resumes with a full snapshot after the final owner releases control. Fixed recorder handoffs so queued records retain their original active RUM View and closed Views reject new records.
 2. Added budgeted WebP encoding for external recorder images, reducing quality and dimensions before rejecting frames that exceed the byte limit.

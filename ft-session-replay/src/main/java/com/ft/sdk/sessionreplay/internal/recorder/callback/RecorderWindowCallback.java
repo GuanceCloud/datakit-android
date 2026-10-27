@@ -59,6 +59,7 @@ public class RecorderWindowCallback implements Window.Callback {
     private long lastPerformedFlushTimeInNs = System.nanoTime();
     private final WindowInspector windowInspector;
     private boolean shouldRecordMotion = false;
+    private boolean recordingEnabled = true;
 
     public RecorderWindowCallback(
             Context appContext,
@@ -101,7 +102,7 @@ public class RecorderWindowCallback implements Window.Callback {
     @Override
     @MainThread
     public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event != null) {
+        if (recordingEnabled && event != null) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 Point touchLocation = new Point((int) event.getX(), (int) event.getY());
                 shouldRecordMotion = touchPrivacyManager.shouldRecordTouch(touchLocation);
@@ -116,7 +117,7 @@ public class RecorderWindowCallback implements Window.Callback {
                     copy.recycle();
                 }
             }
-        } else {
+        } else if (recordingEnabled) {
             internalLogger.e(TAG, MOTION_EVENT_WAS_NULL_ERROR_MESSAGE);
         }
 
@@ -275,6 +276,11 @@ public class RecorderWindowCallback implements Window.Callback {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
+        // The host may resume rendering or change recorder ownership in this callback.
+        wrappedCallback.onWindowFocusChanged(hasFocus);
+        if (!recordingEnabled) {
+            return;
+        }
         List<View> rootViews = windowInspector.getGlobalWindowViews(internalLogger);
         if (!rootViews.isEmpty()) {
             // A new window was added or removed, so we stop recording the previous root views
@@ -331,6 +337,14 @@ public class RecorderWindowCallback implements Window.Callback {
     @Override
     public void onActionModeFinished(ActionMode mode) {
         wrappedCallback.onActionModeFinished(mode);
+    }
+
+    @MainThread
+    public void stopRecording() {
+        // An outer callback may still hold us after the interceptor releases this window.
+        recordingEnabled = false;
+        shouldRecordMotion = false;
+        pointerInteractions.clear();
     }
 
     public Window.Callback getWrappedCallback() {
