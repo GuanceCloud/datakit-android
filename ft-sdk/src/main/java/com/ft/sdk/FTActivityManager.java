@@ -4,6 +4,8 @@ package com.ft.sdk;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
+import androidx.annotation.RestrictTo;
+
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
@@ -85,7 +87,8 @@ public final class FTActivityManager {
      *
      * @return {@link AppState}
      */
-    AppState getAppState() {
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public AppState getAppState() {
         synchronized (crashFreeLock) {
             ensureCrashFreeTrackerInitialized();
             return appState;
@@ -118,12 +121,12 @@ public final class FTActivityManager {
         }
     }
 
-    void resetCrashFreeDuration(long resetTime, AppState resetState) {
+    void resetCrashFreeDuration(long resetTime) {
         synchronized (crashFreeLock) {
             crashFreeStartTime = resetTime;
             foregroundCrashFreeDuration = 0;
             backgroundCrashFreeDuration = 0;
-            appState = normalizeState(resetState);
+            // A delayed Error write must not rewind the current lifecycle state.
             stateStartTime = resetTime;
             persistCrashFreeTracker();
         }

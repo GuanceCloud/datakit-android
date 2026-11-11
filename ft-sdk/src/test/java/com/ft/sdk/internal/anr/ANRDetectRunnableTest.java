@@ -1,11 +1,19 @@
 package com.ft.sdk.internal.anr;
 
 import com.ft.sdk.ExtraLogCatSetting;
+import com.ft.sdk.FTActivityManager;
+import com.ft.sdk.garble.bean.AppState;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -13,7 +21,73 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE, sdk = 28)
 public class ANRDetectRunnableTest {
+    private Object originalActivityManager;
+
+    @Before
+    public void setUp() throws Exception {
+        Field instance = FTActivityManager.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        originalActivityManager = instance.get(null);
+        instance.set(null, null);
+        FTActivityManager.get().getAppState();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        Field instance = FTActivityManager.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        instance.set(null, originalActivityManager);
+    }
+
+    @Test
+    public void capturesStartupForegroundAndBackgroundBeforeCollectingStacks() throws Exception {
+        for (AppState expected : new AppState[]{AppState.STARTUP, AppState.RUN, AppState.BACKGROUND}) {
+            setAppState(expected);
+            BlockingQueue<AppState> reports = new LinkedBlockingQueue<>();
+            Thread mainThread = new Thread("fake-main") {
+                @Override
+                public StackTraceElement[] getStackTrace() {
+                    try {
+                        setAppState(expected == AppState.BACKGROUND ? AppState.RUN : AppState.BACKGROUND);
+                    } catch (Exception e) {
+                        throw new AssertionError(e);
+                    }
+                    return new StackTraceElement[0];
+                }
+            };
+            ANRDetectRunnable runnable = new ANRDetectRunnable(null,
+                    new FakeMainThreadPoster(new LinkedBlockingQueue<>(), mainThread),
+                    new ANRDetectRunnable.IssueReporter() {
+                        @Override
+                        public void report(String stack, long time, String thread) {
+                            Assert.fail("State snapshot was not passed to the reporter");
+                        }
+
+                        @Override
+                        public void report(String stack, long time, String thread, AppState state) {
+                            reports.add(state);
+                        }
+                    }, 25L);
+            Thread detector = new Thread(runnable, "anr-state-test");
+            detector.start();
+            try {
+                Assert.assertEquals(expected, reports.poll(2, TimeUnit.SECONDS));
+            } finally {
+                runnable.shutdown();
+                detector.join(1000L);
+            }
+            Assert.assertFalse(detector.isAlive());
+        }
+    }
+
+    private static void setAppState(AppState state) throws Exception {
+        Field field = FTActivityManager.class.getDeclaredField("appState");
+        field.setAccessible(true);
+        field.set(FTActivityManager.get(), state);
+    }
 
     @Test
     public void legacyPublicConstructorRemainsAvailable() throws Exception {

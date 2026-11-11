@@ -15,6 +15,26 @@ import static org.junit.Assert.assertTrue;
 public class HistoricalAnrReporterTest {
 
     @Test
+    public void reportDistinguishesVisibleUiFromServicesAndUnknownImportance() {
+        int[] importance = {100, 200, 125, 230, 300, 325, 350, 400, 0, 1000, -1, 999};
+        String[] states = {"run", "run", "background", "background", "background",
+                "background", "background", "background", "unknown", "unknown", "unknown", "unknown"};
+        HistoricalRumContext context = new HistoricalRumContext(
+                "com.example.app", "run", 1_000, "session", "view", "Home",
+                10_000_000_000L, 0, false);
+        for (int i = 0; i < importance.length; i++) {
+            RecordingSink sink = new RecordingSink();
+            final String expected = states[i];
+            DefaultHistoricalAnrReporter reporter = new DefaultHistoricalAnrReporter(sink,
+                    (stack, time, state, tags, fields) -> assertEquals(expected, state.toString()));
+            reporter.report(new ProcessExitRecord("com.example.app", 123, 20_000,
+                    ProcessExitRecord.REASON_ANR, importance[i], null), context, "blocked", "dedupe");
+            assertEquals("importance=" + importance[i], expected,
+                    sink.tags.get(Constants.KEY_RUM_ERROR_SITUATION));
+        }
+    }
+
+    @Test
     public void reportUsesOnlyPersistedHistoricalRumContext() {
         RecordingSink sink = new RecordingSink();
         DefaultHistoricalAnrReporter reporter = new DefaultHistoricalAnrReporter(sink);

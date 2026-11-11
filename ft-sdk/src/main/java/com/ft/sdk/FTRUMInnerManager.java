@@ -1349,8 +1349,8 @@ public class FTRUMInnerManager {
                                 new RunnerCompleteCallBack() {
                                     @Override
                                     public void onComplete() {
-                                        if (isCrashError) {
-                                            FTActivityManager.get().resetCrashFreeDuration(dateline, state);
+                                        if (isCrashError && !isPreCrash) {
+                                            FTActivityManager.get().resetCrashFreeDuration(dateline);
                                         }
                                         increaseError(tags);
                                         if (callBack != null) {

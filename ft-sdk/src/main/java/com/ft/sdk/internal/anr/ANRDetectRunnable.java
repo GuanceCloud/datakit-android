@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.ft.sdk.ExtraLogCatSetting;
+import com.ft.sdk.FTActivityManager;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
@@ -24,8 +25,13 @@ public final class ANRDetectRunnable implements Runnable {
     private static final IssueReporter LEGACY_ISSUE_REPORTER = new IssueReporter() {
         @Override
         public void report(String stack, long occurredAtNanoseconds, String threadName) {
+            report(stack, occurredAtNanoseconds, threadName, FTActivityManager.get().getAppState());
+        }
+
+        @Override
+        public void report(String stack, long occurredAtNanoseconds, String threadName, AppState state) {
             FTRUMGlobalManager.get().addError(
-                    stack, "android_anr", ErrorType.ANR_ERROR, AppState.RUN);
+                    stack, "android_anr", occurredAtNanoseconds, ErrorType.ANR_ERROR, state);
         }
     };
 
@@ -102,6 +108,7 @@ public final class ANRDetectRunnable implements Runnable {
 
                 Thread mainThread = mainThreadPoster.getThread();
                 long occurredAtNanoseconds = Utils.getCurrentNanoTime();
+                AppState occurredAppState = FTActivityManager.get().getAppState();
                 if (isClose || Thread.currentThread().isInterrupted()) {
                     break;
                 }
@@ -118,7 +125,7 @@ public final class ANRDetectRunnable implements Runnable {
                     break;
                 }
                 try {
-                    issueReporter.report(stackTrace, occurredAtNanoseconds, mainThread.getName());
+                    issueReporter.report(stackTrace, occurredAtNanoseconds, mainThread.getName(), occurredAppState);
                 } catch (Throwable throwable) {
                     LogUtils.e(TAG, "ANR report failed: " + throwable.getClass().getSimpleName());
                 }
@@ -146,6 +153,11 @@ public final class ANRDetectRunnable implements Runnable {
      */
     public interface IssueReporter {
         void report(String stack, long occurredAtNanoseconds, String threadName);
+
+        /** State captured when the ANR is detected, before stack/logcat collection. */
+        default void report(String stack, long occurredAtNanoseconds, String threadName, AppState state) {
+            report(stack, occurredAtNanoseconds, threadName);
+        }
     }
 
     interface MainThreadPoster {

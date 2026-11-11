@@ -401,6 +401,54 @@ public class RUMIntervalFieldsTest {
         assertFalse(fields.get("action").containsKey("app_state"));
     }
 
+    @Test public void queuedAutomaticCrashKeepsEventStateWithoutRewindingCurrentState() throws Exception {
+        assertAutomaticCrashState(false);
+    }
+
+    @Test public void historicalCrashDoesNotResetCurrentProcessStateOrCrashFreeCounters() throws Exception {
+        assertAutomaticCrashState(true);
+    }
+
+    private void assertAutomaticCrashState(boolean historical) throws Exception {
+        ThreadPoolExecutor queued = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>()) {
+            @Override public void execute(Runnable task) { getQueue().add(task); }
+        };
+        replace(BaseThreadPool.class, EventConsumerThreadPool.get(), "executor", queued);
+        try {
+            FTActivityManager manager = FTActivityManager.get();
+            manager.appBackGround();
+            long occurredAt = Utils.getCurrentNanoTime();
+            HashMap<String, Object> property = new HashMap<>();
+            property.put(FTExceptionHandler.IS_PRE_CRASH, historical);
+            rum.addAutomaticIssue("stack", "crash", occurredAt, FTIssueCategory.CRASH,
+                    ErrorType.NATIVE.toString(), manager.getAppState(), historical, null, property, null);
+            manager.appForeground();
+            replace(FTActivityManager.class, manager, "foregroundCrashFreeDuration", 123L);
+            replace(FTActivityManager.class, manager, "backgroundCrashFreeDuration", 456L);
+            int remaining = 100;
+            Runnable task;
+            while ((task = queued.getQueue().poll()) != null) {
+                assertTrue("Unexpected event queue loop", remaining-- > 0);
+                task.run();
+            }
+            assertEquals("background", tags.get("error").get(Constants.KEY_RUM_ERROR_SITUATION));
+            assertTrue(lines.get("error").contains("error_situation=background"));
+            assertEquals(AppState.RUN, manager.getAppState());
+            if (historical) {
+                Field foreground = FTActivityManager.class.getDeclaredField("foregroundCrashFreeDuration");
+                Field background = FTActivityManager.class.getDeclaredField("backgroundCrashFreeDuration");
+                foreground.setAccessible(true);
+                background.setAccessible(true);
+                assertEquals(123L, foreground.getLong(manager));
+                assertEquals(456L, background.getLong(manager));
+            }
+        } finally {
+            queued.shutdownNow();
+            replace(BaseThreadPool.class, EventConsumerThreadPool.get(), "executor", eventExecutor);
+        }
+    }
+
     private ActiveViewBean active() throws Exception {
         Field f = FTRUMInnerManager.class.getDeclaredField("activeView");
         f.setAccessible(true); return (ActiveViewBean) f.get(rum);

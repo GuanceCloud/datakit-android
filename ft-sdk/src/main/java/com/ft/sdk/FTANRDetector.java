@@ -44,13 +44,18 @@ public class FTANRDetector {
                         new ANRDetectRunnable.IssueReporter() {
                             @Override
                             public void report(String stack, long occurredAtNanoseconds, String threadName) {
+                                report(stack, occurredAtNanoseconds, threadName, FTActivityManager.get().getAppState());
+                            }
+
+                            @Override
+                            public void report(String stack, long occurredAtNanoseconds, String threadName, AppState state) {
                                 FTRUMInnerManager.get().addAutomaticIssue(
                                         stack,
                                         "android_anr",
                                         occurredAtNanoseconds,
                                         FTIssueCategory.ANR,
                                         ErrorType.ANR_ERROR.toString(),
-                                        AppState.RUN,
+                                        state,
                                         false,
                                         threadName,
                                         null,

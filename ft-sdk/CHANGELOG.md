@@ -1,5 +1,6 @@
 # Unreleased
 1. Restore automatic cold-start Actions on Android 5–9 (API 21–28), current Activity tracking, lifecycle cleanup, and foreground-return remote configuration refresh without requiring a Plugin upgrade. Legacy hot-start timing approximates the interval from the Started callback to main-loop completion after Resume; API 29+ retains its existing timing. API 21–23 cold starts use the earliest Application hook as an approximate origin and omit pre-Application timing. Unavailable Activity creation boundaries do not produce automatic View loading_time or cold-start Application/first-frame breakdowns. Repeated Application hooks register lifecycle callbacks once. Configuration recreation no longer marks a pending foreground cold start as background.
+2. Fixed automatically captured Crash/ANR Error state: Java crashes and watchdog ANRs retain the state captured before stack/logcat collection; recovered Native dumps decode native state names and foreground flags (ambiguous startup flags from API 28 and below remain unknown); historical ANRs distinguish visible UI from service/background importance and preserve unknown states. Delayed Error writes and historical Native recovery no longer overwrite the current lifecycle state; historical recovery leaves current-process crash-free counters intact.
 
 ---
 # agent 1.7.6

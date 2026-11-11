@@ -8,6 +8,7 @@ import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.threadpool.BaseThreadPool;
 import com.ft.sdk.garble.threadpool.DataUploadThreadPool;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
+import com.ft.sdk.internal.issue.FTIssueFieldEnricher;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +28,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -105,6 +107,47 @@ public class FTEarlyCrashIntegrationTest {
     public void javaCrashWritesMarkerBeforeStackCollection() {
         assertJavaMarkerAtStackCollection(true);
         assertTrue(hasMarker());
+    }
+
+    @Test
+    public void javaCrashKeepsEntryStateWhenStackCollectionChangesLifecycle() throws Exception {
+        Object oldApplication = field(FTApplication.class, "instance").get(null);
+        Object oldActivityManager = field(FTActivityManager.class, "instance").get(null);
+        FTRUMInnerManager rum = FTRUMInnerManager.get();
+        Object oldEnricher = field(FTRUMInnerManager.class, "issueFieldEnricher").get(rum);
+        AtomicReference<FTIssueInfo> captured = new AtomicReference<>();
+        try {
+            field(FTApplication.class, "instance").set(null, RuntimeEnvironment.getApplication());
+            field(FTActivityManager.class, "instance").set(null, null);
+            field(FTRUMInnerManager.class, "issueFieldEnricher").set(rum,
+                    new FTIssueFieldEnricher(issue -> {
+                        captured.set(issue);
+                        return null;
+                    }));
+            FTActivityManager manager = FTActivityManager.get();
+            manager.getAppState();
+            for (AppState expected : new AppState[]{AppState.STARTUP, AppState.RUN, AppState.BACKGROUND}) {
+                field(FTActivityManager.class, "appState").set(manager, expected);
+                captured.set(null);
+                handler.uncaughtException(Thread.currentThread(), new Throwable("state snapshot") {
+                    @Override
+                    public void printStackTrace(PrintWriter writer) {
+                        if (expected == AppState.BACKGROUND) {
+                            manager.appForeground();
+                        } else {
+                            manager.appBackGround();
+                        }
+                        writer.append("test stack");
+                    }
+                });
+                assertEquals(expected.toString(), captured.get().getAppState());
+                assertFalse(captured.get().isHistorical());
+            }
+        } finally {
+            field(FTRUMInnerManager.class, "issueFieldEnricher").set(rum, oldEnricher);
+            field(FTActivityManager.class, "instance").set(null, oldActivityManager);
+            field(FTApplication.class, "instance").set(null, oldApplication);
+        }
     }
 
     @Test
