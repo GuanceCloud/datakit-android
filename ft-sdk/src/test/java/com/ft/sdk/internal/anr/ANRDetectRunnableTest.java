@@ -20,6 +20,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE, sdk = 28)
@@ -90,6 +91,76 @@ public class ANRDetectRunnableTest {
     }
 
     @Test
+    public void reportsProbeStartStateAndTimeInsteadOfTimeoutStateAndTime() throws Exception {
+        for (AppState state : new AppState[]{AppState.STARTUP, AppState.RUN, AppState.BACKGROUND}) {
+            assertProbeSnapshot(state, false);
+        }
+    }
+
+    @Test
+    public void healthyProbeDoesNotLeaveItsSnapshotOnTheNextBlockedProbe() throws Exception {
+        assertProbeSnapshot(AppState.BACKGROUND, true);
+    }
+
+    private void assertProbeSnapshot(AppState expected, boolean healthyProbeFirst) throws Exception {
+        setAppState(healthyProbeFirst ? AppState.STARTUP : expected);
+        AtomicInteger posts = new AtomicInteger();
+        AtomicLong reportedTime = new AtomicLong();
+        AtomicLong probeLowerBound = new AtomicLong(System.currentTimeMillis() * 1_000_000L);
+        AtomicLong probeUpperBound = new AtomicLong();
+        BlockingQueue<AppState> reports = new LinkedBlockingQueue<>();
+        ANRDetectRunnable runnable = new ANRDetectRunnable(null,
+                new ANRDetectRunnable.MainThreadPoster() {
+                    @Override
+                    public boolean post(Runnable callback) {
+                        try {
+                            if (posts.incrementAndGet() == 1 && healthyProbeFirst) {
+                                setAppState(expected);
+                                callback.run();
+                                probeLowerBound.set(System.currentTimeMillis() * 1_000_000L);
+                            } else {
+                                probeUpperBound.set(System.currentTimeMillis() * 1_000_000L + 999_999L);
+                                // Change state before the timeout, rather than during stack capture.
+                                setAppState(expected == AppState.BACKGROUND ? AppState.RUN : AppState.BACKGROUND);
+                            }
+                            return true;
+                        } catch (Exception e) {
+                            throw new AssertionError(e);
+                        }
+                    }
+
+                    @Override
+                    public Thread getThread() {
+                        return new Thread("fake-main");
+                    }
+                }, new ANRDetectRunnable.IssueReporter() {
+                    @Override
+                    public void report(String stack, long time, String thread) {
+                        Assert.fail("State snapshot was not passed to the reporter");
+                    }
+
+                    @Override
+                    public void report(String stack, long time, String thread, AppState state) {
+                        reportedTime.set(time);
+                        reports.add(state);
+                    }
+                }, 50L);
+        Thread detector = new Thread(runnable, "anr-probe-snapshot-test");
+        detector.start();
+        try {
+            Assert.assertEquals(expected, reports.poll(2, TimeUnit.SECONDS));
+            Assert.assertTrue(reportedTime.get() >= probeLowerBound.get());
+            Assert.assertTrue("Event time moved from probe start to timeout",
+                    reportedTime.get() <= probeUpperBound.get());
+            Assert.assertEquals(healthyProbeFirst ? 2 : 1, posts.get());
+        } finally {
+            runnable.shutdown();
+            detector.join(1000L);
+        }
+        Assert.assertFalse(detector.isAlive());
+    }
+
+    @Test
     public void legacyPublicConstructorRemainsAvailable() throws Exception {
         Constructor<ANRDetectRunnable> constructor =
                 ANRDetectRunnable.class.getConstructor(ExtraLogCatSetting.class);
@@ -140,7 +211,7 @@ public class ANRDetectRunnableTest {
     }
 
     @Test
-    public void reportsOnceAndStopsForDetectorLifetime() throws Exception {
+    public void reportsOncePerBlockAndResumesDetectionAfterRecovery() throws Exception {
         BlockingQueue<Runnable> mainCallbacks = new LinkedBlockingQueue<>();
         BlockingQueue<Integer> reports = new LinkedBlockingQueue<>();
         Thread mainThread = new Thread("fake-main");
@@ -161,17 +232,20 @@ public class ANRDetectRunnableTest {
             Assert.assertNotNull(callback);
             Assert.assertEquals(Integer.valueOf(1), reports.poll(1, TimeUnit.SECONDS));
 
-            callback.run();
-            detector.join(500L);
-
-            Assert.assertFalse(detector.isAlive());
             Assert.assertNull(mainCallbacks.poll(100, TimeUnit.MILLISECONDS));
             Assert.assertNull(reports.poll(100, TimeUnit.MILLISECONDS));
             Assert.assertEquals(1, reportCount.get());
+            Assert.assertTrue(detector.isAlive());
+
+            callback.run();
+            Assert.assertNotNull(mainCallbacks.poll(2, TimeUnit.SECONDS));
+            Assert.assertEquals(Integer.valueOf(2), reports.poll(1, TimeUnit.SECONDS));
+            Assert.assertEquals(2, reportCount.get());
         } finally {
             runnable.shutdown();
             detector.join(1_000L);
         }
+        Assert.assertFalse(detector.isAlive());
     }
 
     @Test

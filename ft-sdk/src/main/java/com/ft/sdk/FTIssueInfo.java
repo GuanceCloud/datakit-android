@@ -88,6 +88,10 @@ public final class FTIssueInfo {
     /**
      * Returns the issue occurrence time as Unix epoch nanoseconds.
      *
+     * <p>For watchdog ANRs, this is the unacknowledged main-thread probe's start time,
+     * an approximation of the blocking onset. Native dump ANRs retain the dump timestamp;
+     * ApplicationExitInfo ANRs retain the process exit timestamp when no onset is available.</p>
+     *
      * @return the occurrence timestamp, not the later recovery or upload timestamp
      */
     public long getOccurredAtNanoseconds() {
@@ -96,6 +100,10 @@ public final class FTIssueInfo {
 
     /**
      * Returns the application state captured when the issue occurred.
+     *
+     * <p>For watchdog ANRs, the state is captured at the start of the unacknowledged
+     * main-thread probe, not when its timeout expires. Native dump and ApplicationExitInfo
+     * ANRs use {@code unknown} because collection/exit state cannot establish onset state.</p>
      *
      * @return the value used by the resulting RUM Error's {@code error.situation} tag:
      * {@code unknown}, {@code startup}, {@code run}, or {@code background}

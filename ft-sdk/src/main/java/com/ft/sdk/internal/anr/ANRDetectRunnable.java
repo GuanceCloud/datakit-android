@@ -6,9 +6,8 @@ import android.os.Looper;
 
 import com.ft.sdk.ExtraLogCatSetting;
 import com.ft.sdk.FTActivityManager;
-import com.ft.sdk.FTRUMGlobalManager;
+import com.ft.sdk.FTANRDetector;
 import com.ft.sdk.garble.bean.AppState;
-import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
@@ -30,8 +29,7 @@ public final class ANRDetectRunnable implements Runnable {
 
         @Override
         public void report(String stack, long occurredAtNanoseconds, String threadName, AppState state) {
-            FTRUMGlobalManager.get().addError(
-                    stack, "android_anr", occurredAtNanoseconds, ErrorType.ANR_ERROR, state);
+            FTANRDetector.reportAnr(stack, occurredAtNanoseconds, threadName, state);
         }
     };
 
@@ -49,7 +47,7 @@ public final class ANRDetectRunnable implements Runnable {
     private final long detectDurationMs;
 
     /**
-     * Creates a detector using the legacy global RUM Error reporting path.
+     * Creates a detector using the SDK's automatic ANR reporting path.
      *
      * @deprecated Configure ANR collection through the SDK instead of constructing the detector.
      */
@@ -80,11 +78,18 @@ public final class ANRDetectRunnable implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
+                final long occurredAtNanoseconds;
+                final AppState occurredAppState;
                 synchronized (runnable) {
                     if (isClose) {
                         break;
                     }
                     runnable.reset();
+                    // The unacknowledged probe is our observable approximation of the
+                    // blocking interval's start. Keep its time and state together;
+                    // detection and stack/logcat collection may happen after a transition.
+                    occurredAtNanoseconds = Utils.getCurrentNanoTime();
+                    occurredAppState = FTActivityManager.get().getAppState();
                     if (!mainThreadPoster.post(runnable)) {
                         return;
                     }
@@ -107,8 +112,6 @@ public final class ANRDetectRunnable implements Runnable {
                 }
 
                 Thread mainThread = mainThreadPoster.getThread();
-                long occurredAtNanoseconds = Utils.getCurrentNanoTime();
-                AppState occurredAppState = FTActivityManager.get().getAppState();
                 if (isClose || Thread.currentThread().isInterrupted()) {
                     break;
                 }
@@ -129,7 +132,17 @@ public final class ANRDetectRunnable implements Runnable {
                 } catch (Throwable throwable) {
                     LogUtils.e(TAG, "ANR report failed: " + throwable.getClass().getSimpleName());
                 }
-                break;
+                // A filtered background report must not end detection permanently.
+                // Wait for this probe to recover so one continuous block produces one candidate.
+                synchronized (runnable) {
+                    while (!isClose && !runnable.isCalled()) {
+                        runnable.wait();
+                    }
+                    if (isClose) {
+                        break;
+                    }
+                }
+                Thread.sleep(ANR_RECOVERY_DELAY_MS);
             } catch (InterruptedException e) {
                 LogUtils.e(TAG, "ANR Thread interrupt");
                 Thread.currentThread().interrupt();
@@ -137,6 +150,8 @@ public final class ANRDetectRunnable implements Runnable {
             }
         }
     }
+
+    private static final long ANR_RECOVERY_DELAY_MS = 500;
 
     /**
      * Shutdown Runner
@@ -154,7 +169,7 @@ public final class ANRDetectRunnable implements Runnable {
     public interface IssueReporter {
         void report(String stack, long occurredAtNanoseconds, String threadName);
 
-        /** State captured when the ANR is detected, before stack/logcat collection. */
+        /** Time and state captured when the unacknowledged main-thread probe was posted. */
         default void report(String stack, long occurredAtNanoseconds, String threadName, AppState state) {
             report(stack, occurredAtNanoseconds, threadName);
         }
@@ -198,6 +213,7 @@ public final class ANRDetectRunnable implements Runnable {
         @Override
         public synchronized void run() {
             called = true;
+            notifyAll();
         }
 
         /**

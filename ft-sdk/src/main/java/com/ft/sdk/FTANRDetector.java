@@ -2,6 +2,8 @@ package com.ft.sdk;
 
 import android.os.Build;
 
+import androidx.annotation.RestrictTo;
+
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.threadpool.ANRDetectThreadPool;
@@ -49,22 +51,22 @@ public class FTANRDetector {
 
                             @Override
                             public void report(String stack, long occurredAtNanoseconds, String threadName, AppState state) {
-                                FTRUMInnerManager.get().addAutomaticIssue(
-                                        stack,
-                                        "android_anr",
-                                        occurredAtNanoseconds,
-                                        FTIssueCategory.ANR,
-                                        ErrorType.ANR_ERROR.toString(),
-                                        state,
-                                        false,
-                                        threadName,
-                                        null,
-                                        null);
+                                reportAnr(stack, occurredAtNanoseconds, threadName, state);
                             }
                         });
                 ANRDetectThreadPool.get().execute(runnable);
             }
         }
+    }
+
+    /** Shared reporting path for configured and legacy watchdog detectors. */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static void reportAnr(String stack, long occurredAtNanoseconds, String threadName, AppState state) {
+        if (!FTRUMConfigManager.get().isRumEnable()) {
+            return;
+        }
+        FTRUMInnerManager.get().addAutomaticIssue(stack, "android_anr", occurredAtNanoseconds,
+                FTIssueCategory.ANR, ErrorType.ANR_ERROR.toString(), state, false, threadName, null, null);
     }
 
     /**

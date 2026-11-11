@@ -336,7 +336,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                     crashTime,
                     FTIssueCategory.ANR,
                     ErrorType.ANR_CRASH.toString(),
-                    state,
+                    // Dump/callback state describes collection, not the blocking onset.
+                    AppState.UNKNOWN,
                     isPreCrash,
                     null,
                     property,

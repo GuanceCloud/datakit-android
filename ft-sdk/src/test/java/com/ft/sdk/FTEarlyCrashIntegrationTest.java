@@ -188,6 +188,46 @@ public class FTEarlyCrashIntegrationTest {
     }
 
     @Test
+    public void nativeAnrDoesNotUseDumpOrCallbackStateAsBlockingOnset() throws Exception {
+        assertNativeIssueState(true);
+    }
+
+    @Test
+    public void nativeCrashStillUsesCapturedCrashState() throws Exception {
+        assertNativeIssueState(false);
+    }
+
+    private void assertNativeIssueState(boolean anr) throws Exception {
+        FTRUMInnerManager rum = FTRUMInnerManager.get();
+        Object oldEnricher = field(FTRUMInnerManager.class, "issueFieldEnricher").get(rum);
+        AtomicReference<FTIssueInfo> captured = new AtomicReference<>();
+        File dump = File.createTempFile(anr ? "tombstone_anr" : "tombstone_native", ".dump");
+        config.setEnableTrackAppANR(true);
+        try {
+            field(FTRUMInnerManager.class, "issueFieldEnricher").set(rum,
+                    new FTIssueFieldEnricher(issue -> {
+                        captured.set(issue);
+                        return null;
+                    }));
+            for (boolean historical : new boolean[]{false, true}) {
+                for (AppState state : new AppState[]{AppState.RUN, AppState.BACKGROUND}) {
+                    captured.set(null);
+                    handler.uploadNativeCrashBackground(dump, state, historical, null);
+                    eventExecutor.getQueue().remove().run();
+                    assertEquals(anr ? "unknown" : state.toString(), captured.get().getAppState());
+                    assertEquals(historical, captured.get().isHistorical());
+                    assertEquals(anr ? FTIssueCategory.ANR : FTIssueCategory.CRASH,
+                            captured.get().getCategory());
+                    eventExecutor.getQueue().clear();
+                }
+            }
+        } finally {
+            field(FTRUMInnerManager.class, "issueFieldEnricher").set(rum, oldEnricher);
+            assertTrue(dump.delete());
+        }
+    }
+
+    @Test
     public void shortDelayIsUsedOnceAndLaterSchedulingStaysAtTenSeconds() throws Exception {
         seedPreviousCrash();
         SyncTaskManager.get().executeSyncPoll();

@@ -403,9 +403,14 @@ public class FTRUMInnerManager {
     }
 
     private RUMViewContext resolveRUMViewContext(AppState state) {
+        return resolveRUMViewContext(state, false);
+    }
+
+    private RUMViewContext resolveRUMViewContext(AppState state, boolean preferActiveView) {
         AppState currentState = state == null ? FTActivityManager.get().getAppState() : state;
         ActiveViewBean viewBean = activeView;
-        if (currentState != AppState.BACKGROUND && viewBean != null && !viewBean.isClose()) {
+        if ((preferActiveView || currentState != AppState.BACKGROUND)
+                && viewBean != null && !viewBean.isClose()) {
             return RUMViewContext.fromView(viewBean);
         }
 
@@ -1209,7 +1214,7 @@ public class FTRUMInnerManager {
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state, HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
         addErrorInternal(log, message, dateline, errorType, state, property, callBack,
-                new HashMap<String, Object>());
+                new HashMap<String, Object>(), false);
     }
 
     /**
@@ -1225,6 +1230,20 @@ public class FTRUMInnerManager {
                            String threadName,
                            HashMap<String, Object> property,
                            RunnerCompleteCallBack callBack) {
+        boolean watchdogAnr = !historical && category == FTIssueCategory.ANR
+                && ErrorType.ANR_ERROR.toString().equals(errorType);
+        if (watchdogAnr) {
+            ActiveViewBean view = activeView;
+            // Match the RUM background-event policy, independently of the onset state.
+            // Synthetic fallback Views do not constitute an active page receiving the Error.
+            if ((view == null || view.isClose())
+                    && FTActivityManager.get().getAppState() == AppState.BACKGROUND) {
+                if (callBack != null) {
+                    callBack.onComplete();
+                }
+                return;
+            }
+        }
         FTIssueInfo issue = new FTIssueInfo(
                 category,
                 errorType,
@@ -1237,7 +1256,7 @@ public class FTRUMInnerManager {
         HashMap<String, Object> additionalFields =
                 issueFieldEnricher.provideAdditionalFields(issue);
         addErrorInternal(log, message, dateline, errorType, state, property, callBack,
-                additionalFields);
+                additionalFields, watchdogAnr);
     }
 
     /**
@@ -1277,7 +1296,8 @@ public class FTRUMInnerManager {
                                   AppState state,
                                   HashMap<String, Object> property,
                                   RunnerCompleteCallBack callBack,
-                                  final HashMap<String, Object> additionalFields) {
+                                  final HashMap<String, Object> additionalFields,
+                                  boolean watchdogAnr) {
 
         try {
             boolean isPreCrash = property != null
@@ -1316,7 +1336,9 @@ public class FTRUMInnerManager {
                 fields.put(Constants.KEY_RUM_FOREGROUND_CRASH_FREE_DURATION, crashFreeDuration.foregroundDuration);
                 fields.put(Constants.KEY_RUM_BACKGROUND_CRASH_FREE_DURATION, crashFreeDuration.backgroundDuration);
             }
-            attachRUMRelative(tags, fields, true, state);
+            // Watchdog acceptance follows current View routing; error_situation still
+            // describes the probe's onset, including a background-to-foreground transition.
+            attachRUMRelative(tags, fields, true, watchdogAnr ? null : state, watchdogAnr);
             final String issueViewId = HashMapUtils.getString(
                     tags, Constants.KEY_RUM_VIEW_ID);
 
@@ -2102,7 +2124,12 @@ public class FTRUMInnerManager {
 
     void attachRUMRelative(HashMap<String, Object> tags, HashMap<String, Object> fields,
                            boolean withAction, AppState state) {
-        RUMViewContext viewContext = resolveRUMViewContext(state);
+        attachRUMRelative(tags, fields, withAction, state, false);
+    }
+
+    private void attachRUMRelative(HashMap<String, Object> tags, HashMap<String, Object> fields,
+                                  boolean withAction, AppState state, boolean preferActiveView) {
+        RUMViewContext viewContext = resolveRUMViewContext(state, preferActiveView);
         tags.put(Constants.KEY_RUM_VIEW_ID, viewContext.viewId);
         tags.put(Constants.KEY_RUM_VIEW_NAME, viewContext.viewName);
         tags.put(Constants.KEY_RUM_VIEW_REFERRER, viewContext.viewReferrer);

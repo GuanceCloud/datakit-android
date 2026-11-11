@@ -16,7 +16,8 @@ import java.util.Map;
  * <p>The SDK invokes the provider once when it constructs each automatically collected Crash or ANR
  * Error. Cache writes, retries and uploads do not invoke it again, and invocation does not guarantee
  * that the Error will later be sampled, cached or uploaded. Manual Errors and Network/WebView Errors
- * do not invoke this provider.</p>
+ * do not invoke this provider. Automatic watchdog ANRs filtered by the background-event policy
+ * are discarded before this provider is invoked.</p>
  *
  * <p>Returned values may contain strings, booleans and finite numbers. Providers should return no more than
  * 50 entries. To bound processing cost, the SDK inspects at most the first 50 entries encountered in map iteration

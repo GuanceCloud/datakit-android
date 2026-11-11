@@ -1,7 +1,5 @@
 package com.ft.sdk.internal.anr.historical;
 
-import android.app.ActivityManager.RunningAppProcessInfo;
-
 import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.bean.AppState;
@@ -61,7 +59,9 @@ final class DefaultHistoricalAnrReporter implements HistoricalAnrReporter {
         if (context.getCollectType() == CollectType.NOT_COLLECT) {
             return ReportResult.ALREADY_EXISTS;
         }
-        AppState state = resolveAppState(exit.getImportance());
+        // Exit importance describes process termination, not the blocking onset.
+        // Without an onset snapshot, do not label it as the Error's occurrence state.
+        AppState state = AppState.UNKNOWN;
         HashMap<String, Object> tags = new HashMap<>();
         tags.put(Constants.KEY_RUM_ERROR_TYPE, ErrorType.ANR_CRASH.toString());
         tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
@@ -105,25 +105,6 @@ final class DefaultHistoricalAnrReporter implements HistoricalAnrReporter {
             return ReportResult.ALREADY_EXISTS;
         }
         return ReportResult.FAILED;
-    }
-
-    private static AppState resolveAppState(int importance) {
-        // Importance is not a foreground/background threshold: foreground services
-        // have a smaller value than visible UI but do not imply a visible Activity.
-        switch (importance) {
-            case RunningAppProcessInfo.IMPORTANCE_FOREGROUND:
-            case RunningAppProcessInfo.IMPORTANCE_VISIBLE:
-                return AppState.RUN;
-            case RunningAppProcessInfo.IMPORTANCE_FOREGROUND_SERVICE:
-            case RunningAppProcessInfo.IMPORTANCE_PERCEPTIBLE:
-            case RunningAppProcessInfo.IMPORTANCE_SERVICE:
-            case RunningAppProcessInfo.IMPORTANCE_TOP_SLEEPING:
-            case RunningAppProcessInfo.IMPORTANCE_CANT_SAVE_STATE:
-            case RunningAppProcessInfo.IMPORTANCE_CACHED:
-                return AppState.BACKGROUND;
-            default:
-                return AppState.UNKNOWN;
-        }
     }
 
     @Override

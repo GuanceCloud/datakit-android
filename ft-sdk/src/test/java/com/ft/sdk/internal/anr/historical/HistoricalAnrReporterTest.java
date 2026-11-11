@@ -15,21 +15,18 @@ import static org.junit.Assert.assertTrue;
 public class HistoricalAnrReporterTest {
 
     @Test
-    public void reportDistinguishesVisibleUiFromServicesAndUnknownImportance() {
+    public void exitImportanceCannotDetermineBlockingOnsetState() {
         int[] importance = {100, 200, 125, 230, 300, 325, 350, 400, 0, 1000, -1, 999};
-        String[] states = {"run", "run", "background", "background", "background",
-                "background", "background", "background", "unknown", "unknown", "unknown", "unknown"};
         HistoricalRumContext context = new HistoricalRumContext(
                 "com.example.app", "run", 1_000, "session", "view", "Home",
                 10_000_000_000L, 0, false);
         for (int i = 0; i < importance.length; i++) {
             RecordingSink sink = new RecordingSink();
-            final String expected = states[i];
             DefaultHistoricalAnrReporter reporter = new DefaultHistoricalAnrReporter(sink,
-                    (stack, time, state, tags, fields) -> assertEquals(expected, state.toString()));
+                    (stack, time, state, tags, fields) -> assertEquals("unknown", state.toString()));
             reporter.report(new ProcessExitRecord("com.example.app", 123, 20_000,
                     ProcessExitRecord.REASON_ANR, importance[i], null), context, "blocked", "dedupe");
-            assertEquals("importance=" + importance[i], expected,
+            assertEquals("importance=" + importance[i], "unknown",
                     sink.tags.get(Constants.KEY_RUM_ERROR_SITUATION));
         }
     }
@@ -115,7 +112,7 @@ public class HistoricalAnrReporterTest {
                         called[0] = true;
                         assertEquals("blocked", stack);
                         assertEquals(20_000_000_000L, occurredAtNs);
-                        assertEquals("run", state.toString());
+                        assertEquals("unknown", state.toString());
                         fields.put("provider_field", "historical-anr");
                     }
                 });

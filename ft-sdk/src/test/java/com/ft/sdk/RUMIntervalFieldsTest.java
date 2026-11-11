@@ -5,6 +5,7 @@ import com.ft.sdk.garble.threadpool.*;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.issue.FTIssueFieldEnricher;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -407,6 +408,112 @@ public class RUMIntervalFieldsTest {
 
     @Test public void historicalCrashDoesNotResetCurrentProcessStateOrCrashFreeCounters() throws Exception {
         assertAutomaticCrashState(true);
+    }
+
+    @Test public void backgroundWatchdogIsDroppedEvenWithSyntheticBackgroundView() throws Exception {
+        int[] providerCalls = {0};
+        replace(FTRUMInnerManager.class, rum, "issueFieldEnricher", new FTIssueFieldEnricher(issue -> {
+            providerCalls[0]++;
+            return null;
+        }));
+        FTActivityManager manager = FTActivityManager.get();
+        manager.appForeground();
+        rum.startAutomaticView(new Object(), "screen", null);
+        manager.appBackGround();
+        rum.onAppBackground();
+        assertTrue(active().isClose());
+        Field synthetic = FTRUMInnerManager.class.getDeclaredField("syntheticViewMap");
+        synthetic.setAccessible(true);
+        assertTrue(((Map<?, ?>) synthetic.get(rum)).containsKey(Constants.VIEW_NAME_BACKGROUND));
+        String session = rum.getCurrentViewSession().get(Constants.KEY_RUM_SESSION_ID).toString();
+        int[] completions = {0};
+        runQueuedEvents(() -> rum.addAutomaticIssue("stack", "anr", Utils.getCurrentNanoTime(),
+                FTIssueCategory.ANR, ErrorType.ANR_ERROR.toString(), AppState.RUN,
+                false, "main", null, () -> completions[0]++));
+        assertEquals(0, providerCalls[0]);
+        assertEquals(1, completions[0]);
+        assertFalse(tags.containsKey("error"));
+        assertEquals(session, rum.getCurrentViewSession().get(Constants.KEY_RUM_SESSION_ID));
+    }
+
+    @Test public void backgroundWatchdogWithoutAnyViewIsDropped() throws Exception {
+        FTActivityManager.get().appBackGround();
+        int[] completions = {0};
+        runQueuedEvents(() -> rum.addAutomaticIssue("stack", "anr", Utils.getCurrentNanoTime(),
+                FTIssueCategory.ANR, ErrorType.ANR_ERROR.toString(), AppState.BACKGROUND,
+                false, "main", null, () -> completions[0]++));
+        assertEquals(1, completions[0]);
+        assertFalse(tags.containsKey("error"));
+    }
+
+    @Test public void activeManualViewReceivesWatchdogAnrEvenInBackground() throws Exception {
+        FTActivityManager.get().appForeground();
+        rum.startView("manual-screen");
+        String viewId = active().getId();
+        FTActivityManager.get().appBackGround();
+        rum.onAppBackground();
+        assertFalse(active().isClose());
+        runQueuedEvents(() -> reportWatchdog(AppState.BACKGROUND));
+        assertEquals(viewId, tags.get("error").get(Constants.KEY_RUM_VIEW_ID));
+        assertEquals("background", tags.get("error").get(Constants.KEY_RUM_ERROR_SITUATION));
+    }
+
+    @Test public void foregroundReturnKeepsBackgroundOnsetButRoutesToCurrentView() throws Exception {
+        FTActivityManager.get().appBackGround();
+        FTActivityManager.get().appForeground();
+        rum.startView("returned-screen");
+        String viewId = active().getId();
+        runQueuedEvents(() -> reportWatchdog(AppState.BACKGROUND));
+        assertEquals(viewId, tags.get("error").get(Constants.KEY_RUM_VIEW_ID));
+        assertEquals("background", tags.get("error").get(Constants.KEY_RUM_ERROR_SITUATION));
+    }
+
+    @Test public void startupWatchdogStillUsesLaunchContext() throws Exception {
+        assertEquals(AppState.STARTUP, FTActivityManager.get().getAppState());
+        runQueuedEvents(() -> reportWatchdog(AppState.STARTUP));
+        assertEquals(Constants.VIEW_NAME_APPLICATION_LAUNCH,
+                tags.get("error").get(Constants.KEY_RUM_VIEW_NAME));
+        assertEquals("startup", tags.get("error").get(Constants.KEY_RUM_ERROR_SITUATION));
+    }
+
+    @Test public void backgroundPolicyDoesNotDropManualErrorsOrNativeAnrs() throws Exception {
+        FTActivityManager.get().appBackGround();
+        runQueuedEvents(() -> rum.addError("manual", "manual", ErrorType.ANR_ERROR.toString(), AppState.BACKGROUND));
+        assertEquals("manual", fields.get("error").get(Constants.KEY_RUM_ERROR_MESSAGE));
+        for (boolean historical : new boolean[]{false, true}) {
+            fields.remove("error");
+            HashMap<String, Object> property = new HashMap<>();
+            property.put(FTExceptionHandler.IS_PRE_CRASH, historical);
+            runQueuedEvents(() -> rum.addAutomaticIssue("native", "native-anr", Utils.getCurrentNanoTime(),
+                    FTIssueCategory.ANR, ErrorType.ANR_CRASH.toString(), AppState.UNKNOWN,
+                    historical, null, property, null));
+            assertEquals("native-anr", fields.get("error").get(Constants.KEY_RUM_ERROR_MESSAGE));
+        }
+    }
+
+    private void reportWatchdog(AppState onsetState) {
+        rum.addAutomaticIssue("stack", "anr", Utils.getCurrentNanoTime(), FTIssueCategory.ANR,
+                ErrorType.ANR_ERROR.toString(), onsetState, false, "main", null, null);
+    }
+
+    private void runQueuedEvents(Runnable action) throws Exception {
+        ThreadPoolExecutor queued = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>()) {
+            @Override public void execute(Runnable task) { getQueue().add(task); }
+        };
+        replace(BaseThreadPool.class, EventConsumerThreadPool.get(), "executor", queued);
+        try {
+            action.run();
+            int remaining = 100;
+            Runnable task;
+            while ((task = queued.getQueue().poll()) != null) {
+                assertTrue("Unexpected event queue loop", remaining-- > 0);
+                task.run();
+            }
+        } finally {
+            queued.shutdownNow();
+            replace(BaseThreadPool.class, EventConsumerThreadPool.get(), "executor", eventExecutor);
+        }
     }
 
     private void assertAutomaticCrashState(boolean historical) throws Exception {
