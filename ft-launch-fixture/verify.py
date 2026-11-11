@@ -61,6 +61,16 @@ def main():
         output = run(*command)
         if "Error" in output or "Exception" in output:
             raise RuntimeError(output[-3000:])
+        # Querying the control provider before Activity resume can itself start the process.
+        # Observe the system first so the probe cannot change the launch being measured.
+        deadline = time.monotonic() + 15
+        while time.monotonic() < deadline:
+            activities = run("shell", "dumpsys", "activity", "activities")
+            if any(PACKAGE in line and ("mResumedActivity:" in line or "topResumedActivity=" in line)
+                   for line in activities.splitlines()):
+                return
+            time.sleep(.2)
+        raise AssertionError("Activity did not resume without a provider probe")
 
     def completed(expected):
         report = wait_for(lambda s: s["first_draw_done"] and len(s["cold_actions"]) == 1,
@@ -73,7 +83,17 @@ def main():
         action["duration_ns"] = int(duration.group(1))
         segments = sum(report[k] for k in ["pre_application_duration_ns", "application_duration_ns",
                                           "first_frame_duration_ns"])
-        assert action["duration_ns"] == segments, report
+        assert action["duration_ns"] > 0, report
+        if report["api"] >= 29 and report["first_activity_ns"] > 0:
+            assert action["duration_ns"] == segments, report
+        elif report["api"] < 29:
+            assert report["first_activity_ns"] == 0, report
+            assert report["application_duration_ns"] == 0, report
+            assert report["first_frame_duration_ns"] == 0, report
+            assert "app_application_init_time=" not in action["line_protocol"], report
+            assert "app_first_frame_init_time=" not in action["line_protocol"], report
+            if report["api"] < 24:
+                assert "app_pre_application_init_time=" not in action["line_protocol"], report
         return report
 
     def save(name, report, endpoint):
@@ -97,6 +117,18 @@ def main():
         wait_for(lambda s: not s["foreground"], "foreground control must enter background")
         assert status()["launch_type"] == "foreground"
         save("foreground_control", foreground, "automatic_first_draw")
+        time.sleep(11)
+        start()
+        warm = wait_for(lambda s: len(s["hot_actions"]) == 1, "one hot Action after background")
+        assert len(warm["cold_actions"]) == 1 and warm["current_activity"], warm
+        assert warm["app_state"] == "run", warm
+        assert re.search(r"(?:[, ])duration=[1-9]\d*(?:i)?(?:[, ]|$)", warm["hot_actions"][0]), warm
+        control("repeat_hook")
+        run("shell", "input", "keyevent", "KEYCODE_HOME")
+        stopped = wait_for(lambda s: not s["foreground"], "repeat hook must not unbalance Activity count")
+        assert stopped["app_state"] == "background", stopped
+        assert len(stopped["cold_actions"]) == 1 and len(stopped["hot_actions"]) == 1, stopped
+        save("hot_start_and_repeat_hook", stopped, "automatic_resume")
 
         reset()
         pending = wait_for(lambda s: s["application_ns"] != 0 and s["launch_type"] == "background",
@@ -163,6 +195,16 @@ def main():
         control("release")
         save("foreground_background_foreground_before_first_draw", completed(MIXED),
              "automatic_first_draw")
+        reset()
+        start(gated=True)
+        wait_for(lambda s: s["foreground"] and s["listener_registered"], "held startup before recreation")
+        control("recreate")
+        recreated = wait_for(lambda s: sum(e["event"] == "created" for e in s["events"]) == 2
+                             and s["listener_registered"], "Activity recreated with pending draw")
+        assert recreated["launch_type"] == "foreground" and not recreated["first_draw_done"], recreated
+        assert recreated["current_activity"] and recreated["cold_actions"] == [], recreated
+        control("release")
+        save("configuration_recreation_before_first_draw", completed("foreground"), "automatic_first_draw")
     except Exception as exc:
         (args.output / "failure.txt").write_text(str(exc))
         raise

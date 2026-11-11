@@ -44,6 +44,7 @@ import okhttp3.WebSocketListener;
  */
 public class FTAutoTrack {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "AutoTrack";
+    private static boolean lifecycleCallbacksRegistered;
 
 
     /**
@@ -52,9 +53,12 @@ public class FTAutoTrack {
      * <p>
      * This method was originally called by the FT Plugin
      */
-    public static void startApp(Application app) {
+    public static synchronized void startApp(Application app) {
         try {
-            FTAppStartCounter.get().appOnCreate(System.nanoTime(), app != null ? app : getApplication());
+            long startTime = System.nanoTime();
+            FTAppStartCounter.get().captureLegacyStart(startTime);
+            FTAppStartCounter.get().appOnCreate(startTime, app != null ? app : getApplication());
+            if (lifecycleCallbacksRegistered) return;
             LogUtils.d(TAG, "startApp:" + app);
             //Determine if it is the main process
             FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
@@ -62,9 +66,11 @@ public class FTAutoTrack {
                 Class<?> clazz = PackageUtils.getSophixClass();
                 if (clazz == null || !clazz.isInstance(app)) {
                     app.registerActivityLifecycleCallbacks(life);
+                    lifecycleCallbacksRegistered = true;
                 }
             } else {
                 getApplication().registerActivityLifecycleCallbacks(life);
+                lifecycleCallbacksRegistered = true;
             }
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override

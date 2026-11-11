@@ -27,6 +27,8 @@ public class LaunchControlProvider extends ContentProvider {
         FutureTask<Bundle> task = new FutureTask<>(() -> {
             if ("release".equals(method)) {
                 LaunchActivity.releaseFirstDraw();
+            } else if ("recreate".equals(method)) {
+                LaunchActivity.recreateCurrent();
             } else if ("repeat_hook".equals(method)) {
                 FTAutoTrack.startApp((android.app.Application) getContext().getApplicationContext());
                 LaunchApplication.event("repeat_hook");

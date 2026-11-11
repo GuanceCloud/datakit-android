@@ -22,6 +22,8 @@ and stops its process on completion. It reads the actual stored cold-start Actio
 line protocol and writes JSON evidence for each scenario:
 
 - Foreground-only startup, including classification remaining frozen after completion.
+- A background interval over 10 seconds followed by exactly one hot Action, current Activity tracking, and balanced foreground/background state after repeated hooks.
+- Activity recreation before first draw, retaining foreground classification and one eventual cold Action.
 - Headless background startup: `background`, no Activity, no first draw, and no automatic cold Action.
 - An explicit **test-only** background completion to verify `background` serialization and freezing.
 - Background startup, repeated Application hook, then foreground and an automatic first draw:
@@ -30,6 +32,10 @@ line protocol and writes JSON evidence for each scenario:
   then release: still `background` because the launch originated in the background.
 - Foreground startup with drawing held by an `OnPreDrawListener`, Home/background,
   return to the same Activity, then release: automatic `foreground_and_background`.
+
+On API 21–28, the runner verifies that unavailable Activity creation timing is omitted
+from both the counter and cold Action. API 21–23 also omit pre-Application timing.
+On API 29+, complete Activity-stage durations must sum to the cold-start duration.
 
 A headless background process has no Activity first-draw endpoint. The explicit
 background endpoint is deliberately identified as `explicit_test_completion` in
