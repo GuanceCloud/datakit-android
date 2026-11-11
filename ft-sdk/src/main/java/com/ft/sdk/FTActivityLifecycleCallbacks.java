@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Process;
 
 import androidx.annotation.NonNull;
@@ -15,7 +18,9 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.FpsUtils;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -37,6 +42,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     private final WindowCallbackTracker mDispatcherReceiver = new WindowCallbackTracker();
 
     private static int activityCount = 0;
+    private final Handler legacyHandler = new Handler(Looper.getMainLooper());
+    private final Map<Activity, Runnable> legacyResumes = new IdentityHashMap<>();
 
     private final FTFragmentLifecycleHelper mFragmentLifecycleHelper = new FTFragmentLifecycleHelper();
 
@@ -50,6 +57,9 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
      */
     @Override
     public void onActivityCreated(@NonNull Activity activity, @NonNull Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT < 29) {
+            mAppRestartCallback.onLegacyCreated(activity);
+        }
     }
 
     /**
@@ -71,6 +81,9 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
      */
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
+        if (Build.VERSION.SDK_INT < 29) {
+            mAppRestartCallback.onPreStart();
+        }
         activityCount++;
         if (activityCount > 0) {
             FTActivityManager.get().appForeground();
@@ -118,6 +131,18 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
      */
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
+        if (Build.VERSION.SDK_INT < 29) {
+            mAppRestartCallback.onPreResume(activity);
+            cancelLegacyResume(activity);
+            // Observe a draw immediately; the fallback also retries roots installed after super.onResume().
+            mAppRestartCallback.registerFirstFrame(activity);
+            Runnable completion = () -> {
+                legacyResumes.remove(activity);
+                mAppRestartCallback.onPostResume(activity);
+            };
+            legacyResumes.put(activity, completion);
+            legacyHandler.postAtFrontOfQueue(completion);
+        }
 
         //page open data insertion
         FTRUMConfigManager manager = FTRUMConfigManager.get();
@@ -169,6 +194,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
      */
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
+        cancelLegacyResume(activity);
         FTAppStartCounter.get().cancelFirstFrame(activity);
         //page close data insertion
         FTRUMConfigManager manager = FTRUMConfigManager.get();
@@ -198,7 +224,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
         activityCount--;
-        if (activityCount == 0 && !hasForegroundSiblingProcess(activity)) {
+        if (activityCount == 0 && !activity.isChangingConfigurations()
+                && !hasForegroundSiblingProcess(activity)) {
             long boundary = FTActivityManager.get().appBackGround();
             mAppRestartCallback.onEnterBackground();
             FTAppStartCounter.get().onAppBackground();
@@ -233,6 +260,18 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
      */
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
+        if (Build.VERSION.SDK_INT < 29) {
+            cancelLegacyResume(activity);
+            mAppRestartCallback.onPostDestroy(activity);
+            if (FTActivityManager.get().curentActivity() == activity) {
+                FTActivityManager.get().setCurrentActivity(null);
+            }
+        }
+    }
+
+    private void cancelLegacyResume(Activity activity) {
+        Runnable pending = legacyResumes.remove(activity);
+        if (pending != null) legacyHandler.removeCallbacks(pending);
     }
 
     /**

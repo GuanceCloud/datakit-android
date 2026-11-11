@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -97,6 +98,12 @@ class LifeCircleTraceCallback {
         }
     }
 
+    void onLegacyCreated(Activity activity) {
+        // Track ownership without inventing an onCreate entry timestamp.
+        mCreateMap.put(activity, new long[]{0, 0});
+        FTAppStartCounter.get().onLegacyActivityCreated();
+    }
+
     /**
      * After {@link Activity#onCreate(Bundle)}
      *
@@ -145,18 +152,7 @@ class LifeCircleTraceCallback {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         FTRUMConfig config = manager.getConfig();
 
-        FTAppStartCounter.get().checkFirstFrameStart(activity, new Runnable() {
-            @Override
-            public void run() {
-                FTAppStartCounter.get().coldStart(System.nanoTime());
-                // RUM may have been initialized after this Activity resumed.
-                FTRUMConfigManager currentManager = FTRUMConfigManager.get();
-                if (currentManager.isRumEnable()
-                        && currentManager.getConfig().isEnableTraceUserAction()) {
-                    FTAppStartCounter.get().coldStartUpload();
-                }
-            }
-        });
+        registerFirstFrame(activity);
 
         // Already sleeping
         if (alreadySleep) {
@@ -178,6 +174,22 @@ class LifeCircleTraceCallback {
         if (!mInited) {
             mInited = true;
         }
+    }
+
+    void registerFirstFrame(Activity activity) {
+        FTAppStartCounter.get().checkFirstFrameStart(activity, new Runnable() {
+            @Override
+            public void run() {
+                FTAppStartCounter.get().coldStart(System.nanoTime());
+                // RUM may have been initialized after this Activity resumed.
+                FTRUMConfigManager currentManager = FTRUMConfigManager.get();
+                if (currentManager.isRumEnable()
+                        && currentManager.getConfig().isEnableTraceUserAction()) {
+                    FTAppStartCounter.get().coldStartUpload();
+                }
+            }
+        });
+
     }
 
     public void onPreResume(Activity activity) {
@@ -205,7 +217,8 @@ class LifeCircleTraceCallback {
             FTAppStartCounter.get().cancelFirstFrame((Activity) context);
         }
         mCreateMap.remove(context);
-        if (mCreateMap.isEmpty()) {
+        // Legacy Started callbacks must still time a warm return after all Activities were destroyed.
+        if (mCreateMap.isEmpty() && Build.VERSION.SDK_INT >= 29) {
             mInited = false;
             LogUtils.d(TAG, "Application all close");
         }

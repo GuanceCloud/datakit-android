@@ -214,7 +214,8 @@ public class FTAppStartCounterTest {
 
             Assert.assertTrue(launchFromBackground);
             Assert.assertEquals(firstAppOnCreate, applicationOnCreateTimeLine);
-            Assert.assertEquals(preApplicationDuration, applicationPreOnCreateDuration);
+            // API 23 has no reliable process origin for a pre-Application breakdown.
+            Assert.assertEquals(0L, applicationPreOnCreateDuration);
             Assert.assertEquals(duration, coldStartDuration);
         } finally {
             FTApplication.APP_START_TIME = originalAppStartTime;

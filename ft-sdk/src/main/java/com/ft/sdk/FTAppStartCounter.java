@@ -3,6 +3,7 @@ package com.ft.sdk;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
+import android.os.Build;
 import android.view.View;
 
 import com.ft.sdk.garble.utils.Constants;
@@ -92,6 +93,8 @@ class FTAppStartCounter {
      * Whether the process was started while the app was not in foreground.
      */
     private boolean launchFromBackground = false;
+    private boolean legacyActivityObserved;
+    private long legacyStartTime;
 
     private boolean foregroundDuringLaunch = false;
 
@@ -118,13 +121,17 @@ class FTAppStartCounter {
      */
     void coldStart(long coldStartEndTimeLine) {
         firstDrawDone.set(true);
-        this.coldStartTimeLineForNanoDuration = Utils.getAppStartTimeNs();
+        this.coldStartTimeLineForNanoDuration = Build.VERSION.SDK_INT < 24 && legacyStartTime > 0
+                ? legacyStartTime : Utils.getAppStartTimeNs();
         this.coldStartDuration = coldStartEndTimeLine - coldStartTimeLineForNanoDuration;
         this.coldStartTimeLine = Utils.getCurrentNanoTime() - coldStartDuration;
 
-        this.applicationPreOnCreateDuration = applicationOnCreateTimeLine - coldStartTimeLineForNanoDuration;
-        this.applicationOnCreateDuration = firstActivityPreOnActivityTimeline - applicationOnCreateTimeLine;
-        this.firsDrawnDuration = coldStartEndTimeLine - firstActivityPreOnActivityTimeline;
+        this.applicationPreOnCreateDuration = Build.VERSION.SDK_INT >= 24
+                ? applicationOnCreateTimeLine - coldStartTimeLineForNanoDuration : 0;
+        this.applicationOnCreateDuration = firstActivityPreOnActivityTimeline > 0
+                ? firstActivityPreOnActivityTimeline - applicationOnCreateTimeLine : 0;
+        this.firsDrawnDuration = firstActivityPreOnActivityTimeline > 0
+                ? coldStartEndTimeLine - firstActivityPreOnActivityTimeline : 0;
 
         LogUtils.d(TAG, "coldStart:" + coldStartDuration
                 + ",coldTimeLine:" + coldStartTimeLineForNanoDuration
@@ -233,6 +240,18 @@ class FTAppStartCounter {
         }
     }
 
+    void captureLegacyStart(long nanoTimeLine) {
+        if (legacyStartTime == 0 && !firstDrawDone.get()) {
+            legacyStartTime = nanoTimeLine;
+        }
+    }
+
+    void onLegacyActivityCreated() {
+        if (!firstDrawDone.get()) {
+            legacyActivityObserved = true;
+        }
+    }
+
     /**
      * Record Application.onCreate() timestamp
      *
@@ -258,7 +277,7 @@ class FTAppStartCounter {
             applicationOnCreateCompletedTimeLine = nanoTimeLine;
             LogUtils.d(TAG, "appOnCreateCompleted:" + nanoTimeLine
                     + ",firstActivityPreCreate:" + firstActivityPreOnActivityTimeline);
-            if (firstActivityPreOnActivityTimeline == 0 && !foregroundDuringLaunch) {
+            if (firstActivityPreOnActivityTimeline == 0 && !legacyActivityObserved && !foregroundDuringLaunch) {
                 launchFromBackground = true;
                 LogUtils.d(TAG, "launchFromBackground:true,noActivityAfterApplication");
             }
