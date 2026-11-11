@@ -33,7 +33,10 @@ public final class LaunchAcceptanceProbe {
         report.put("launch_type", type());
         report.put("foreground", FTActivityLifecycleCallbacks.isAppInForeground());
         report.put("first_draw_done", ((AtomicBoolean) field(counter, "firstDrawDone")).get());
-        report.put("listener_registered", ((AtomicBoolean) field(counter, "firstDrawListenerRegistered")).get());
+        report.put("listener_registered", !((java.util.Map<?, ?>) field(counter, "firstDrawListeners")).isEmpty());
+        report.put("api", android.os.Build.VERSION.SDK_INT);
+        report.put("current_activity", FTActivityManager.get().curentActivity() != null);
+        report.put("app_state", FTActivityManager.get().getAppState().toString());
         report.put("application_ns", field(counter, "applicationOnCreateTimeLine"));
         report.put("first_activity_ns", field(counter, "firstActivityPreOnActivityTimeline"));
         report.put("sdk_version", BuildConfig.FT_SDK_VERSION);
@@ -41,9 +44,12 @@ public final class LaunchAcceptanceProbe {
         report.put("application_duration_ns", field(counter, "applicationOnCreateDuration"));
         report.put("first_frame_duration_ns", field(counter, "firsDrawnDuration"));
         JSONArray actions = new JSONArray();
+        JSONArray hotActions = new JSONArray();
         for (SyncData data : FTDBManager.get().queryDataByDescLimit(0)) {
             String line = data.getDataString();
-            if (line == null || !line.contains("action_type=launch_cold")) continue;
+            if (line == null) continue;
+            if (line.contains("action_type=launch_hot")) hotActions.put(line);
+            if (!line.contains("action_type=launch_cold")) continue;
             Matcher matcher = TYPE.matcher(line);
             JSONObject action = new JSONObject();
             action.put("launch_type", matcher.find() ? matcher.group(1) : "missing");
@@ -51,6 +57,7 @@ public final class LaunchAcceptanceProbe {
             actions.put(action);
         }
         report.put("cold_actions", actions);
+        report.put("hot_actions", hotActions);
         return report;
     }
 

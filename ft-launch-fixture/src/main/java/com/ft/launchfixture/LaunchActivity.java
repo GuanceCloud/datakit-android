@@ -21,6 +21,12 @@ public class LaunchActivity extends Activity {
         getWindow().getDecorView().getViewTreeObserver().addOnPreDrawListener(() -> allowDraw);
     }
 
+    public static void recreateCurrent() {
+        LaunchActivity activity = current.get();
+        if (activity == null) throw new IllegalStateException("No current Activity");
+        activity.recreate();
+    }
+
     public static void releaseFirstDraw() {
         LaunchActivity activity = current.get();
         if (activity == null) throw new IllegalStateException("No pending Activity");
